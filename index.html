@@ -45,19 +45,17 @@
             position: relative;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background:
-                radial-gradient(circle at 10% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(46, 204, 113, 0.1) 0%, transparent 20%);
-            pointer-events: none;
-            z-index: -1;
-        }
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 10% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(46, 204, 113, 0.1) 0%, transparent 20%);
+                pointer-events: none;
+                z-index: -1;
+            }
 
         /* ==================== 布局系统 ==================== */
         .container {
@@ -87,20 +85,20 @@
             overflow: hidden;
         }
 
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s;
-        }
+            header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                transition: left 0.5s;
+            }
 
-        header:hover::before {
-            left: 100%;
-        }
+            header:hover::before {
+                left: 100%;
+            }
 
         h1 {
             font-size: 2.5rem;
@@ -130,16 +128,16 @@
             flex-wrap: wrap;
         }
 
-        .license-info a {
-            color: var(--light);
-            text-decoration: none;
-            border-bottom: 1px dotted var(--border);
-        }
+            .license-info a {
+                color: var(--light);
+                text-decoration: none;
+                border-bottom: 1px dotted var(--border);
+            }
 
-        .license-info a:hover {
-            opacity: 1;
-            border-bottom-color: var(--primary);
-        }
+                .license-info a:hover {
+                    opacity: 1;
+                    border-bottom-color: var(--primary);
+                }
 
         /* ==================== 统计面板 ==================== */
         .stats {
@@ -175,18 +173,18 @@
             position: relative;
         }
 
-        .stat-card:hover {
-            transform: translateX(5px);
-            background: rgba(0, 0, 0, 0.3);
-        }
+            .stat-card:hover {
+                transform: translateX(5px);
+                background: rgba(0, 0, 0, 0.3);
+            }
 
-        .stat-card h3 {
-            font-size: 0.9rem;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+            .stat-card h3 {
+                font-size: 0.9rem;
+                margin-bottom: 6px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
 
         .stat-value {
             font-weight: bold;
@@ -212,16 +210,16 @@
             overflow: hidden;
         }
 
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
+            .progress-fill::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                animation: shimmer 2s infinite;
+            }
 
         @keyframes shimmer {
             0% {
@@ -338,46 +336,46 @@
             position: relative;
         }
 
-        .event-item::before {
-            content: '•';
-            position: absolute;
-            left: -2px;
-            color: var(--primary);
-            font-weight: bold;
-        }
+            .event-item::before {
+                content: '•';
+                position: absolute;
+                left: -2px;
+                color: var(--primary);
+                font-weight: bold;
+            }
 
-        .event-item.good {
-            border-left-color: var(--secondary);
-            background: rgba(46, 204, 113, 0.15);
-        }
+            .event-item.good {
+                border-left-color: var(--secondary);
+                background: rgba(46, 204, 113, 0.15);
+            }
 
-        .event-item.bad {
-            border-left-color: var(--danger);
-            background: rgba(231, 76, 60, 0.15);
-        }
+            .event-item.bad {
+                border-left-color: var(--danger);
+                background: rgba(231, 76, 60, 0.15);
+            }
 
-        .event-item.neutral {
-            border-left-color: var(--warning);
-            background: rgba(243, 156, 18, 0.15);
-        }
+            .event-item.neutral {
+                border-left-color: var(--warning);
+                background: rgba(243, 156, 18, 0.15);
+            }
 
-        .event-item.story {
-            border-left-color: var(--purple);
-            background: rgba(155, 89, 182, 0.2);
-        }
+            .event-item.story {
+                border-left-color: var(--purple);
+                background: rgba(155, 89, 182, 0.2);
+            }
 
-        .event-item.important {
-            border-left-color: var(--pink);
-            background: rgba(233, 30, 99, 0.2);
-            font-weight: bold;
-        }
+            .event-item.important {
+                border-left-color: var(--pink);
+                background: rgba(233, 30, 99, 0.2);
+                font-weight: bold;
+            }
 
-        .event-item .timestamp {
-            font-size: 0.7rem;
-            opacity: 0.6;
-            margin-right: 6px;
-            font-family: monospace;
-        }
+            .event-item .timestamp {
+                font-size: 0.7rem;
+                opacity: 0.6;
+                margin-right: 6px;
+                font-family: monospace;
+            }
 
         /* ==================== 课程表 ==================== */
         .schedule {
@@ -391,11 +389,11 @@
             overflow-y: auto;
         }
 
-        .schedule h3 {
-            font-size: 1rem;
-            margin-bottom: 10px;
-            color: var(--cyan);
-        }
+            .schedule h3 {
+                font-size: 1rem;
+                margin-bottom: 10px;
+                color: var(--cyan);
+            }
 
         .schedule-item {
             background: rgba(0, 0, 0, 0.2);
@@ -409,21 +407,21 @@
             align-items: center;
         }
 
-        .schedule-item.completed {
-            opacity: 0.5;
-            text-decoration: line-through;
-            border-left-color: var(--secondary);
-        }
+            .schedule-item.completed {
+                opacity: 0.5;
+                text-decoration: line-through;
+                border-left-color: var(--secondary);
+            }
 
-        .schedule-item.missed {
-            border-left-color: var(--danger);
-            background: rgba(231, 76, 60, 0.2);
-        }
+            .schedule-item.missed {
+                border-left-color: var(--danger);
+                background: rgba(231, 76, 60, 0.2);
+            }
 
-        .schedule-item .time {
-            font-weight: bold;
-            color: var(--cyan);
-        }
+            .schedule-item .time {
+                font-weight: bold;
+                color: var(--cyan);
+            }
 
         /* ==================== 事件区域 ==================== */
         .events {
@@ -448,45 +446,45 @@
             transition: all 0.3s ease;
         }
 
-        .event-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
+            .event-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
 
-        .event-card h3 {
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+            .event-card h3 {
+                font-size: 0.95rem;
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
 
-        .event-card p {
-            font-size: 0.85rem;
-            line-height: 1.4;
-            opacity: 0.9;
-        }
+            .event-card p {
+                font-size: 0.85rem;
+                line-height: 1.4;
+                opacity: 0.9;
+            }
 
-        .event-card.relationship {
-            border-top-color: var(--purple);
-        }
+            .event-card.relationship {
+                border-top-color: var(--purple);
+            }
 
-        .event-card.achievement {
-            border-top-color: var(--secondary);
-        }
+            .event-card.achievement {
+                border-top-color: var(--secondary);
+            }
 
-        .event-card.economy {
-            border-top-color: var(--cyan);
-        }
+            .event-card.economy {
+                border-top-color: var(--cyan);
+            }
 
-        .event-card.mental {
-            border-top-color: var(--pink);
-        }
+            .event-card.mental {
+                border-top-color: var(--pink);
+            }
 
-        .event-card .progress-bar {
-            height: 6px;
-            margin-top: 8px;
-        }
+            .event-card .progress-bar {
+                height: 6px;
+                margin-top: 8px;
+            }
 
         /* ==================== 操作区域 ==================== */
         .actions {
@@ -518,79 +516,79 @@
             overflow: hidden;
         }
 
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.4s;
-        }
+            .action-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.4s;
+            }
 
-        .action-btn:hover::before {
-            left: 100%;
-        }
+            .action-btn:hover::before {
+                left: 100%;
+            }
 
-        .action-btn:hover {
-            background: rgba(52, 152, 219, 0.4);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-        }
+            .action-btn:hover {
+                background: rgba(52, 152, 219, 0.4);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            }
 
-        .action-btn:active {
-            transform: translateY(0);
-        }
+            .action-btn:active {
+                transform: translateY(0);
+            }
 
-        .action-btn.primary {
-            background: rgba(46, 204, 113, 0.2);
-            border-color: var(--secondary);
-        }
+            .action-btn.primary {
+                background: rgba(46, 204, 113, 0.2);
+                border-color: var(--secondary);
+            }
 
-        .action-btn.primary:hover {
-            background: rgba(46, 204, 113, 0.4);
-        }
+                .action-btn.primary:hover {
+                    background: rgba(46, 204, 113, 0.4);
+                }
 
-        .action-btn.danger {
-            background: rgba(231, 76, 60, 0.2);
-            border-color: var(--danger);
-        }
+            .action-btn.danger {
+                background: rgba(231, 76, 60, 0.2);
+                border-color: var(--danger);
+            }
 
-        .action-btn.danger:hover {
-            background: rgba(231, 76, 60, 0.4);
-        }
+                .action-btn.danger:hover {
+                    background: rgba(231, 76, 60, 0.4);
+                }
 
-        .action-btn.warning {
-            background: rgba(243, 156, 18, 0.2);
-            border-color: var(--warning);
-        }
+            .action-btn.warning {
+                background: rgba(243, 156, 18, 0.2);
+                border-color: var(--warning);
+            }
 
-        .action-btn.purple {
-            background: rgba(155, 89, 182, 0.2);
-            border-color: var(--purple);
-        }
+            .action-btn.purple {
+                background: rgba(155, 89, 182, 0.2);
+                border-color: var(--purple);
+            }
 
-        .action-btn.cyan {
-            background: rgba(0, 188, 212, 0.2);
-            border-color: var(--cyan);
-        }
+            .action-btn.cyan {
+                background: rgba(0, 188, 212, 0.2);
+                border-color: var(--cyan);
+            }
 
-        .action-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none !important;
-        }
+            .action-btn:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+                transform: none !important;
+            }
 
-        .action-btn:disabled::before {
-            display: none;
-        }
+                .action-btn:disabled::before {
+                    display: none;
+                }
 
-        .action-btn .hotkey {
-            font-size: 0.7rem;
-            opacity: 0.6;
-            margin-left: 4px;
-        }
+            .action-btn .hotkey {
+                font-size: 0.7rem;
+                opacity: 0.6;
+                margin-left: 4px;
+            }
 
         /* ==================== 成就区域 ==================== */
         .achievements {
@@ -607,14 +605,14 @@
             overflow-y: auto;
         }
 
-        .achievements h3 {
-            font-size: 1rem;
-            margin-bottom: 5px;
-            color: var(--secondary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+            .achievements h3 {
+                font-size: 1rem;
+                margin-bottom: 5px;
+                color: var(--secondary);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
 
         .achievement-list {
             display: flex;
@@ -634,25 +632,25 @@
             white-space: nowrap;
         }
 
-        .achievement-badge.unlocked {
-            opacity: 1;
-            background: rgba(46, 204, 113, 0.4);
-            box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
-            animation: popIn 0.3s ease;
-        }
+            .achievement-badge.unlocked {
+                opacity: 1;
+                background: rgba(46, 204, 113, 0.4);
+                box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+                animation: popIn 0.3s ease;
+            }
 
-        .achievement-badge.hidden {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--border);
-            color: transparent;
-            cursor: default;
-        }
+            .achievement-badge.hidden {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: var(--border);
+                color: transparent;
+                cursor: default;
+            }
 
-        .achievement-badge.hidden.unlocked {
-            color: var(--light);
-            background: rgba(155, 89, 182, 0.4);
-            border-color: var(--purple);
-        }
+                .achievement-badge.hidden.unlocked {
+                    color: var(--light);
+                    background: rgba(155, 89, 182, 0.4);
+                    border-color: var(--purple);
+                }
 
         @keyframes popIn {
             0% {
@@ -688,14 +686,14 @@
             gap: 10px;
         }
 
-        .footer .save-status {
-            color: var(--secondary);
-            font-weight: bold;
-        }
+            .footer .save-status {
+                color: var(--secondary);
+                font-weight: bold;
+            }
 
-        .footer .save-status.error {
-            color: var(--danger);
-        }
+                .footer .save-status.error {
+                    color: var(--danger);
+                }
 
         /* ==================== 模态框 ==================== */
         .modal {
@@ -746,13 +744,13 @@
             border-bottom: 1px solid var(--border);
         }
 
-        .modal-header h2 {
-            font-size: 1.4rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+            .modal-header h2 {
+                font-size: 1.4rem;
+                color: var(--primary);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
 
         .close-btn {
             background: none;
@@ -770,11 +768,11 @@
             border-radius: 50%;
         }
 
-        .close-btn:hover {
-            opacity: 1;
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(90deg);
-        }
+            .close-btn:hover {
+                opacity: 1;
+                background: rgba(255, 255, 255, 0.1);
+                transform: rotate(90deg);
+            }
 
         .modal-body {
             line-height: 1.6;
@@ -812,47 +810,47 @@
             overflow: hidden;
         }
 
-        .study-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.4s;
-        }
+            .study-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.4s;
+            }
 
-        .study-btn:hover::before {
-            left: 100%;
-        }
+            .study-btn:hover::before {
+                left: 100%;
+            }
 
-        .study-btn:hover {
-            background: rgba(52, 152, 219, 0.4);
-            transform: translateY(-2px);
-        }
+            .study-btn:hover {
+                background: rgba(52, 152, 219, 0.4);
+                transform: translateY(-2px);
+            }
 
-        .study-btn small {
-            display: block;
-            font-size: 0.75rem;
-            opacity: 0.7;
-            margin-top: 4px;
-            font-weight: normal;
-        }
+            .study-btn small {
+                display: block;
+                font-size: 0.75rem;
+                opacity: 0.7;
+                margin-top: 4px;
+                font-weight: normal;
+            }
 
-        .study-btn.special {
-            background: rgba(155, 89, 182, 0.2);
-            border-color: var(--purple);
-        }
+            .study-btn.special {
+                background: rgba(155, 89, 182, 0.2);
+                border-color: var(--purple);
+            }
 
-        .study-btn.special:hover {
-            background: rgba(155, 89, 182, 0.4);
-        }
+                .study-btn.special:hover {
+                    background: rgba(155, 89, 182, 0.4);
+                }
 
-        .study-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+            .study-btn:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
 
         /* 故事模态框 */
         .story-modal {
@@ -890,10 +888,10 @@
             position: relative;
         }
 
-        .story-choice-btn:hover {
-            background: rgba(155, 89, 182, 0.4);
-            transform: translateX(5px);
-        }
+            .story-choice-btn:hover {
+                background: rgba(155, 89, 182, 0.4);
+                transform: translateX(5px);
+            }
 
         .choice-preview {
             font-size: 0.8rem;
@@ -912,38 +910,38 @@
             border: 1px solid var(--border);
         }
 
-        .end-screen h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            background: linear-gradient(90deg, var(--secondary), var(--primary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+            .end-screen h2 {
+                font-size: 2.5rem;
+                margin-bottom: 20px;
+                background: linear-gradient(90deg, var(--secondary), var(--primary));
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
 
-        .end-screen .final-score {
-            font-size: 3.5rem;
-            font-weight: bold;
-            margin: 15px 0;
-            color: var(--secondary);
-            text-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
-        }
+            .end-screen .final-score {
+                font-size: 3.5rem;
+                font-weight: bold;
+                margin: 15px 0;
+                color: var(--secondary);
+                text-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+            }
 
-        .end-screen .ending-text {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin: 20px 0;
-            opacity: 0.9;
-            font-family: 'Georgia', serif;
-        }
+            .end-screen .ending-text {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                margin: 20px 0;
+                opacity: 0.9;
+                font-family: 'Georgia', serif;
+            }
 
-        .end-screen .stats-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin: 20px 0;
-            font-size: 0.9rem;
-        }
+            .end-screen .stats-summary {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 10px;
+                margin: 20px 0;
+                font-size: 0.9rem;
+            }
 
         .stat-box {
             background: rgba(0, 0, 0, 0.3);
@@ -952,16 +950,16 @@
             border: 1px solid var(--border);
         }
 
-        .stat-box .label {
-            font-size: 0.75rem;
-            opacity: 0.7;
-        }
+            .stat-box .label {
+                font-size: 0.75rem;
+                opacity: 0.7;
+            }
 
-        .stat-box .value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--secondary);
-        }
+            .stat-box .value {
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: var(--secondary);
+            }
 
         .restart-btn {
             background: linear-gradient(135deg, var(--secondary), var(--primary));
@@ -977,10 +975,10 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .restart-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        }
+            .restart-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            }
 
         /* ==================== 通知系统 ==================== */
         .notification {
@@ -1001,29 +999,29 @@
             line-height: 1.4;
         }
 
-        .notification.show {
-            transform: translateX(0);
-        }
+            .notification.show {
+                transform: translateX(0);
+            }
 
-        .notification.good {
-            border-left: 4px solid var(--secondary);
-        }
+            .notification.good {
+                border-left: 4px solid var(--secondary);
+            }
 
-        .notification.bad {
-            border-left: 4px solid var(--danger);
-        }
+            .notification.bad {
+                border-left: 4px solid var(--danger);
+            }
 
-        .notification.neutral {
-            border-left: 4px solid var(--warning);
-        }
+            .notification.neutral {
+                border-left: 4px solid var(--warning);
+            }
 
-        .notification.story {
-            border-left: 4px solid var(--purple);
-        }
+            .notification.story {
+                border-left: 4px solid var(--purple);
+            }
 
-        .notification.important {
-            border-left: 4px solid var(--pink);
-        }
+            .notification.important {
+                border-left: 4px solid var(--pink);
+            }
 
         /* ==================== 工具提示 ==================== */
         .tooltip {
@@ -1033,30 +1031,30 @@
             border-bottom: 1px dotted var(--light);
         }
 
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 240px;
-            background-color: rgba(0, 0, 0, 0.95);
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -120px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.85rem;
-            line-height: 1.4;
-            border: 1px solid var(--border);
-        }
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 240px;
+                background-color: rgba(0, 0, 0, 0.95);
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 10px;
+                position: absolute;
+                z-index: 1;
+                bottom: 125%;
+                left: 50%;
+                margin-left: -120px;
+                opacity: 0;
+                transition: opacity 0.3s;
+                font-size: 0.85rem;
+                line-height: 1.4;
+                border: 1px solid var(--border);
+            }
 
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+                opacity: 1;
+            }
 
         /* ==================== 动画 ==================== */
         @keyframes fadeIn {
@@ -1105,9 +1103,9 @@
             border-radius: 4px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
 
         /* ==================== 响应式设计 ==================== */
         @media (max-width: 1200px) {
@@ -1196,17 +1194,17 @@
             z-index: 50;
         }
 
-        .hotkey-hint.show {
-            opacity: 1;
-        }
+            .hotkey-hint.show {
+                opacity: 1;
+            }
 
-        .hotkey-hint kbd {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            margin: 0 2px;
-        }
+            .hotkey-hint kbd {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: monospace;
+                margin: 0 2px;
+            }
 
         /* ==================== 操作计数器 ==================== */
         .action-counter {
@@ -1223,16 +1221,16 @@
             color: var(--secondary);
         }
 
-        .action-counter.warning {
-            border-color: var(--warning);
-            color: var(--warning);
-        }
+            .action-counter.warning {
+                border-color: var(--warning);
+                color: var(--warning);
+            }
 
-        .action-counter.danger {
-            border-color: var(--danger);
-            color: var(--danger);
-            animation: pulse 1s infinite;
-        }
+            .action-counter.danger {
+                border-color: var(--danger);
+                color: var(--danger);
+                animation: pulse 1s infinite;
+            }
 
         /* ==================== 启动弹窗（捐助） ==================== */
         .donation-modal {
@@ -1244,17 +1242,17 @@
             padding: 20px;
         }
 
-        .donation-content h3 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
+            .donation-content h3 {
+                color: var(--primary);
+                margin-bottom: 15px;
+                font-size: 1.3rem;
+            }
 
-        .donation-content p {
-            margin-bottom: 15px;
-            line-height: 1.6;
-            opacity: 0.9;
-        }
+            .donation-content p {
+                margin-bottom: 15px;
+                line-height: 1.6;
+                opacity: 0.9;
+            }
 
         .donation-qr {
             width: 200px;
@@ -1266,11 +1264,11 @@
             background: white;
         }
 
-        .donation-qr img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+            .donation-qr img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
 
         .donation-link {
             display: inline-block;
@@ -1281,9 +1279,9 @@
             border-bottom: 1px dotted var(--cyan);
         }
 
-        .donation-link:hover {
-            opacity: 0.8;
-        }
+            .donation-link:hover {
+                opacity: 0.8;
+            }
 
         .donation-buttons {
             display: flex;
@@ -1303,19 +1301,19 @@
             font-weight: 600;
         }
 
-        .donation-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
+            .donation-btn:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateY(-2px);
+            }
 
-        .donation-btn.primary {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
+            .donation-btn.primary {
+                background: var(--primary);
+                border-color: var(--primary);
+            }
 
-        .donation-btn.primary:hover {
-            background: #2980b9;
-        }
+                .donation-btn.primary:hover {
+                    background: #2980b9;
+                }
 
         /* ==================== 阶段目标弹窗 ==================== */
         .goal-modal {
@@ -1334,26 +1332,26 @@
             border-left: 4px solid var(--warning);
         }
 
-        .goal-item.achieved {
-            border-left-color: var(--secondary);
-            background: rgba(46, 204, 113, 0.15);
-        }
+            .goal-item.achieved {
+                border-left-color: var(--secondary);
+                background: rgba(46, 204, 113, 0.15);
+            }
 
-        .goal-item.failed {
-            border-left-color: var(--danger);
-            background: rgba(231, 76, 60, 0.15);
-        }
+            .goal-item.failed {
+                border-left-color: var(--danger);
+                background: rgba(231, 76, 60, 0.15);
+            }
 
-        .goal-item h4 {
-            margin-bottom: 5px;
-            font-size: 1rem;
-        }
+            .goal-item h4 {
+                margin-bottom: 5px;
+                font-size: 1rem;
+            }
 
-        .goal-item p {
-            font-size: 0.85rem;
-            opacity: 0.8;
-            margin-bottom: 5px;
-        }
+            .goal-item p {
+                font-size: 0.85rem;
+                opacity: 0.8;
+                margin-bottom: 5px;
+            }
 
         .goal-progress {
             font-size: 0.8rem;
@@ -1361,13 +1359,13 @@
             margin-top: 5px;
         }
 
-        .goal-progress.achieved {
-            color: var(--secondary);
-        }
+            .goal-progress.achieved {
+                color: var(--secondary);
+            }
 
-        .goal-progress.failed {
-            color: var(--danger);
-        }
+            .goal-progress.failed {
+                color: var(--danger);
+            }
 
         /* ==================== 成就详情弹窗 ==================== */
         .achievement-detail-modal {
@@ -1389,24 +1387,24 @@
             font-size: 0.9rem;
         }
 
-        .achievement-detail-item.hidden {
-            border-left-color: var(--purple);
-            opacity: 0.6;
-        }
+            .achievement-detail-item.hidden {
+                border-left-color: var(--purple);
+                opacity: 0.6;
+            }
 
-        .achievement-detail-item .name {
-            font-weight: bold;
-            color: var(--secondary);
-        }
+            .achievement-detail-item .name {
+                font-weight: bold;
+                color: var(--secondary);
+            }
 
-        .achievement-detail-item.hidden .name {
-            color: var(--purple);
-        }
+            .achievement-detail-item.hidden .name {
+                color: var(--purple);
+            }
 
-        .achievement-detail-item .desc {
-            font-size: 0.8rem;
-            opacity: 0.8;
-        }
+            .achievement-detail-item .desc {
+                font-size: 0.8rem;
+                opacity: 0.8;
+            }
     </style>
 </head>
 
@@ -1427,9 +1425,13 @@
             <h1>AFO：结束？开始？</h1>
             <div class="subtitle">"从代码到考卷，这是一场关于成长与救赎的史诗旅程"</div>
             <div class="license-info">
-                <span><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans" target="_blank"
-                        style="color: rgb(196, 196, 196)">CC
-                        BY-NC-ND 4.0</a></span>
+                <span>
+                    <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans" target="_blank"
+                       style="color: rgb(196, 196, 196)">
+                        CC
+                        BY-NC-ND 4.0
+                    </a>
+                </span>
                 <span>作者: wujiahaocoder</span>
                 <a href="https://github.com/wujiahaocoder/AFO-Simulator" target="_blank">GitHub</a>
                 <span>v1.14.514</span>
@@ -1647,17 +1649,22 @@
         <!-- 页脚 -->
         <div class="footer">
             <span>💡 提示：按住Shift显示快捷键提示</span>
-            <span><a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans" target="_blank"
-                    style="color: rgb(196, 196, 196)">CC
-                    BY-NC-ND 4.0</a> | wujiahaocoder | 仓库：https://github.com/wujiahaocoder/AFO-Simulator</span>
+            <span>
+                <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans" target="_blank"
+                   style="color: rgb(196, 196, 196)">
+                    CC
+                    BY-NC-ND 4.0
+                </a> | wujiahaocoder | 仓库：https://github.com/wujiahaocoder/AFO-Simulator
+            </span>
             <button class="donation-btn" onclick="showAchievementDetail()"
-                style="padding: 5px 10px; font-size: 0.75rem;">查看成就</button>
+                    style="padding: 5px 10px; font-size: 0.75rem;">
+                查看成就
+            </button>
 
         </div>
     </div>
 
     <!-- ==================== 模态框系统 ==================== -->
-
     <!-- 启动弹窗（捐助+介绍） -->
     <div class="modal" id="welcome-modal" style="display: flex;">
         <div class="modal-content donation-modal">
@@ -1671,22 +1678,24 @@
                 <p><strong>核心机制：</strong>每周限制3次操作，必须在有限资源下做出最优决策。你的心理状态、人际关系、经济状况都会直接影响学习效率！</p>
 
                 <h3 style="margin-top: 20px;">❤️ 支持开发</h3>
-                <p>本游戏完全免费，采用<a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans"
-                        target="_blank" style="color: rgb(196, 196, 196)">CC BY-NC-ND
-                        4.0</a>协议。如果你喜欢这个游戏，欢迎请我喝杯咖啡，支持后续开发！
+                <p>
+                    本游戏完全免费，采用<a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans"
+                                 target="_blank" style="color: rgb(196, 196, 196)">
+                        CC BY-NC-ND
+                        4.0
+                    </a>协议。如果你喜欢这个游戏，欢迎请我喝杯咖啡，支持后续开发！
                 </p>
 
                 <div class="donation-qr">
                     <img src="https://github.com/wujiahaocoder/English_word_learner/blob/master/image.png?raw=true"
-                        alt="捐助二维码"
-                        onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'padding:20px;color:#666;font-size:0.8rem;\'>二维码加载失败<br>请访问GitHub支持</div>'">
+                         alt="捐助二维码"
+                         onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'padding:20px;color:#666;font-size:0.8rem;\'>二维码加载失败<br>请访问GitHub支持</div>'">
                 </div>
 
                 <a href="https://github.com/wujiahaocoder/English_word_learner/blob/master/image.png" target="_blank"
-                    class="donation-link">或点击这里查看高清二维码</a>
+                   class="donation-link">或点击这里查看高清二维码</a>
 
-                <div
-                    style="margin-top: 20px; font-size: 0.85rem; opacity: 0.7; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
+                <div style="margin-top: 20px; font-size: 0.85rem; opacity: 0.7; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
                     <strong>游戏特色：</strong><br>
                     • 52周完整学年，每周3次操作限制<br>
                     • 50+随机事件，15+故事剧情<br>
@@ -1698,7 +1707,9 @@
             <div class="donation-buttons">
                 <button class="donation-btn" onclick="closeModal('welcome-modal')">暂不支持，直接开始</button>
                 <button class="donation-btn primary"
-                    onclick="window.open('https://github.com/wujiahaocoder/English_word_learner/blob/master/image.png', '_blank')">支持开发者</button>
+                        onclick="window.open('https://github.com/wujiahaocoder/English_word_learner/blob/master/image.png', '_blank')">
+                    支持开发者
+                </button>
             </div>
         </div>
     </div>
@@ -2678,11 +2689,204 @@
         };
 
         // 故事线事件（15+事件）
+        //const storyEvents = [
+        //    {
+        //        id: 1,
+        //        week: 1,
+        //        day: 0, // 周一
+        //        title: "AFO第一天",
+        //        content: "你站在教室门口，深吸一口气。曾经的OI队友在隔壁班，听说他还在坚持竞赛。你握紧书包带，走进了新班级。",
+        //        choices: [
+        //            { text: "找个角落坐下，低调开始", effect: { stress: 5 }, next: 2 },
+        //            { text: "主动和同桌打招呼", effect: { classmateA: 5, stress: -3 }, next: 2 }
+        //        ]
+        //    },
+        //    {
+        //        id: 2,
+        //        week: 2,
+        //        day: 2,
+        //        title: "第一次作业",
+        //        content: "数学老师布置了20道题，你发现大部分都是竞赛难度。你熬夜到凌晨，终于完成。",
+        //        choices: [
+        //            { text: "按时交作业，展示实力", effect: { math: 2, mathTeacher: 5, energy: -10 }, next: 3 },
+        //            { text: "只做一半，保留实力", effect: { stress: 3 }, next: 3 }
+        //        ]
+        //    },
+        //    {
+        //        id: 3,
+        //        week: 3,
+        //        day: 4,
+        //        title: "父母的期望",
+        //        content: "父亲在饭桌上说：'听说XXX家的孩子这次考了班级第一，你以前搞竞赛，现在不能落后啊。'你握着筷子的手紧了紧。",
+        //        choices: [
+        //            { text: "沉默不语，默默承受", effect: { stress: 8, parents: -2 }, next: 4 },
+        //            { text: "解释说需要时间适应", effect: { parents: 2, stress: -2 }, next: 4 },
+        //            { text: "发脾气说'你们懂什么！'", effect: { parents: -10, stress: 10 }, next: 4 }
+        //        ]
+        //    },
+        //    {
+        //        id: 4,
+        //        week: 4,
+        //        day: 1,
+        //        title: "旧友重逢",
+        //        content: "在走廊遇到以前集训的队友。他问：'怎么退竞了？'你不知如何回答。他拍拍你的肩：'文化课也不容易，加油。'",
+        //        choices: [
+        //            { text: "感到失落，怀疑选择", effect: { stress: 10 }, next: 5 },
+        //            { text: "释然一笑，各自有路", effect: { stress: -3 }, next: 5 },
+        //            { text: "暗下决心，要证明自己", effect: { energy: 5, stress: 5 }, next: 5 }
+        //        ]
+        //    },
+        //    {
+        //        id: 5,
+        //        week: 5,
+        //        day: 3,
+        //        title: "暗恋的悸动",
+        //        content: "她转过头问你物理题，发梢的香味让你心跳加速。你发现她也在努力学习，笔记本上密密麻麻。原来大家都在为未来拼命。",
+        //        choices: [
+        //            { text: "认真讲题，展示实力", effect: { crush: 7, physics: 1 }, next: 6 },
+        //            { text: "紧张结巴，发挥失常", effect: { crush: -5, stress: 3 }, next: 6 },
+        //            { text: "讲完后邀请一起学习", effect: { crush: 12, stress: -10 }, next: 6 }
+        //        ]
+        //    },
+        //    {
+        //        id: 6,
+        //        week: 8,
+        //        day: 4,
+        //        title: "第一次月考",
+        //        content: "成绩出来了，你进步了15名。老师在全班面前表扬你：'XXX同学从竞赛转文化课，适应得很快。'你看到父母眼中的欣慰。",
+        //        choices: [
+        //            { text: "继续保持，冲击前10", effect: { energy: 5, stress: -5, teacher: 5 }, next: 7 },
+        //            { text: "松懈下来，想休息几天", effect: { energy: 10, stress: -10 }, next: 7 },
+        //            { text: "感到迷茫，不知道意义何在", effect: { stress: 8 }, next: 7 }
+        //        ]
+        //    },
+        //    {
+        //        id: 7,
+        //        week: 12,
+        //        day: 6,
+        //        title: "深夜的对话",
+        //        content: "母亲深夜端来牛奶：'其实我们不求你考多好，只希望你别后悔。'你第一次和父母聊起竞赛的日子，聊起那些熬夜刷题的时光。",
+        //        choices: [
+        //            { text: "感动落泪，压力释放", effect: { parents: 10, stress: -15 }, next: 8 },
+        //            { text: "表面平静，内心温暖", effect: { parents: 5, stress: -8 }, next: 8 },
+        //            { text: "觉得唠叨，不耐烦", effect: { parents: -5, stress: 3 }, next: 8 }
+        //        ]
+        //    },
+        //    {
+        //        id: 8,
+        //        week: 16,
+        //        day: 2,
+        //        title: "回响",
+        //        content: "收到曾经OI教练的邮件：'听说你转文化课了，无论选择什么，都要像解题一样，找到最优解。'你突然明白，竞赛教会你的不只是算法，更是思维方式。",
+        //        choices: [
+        //            { text: "重拾信心，应用算法思维", effect: { math: 3, physics: 2, stress: -5 }, next: 9 },
+        //            { text: "感到遗憾，回不去了", effect: { stress: 8 }, next: 9 },
+        //            { text: "释然，感谢那段经历", effect: { stress: -8, energy: 5 }, next: 9 }
+        //        ]
+        //    },
+        //    {
+        //        id: 9,
+        //        week: 20,
+        //        day: 1,
+        //        title: "回应",
+        //        content: "她递来一张纸条：'谢谢你一直帮我...。我们一起努力，考同一所大学吧！'",
+        //        choices: [
+        //            { text: "开心接受，动力满满", effect: { crush: 15, stress: -10, energy: 30 }, next: 10 },
+        //            { text: "紧张不知所措", effect: { stress: 10 }, next: 10 },
+        //            { text: "拒绝，说要专心学习", effect: { crush: -10, stress: 5 }, next: 10 }
+        //        ]
+        //    },
+        //    {
+        //        id: 10,
+        //        week: 24,
+        //        day: 3,
+        //        title: "寒假前夜",
+        //        content: "期末考试结束，你考进了班级前10。寒假来临，但你知道，真正的冲刺才刚刚开始。",
+        //        choices: [
+        //            { text: "制定寒假计划，全力冲刺", effect: { energy: 5, stress: -5 }, next: 11 },
+        //            { text: "先放松几天，再学习", effect: { energy: 10, stress: -10 }, next: 11 },
+        //            { text: "感到疲惫，想放弃", effect: { stress: 10 }, next: 11 }
+        //        ]
+        //    },
+        //    {
+        //        id: 11,
+        //        week: 30,
+        //        day: 5,
+        //        title: "春节的感悟",
+        //        content: "亲戚们问起你的成绩，父母骄傲地说：'进步很大！'你突然意识到，自己的努力不仅是为了自己，也为了不辜负他们的期望。",
+        //        choices: [
+        //            { text: "感到责任重大", effect: { parents: 5, stress: 5 }, next: 12 },
+        //            { text: "感到温暖和支持", effect: { parents: 8, stress: -5 }, next: 12 },
+        //            { text: "感到压力倍增", effect: { stress: 10 }, next: 12 }
+        //        ]
+        //    },
+        //    {
+        //        id: 12,
+        //        week: 35,
+        //        day: 2,
+        //        title: "倒计时100天",
+        //        content: "黑板上的数字变成100。教室里弥漫着紧张的气氛，但你感到一种奇怪的平静。两年竞赛，一年WHK，你已经准备好了。",
+        //        choices: [
+        //            { text: "充满信心，迎接挑战", effect: { stress: 10, energy: 20 }, next: 13 },
+        //            { text: "按部就班，保持节奏", effect: { stress: 5 }, next: 13 },
+        //            { text: "紧张不安，难以入眠", effect: { stress: 10, energy: -5 }, next: 13 }
+        //        ]
+        //    },
+        //    {
+        //        id: 13,
+        //        week: 40,
+        //        day: 4,
+        //        title: "最后的冲刺",
+        //        content: "五一假期，你拒绝了所有邀约，每天学习12小时。虽然辛苦，但你知道，这是最后的冲刺。",
+        //        choices: [
+        //            { text: "坚持到底，不放弃", effect: { energy: -10, stress: 5, subjects: { all: 2 } }, next: 14 },
+        //            { text: "适当休息，劳逸结合", effect: { energy: 5, stress: -5 }, next: 14 },
+        //            { text: "感到崩溃，想放弃", effect: { stress: 15, energy: -15 }, next: 14 }
+        //        ]
+        //    },
+        //    {
+        //        id: 14,
+        //        week: 45,
+        //        day: 1,
+        //        title: "最后的告别",
+        //        content: "高考前60天，你整理书桌，翻出那张合影。照片背面写着：'To be continued...'你笑了笑，把它收进抽屉。是的，故事还在继续。",
+        //        choices: [
+        //            { text: "充满期待，迎接挑战", effect: { stress: -10, energy: 10 }, next: 15 },
+        //            { text: "平静接受，顺其自然", effect: { stress: -5 }, next: 15 },
+        //            { text: "紧张不安，难以入眠", effect: { stress: 10, energy: -5 }, next: 15 }
+        //        ]
+        //    },
+        //    {
+        //        id: 15,
+        //        week: 50,
+        //        day: 6,
+        //        title: "高考前夜",
+        //        content: "你躺在床上，回想这一年。从迷茫到坚定，从失落到希望。无论结果如何，你都已经成长。马上就是检验的时刻。",
+        //        choices: [
+        //            { text: "充满信心，安然入睡", effect: { stress: -10, energy: 5 }, next: 16 },
+        //            { text: "平静接受，顺其自然", effect: { stress: -5 }, next: 16 },
+        //            { text: "紧张复习，最后冲刺", effect: { energy: -10, stress: 10 }, next: 16 }
+        //        ]
+        //    },
+        //    {
+        //        id: 16,
+        //        week: 51,
+        //        day: 6,
+        //        title: "承诺",
+        //        content: "她找到你:'高考加油！我们......'",
+        //        choices: [
+        //            { text: "相约考后，共赴山海", effect: { stress: 5, energy: 5, crush: 10 }, next: null },
+        //            { text: "默默点头，转身离去", effect: { stress: 10, energy: 5, crush: 5 }, next: null },
+        //            { text: "心乱如麻，无言以对", effect: { energy: -10, stress: 10, crush: -2 }, next: null }
+        //        ]
+        //    },
+        //];
+
         const storyEvents = [
             {
                 id: 1,
                 week: 1,
-                day: 0, // 周一
+                day: 0,
                 title: "AFO第一天",
                 content: "你站在教室门口，深吸一口气。曾经的OI队友在隔壁班，听说他还在坚持竞赛。你握紧书包带，走进了新班级。",
                 choices: [
@@ -2694,171 +2898,412 @@
                 id: 2,
                 week: 2,
                 day: 2,
-                title: "第一次作业",
-                content: "数学老师布置了20道题，你发现大部分都是竞赛难度。你熬夜到凌晨，终于完成。",
+                title: "作业",
+                content:
+                    "数学老师布置了20道题，你发现大部分都是竞赛难度。你熬夜到凌晨，终于完成。",
                 choices: [
                     { text: "按时交作业，展示实力", effect: { math: 2, mathTeacher: 5, energy: -10 }, next: 3 },
-                    { text: "只做一半，保留实力", effect: { stress: 3 }, next: 3 }
+                    { text: "只做一半，保留实力", effect: { stress: 3, mathTeacher: -5 }, next: 3 }
                 ]
             },
             {
                 id: 3,
                 week: 3,
-                day: 4,
-                title: "父母的期望",
-                content: "父亲在饭桌上说：'听说XXX家的孩子这次考了班级第一，你以前搞竞赛，现在不能落后啊。'你握着筷子的手紧了紧。",
+                day: 2,
+                title: "化学课",
+                content: "化学老师走进教室，你惊讶地发现他竟是曾经带过竞赛集训的助教。他看到你时眼神微微一亮，却没有特别表示。下课时，他在你桌边停顿了一下。",
                 choices: [
-                    { text: "沉默不语，默默承受", effect: { stress: 8, parents: -2 }, next: 4 },
-                    { text: "解释说需要时间适应", effect: { parents: 2, stress: -2 }, next: 4 },
-                    { text: "发脾气说'你们懂什么！'", effect: { parents: -10, stress: 10 }, next: 4 }
+                    { text: "主动上前相认", effect: { chemistryTeacher: 5, stress: -3 }, next: 4 },
+                    { text: "低头装作没看见", effect: { stress: 2, chemistryTeacher: -5 }, next: 4 },
+                    { text: "课后去办公室找他", effect: { chemistryTeacher: 5, stress: 5 }, next: 4 }
                 ]
             },
             {
                 id: 4,
+                week: 3,
+                day: 4,
+                title: "父母的期望",
+                content: "父亲在饭桌上说：'听说XXX家的孩子这次考了班级第一，你以前搞竞赛，现在不能落后啊。'你握着筷子的手紧了紧。",
+                choices: [
+                    { text: "沉默不语，默默承受", effect: { stress: 8, parents: -2 }, next: 5 },
+                    { text: "解释说需要时间适应", effect: { parents: 2, stress: 2 }, next: 5 },
+                    { text: "发脾气说'你们懂什么！'", effect: { parents: -10, stress: 10, health: -5 }, next: 5 }
+                ]
+            },
+            {
+                id: 5,
                 week: 4,
                 day: 1,
                 title: "旧友重逢",
                 content: "在走廊遇到以前集训的队友。他问：'怎么退竞了？'你不知如何回答。他拍拍你的肩：'文化课也不容易，加油。'",
                 choices: [
-                    { text: "感到失落，怀疑选择", effect: { stress: 10 }, next: 5 },
-                    { text: "释然一笑，各自有路", effect: { stress: -3 }, next: 5 },
-                    { text: "暗下决心，要证明自己", effect: { energy: 5, stress: 5 }, next: 5 }
+                    { text: "感到失落，怀疑选择", effect: { stress: 10 }, next: 6 },
+                    { text: "释然一笑，各自有路", effect: { stress: -3 }, next: 6 },
+                    { text: "暗下决心，要证明自己", effect: { energy: 5, stress: 5 }, next: 6 }
                 ]
             },
             {
-                id: 5,
+                id: 6,
                 week: 5,
                 day: 3,
                 title: "暗恋的悸动",
                 content: "她转过头问你物理题，发梢的香味让你心跳加速。你发现她也在努力学习，笔记本上密密麻麻。原来大家都在为未来拼命。",
                 choices: [
-                    { text: "认真讲题，展示实力", effect: { crush: 7, physics: 1 }, next: 6 },
-                    { text: "紧张结巴，发挥失常", effect: { crush: -5, stress: 3 }, next: 6 },
-                    { text: "讲完后邀请一起学习", effect: { crush: 12, stress: -10 }, next: 6 }
-                ]
-            },
-            {
-                id: 6,
-                week: 8,
-                day: 4,
-                title: "第一次月考",
-                content: "成绩出来了，你进步了15名。老师在全班面前表扬你：'XXX同学从竞赛转文化课，适应得很快。'你看到父母眼中的欣慰。",
-                choices: [
-                    { text: "继续保持，冲击前10", effect: { energy: 5, stress: -5, teacher: 5 }, next: 7 },
-                    { text: "松懈下来，想休息几天", effect: { energy: 10, stress: -10 }, next: 7 },
-                    { text: "感到迷茫，不知道意义何在", effect: { stress: 8 }, next: 7 }
+                    { text: "认真讲题，展示实力", effect: { crush: 7, physics: 1 }, next: 7 },
+                    { text: "紧张结巴，发挥失常", effect: { crush: -5, stress: 3 }, next: 7 },
+                    { text: "讲完后邀请一起学习", effect: { crush: 12, stress: -10, subjects: { all: 2 } }, next: 7 }
                 ]
             },
             {
                 id: 7,
+                week: 6,
+                day: 3,
+                title: "模式的碰撞",
+                content: "物理课讲到一个复杂模型，你下意识地用竞赛的思维去拆解，很快找到了关键。但解题步骤却和标准答案大相径庭。老师看着你的草稿纸，若有所思。",
+                choices: [
+                    { text: "向老师解释你的思路", effect: { physicsTeacher: 5, stress: -2, physics: 1 }, next: 8 },
+                    { text: "默默擦掉，按课本方法重做", effect: { stress: 3 }, next: 8 },
+                    { text: "课后和同学讨论你的方法", effect: { classmateA: 3, physics: 2 }, next: 8 }
+                ]
+            },
+            {
+                id: 8,
+                week: 7,
+                day: 5,
+                title: "周末的图书馆",
+                content: "你选择去图书馆自习，却偶遇了也在那里的她。你们默契地坐到了角落的同一张桌子，整整一个下午，只有翻书声和偶尔低声的讨论。",
+                choices: [
+                    { text: "专注学习，偶尔交流", effect: { crush: 3, subjects: { all: 1 }, stress: 5 }, next: 9 },
+                    { text: "分心关注她，效率降低", effect: { crush: 5, energy: -5 }, next: 9 },
+                    { text: "提前离开，避免紧张", effect: { stress: -3, crush: -5 }, next: 9 }
+                ]
+            },
+            {
+                id: 9,
+                week: 8,
+                day: 4,
+                title: "第一次月考",
+                content: "成绩出来了，你进步了许多。老师在全班面前表扬你：'XXX同学从竞赛转文化课，适应得很快。'你看到父母眼中的欣慰。",
+                choices: [
+                    { text: "继续保持，冲击更高分数", effect: { energy: 5, stress: -5, teacher: 5 }, next: 10 },
+                    { text: "松懈下来，想休息几天", effect: { energy: 10, stress: -10 }, next: 10 },
+                    { text: "感到迷茫，不知道意义何在", effect: { stress: 8 }, next: 10 }
+                ]
+            },
+            {
+                id: 10,
+                week: 9,
+                day: 1,
+                title: "班委竞选",
+                content: "班主任建议你竞选学习委员，说你的竞赛经历能帮助同学。你犹豫了，这会不会占用太多学习时间？",
+                choices: [
+                    { text: "接受挑战，参加竞选", effect: { teacher: 5, classmateA: 3, classmateB: 3， stress: 5, energy: -10 }, next: 11 },
+                    { text: "婉拒，说明要专注学习", effect: { stress: -3, teacher: -2 }, next: 11 },
+                    { text: "折中，只做科代表", effect: { teacher: 2, stress: 2 }, next: 11 }
+                ]
+            },
+            {
+                id: 11,
+                week: 10,
+                day: 5,
+                title: "意外的盟友",
+                content: "放学时下雨了，你没带伞。那个总在埋头刷题的'卷王'同桌默默把伞往你这边挪了挪。'一起走吧，顺便问你上午那道题的另一种解法。'",
+                choices: [
+                    { text: "感激接受，路上热烈讨论", effect: { classmateA: 8, stress: -5, math: 1 }, next: 12 },
+                    { text: "婉拒，说想自己静静", effect: { stress: 2, energy: 5, health: -5 }, next: 12 },
+                    { text: "接受，但一路沉默", effect: { classmateA: -2, stress: 5 }, next: 12 }
+                ]
+            },
+            {
+                id: 12,
+                week: 11,
+                day: 4,
+                title: "物理竞赛题",
+                content: "物理老师上课时讲到了一道改编自竞赛的题目，全班只有你和另一名同学举手表示会做。老师让你们各自上台讲解。",
+                choices: [
+                    { text: "用简洁的竞赛思路讲解", effect: { teacher: 1, physics: 2, stress: -3 }, next: 13 },
+                    { text: "按常规课本方法讲解", effect: { stress: -2 }, next: 13 },
+                    { text: "谦让，让同学先讲", effect: { classmateA: 3, teacher: 1 }, next: 13 }
+                ]
+            },
+            {
+                id: 13,
                 week: 12,
                 day: 6,
                 title: "深夜的对话",
                 content: "母亲深夜端来牛奶：'其实我们不求你考多好，只希望你别后悔。'你第一次和父母聊起竞赛的日子，聊起那些熬夜刷题的时光。",
                 choices: [
-                    { text: "感动落泪，压力释放", effect: { parents: 10, stress: -15 }, next: 8 },
-                    { text: "表面平静，内心温暖", effect: { parents: 5, stress: -8 }, next: 8 },
-                    { text: "觉得唠叨，不耐烦", effect: { parents: -5, stress: 3 }, next: 8 }
+                    { text: "感动落泪，压力释放", effect: { parents: 10, stress: -15 }, next: 14 },
+                    { text: "表面平静，内心温暖", effect: { parents: 5, stress: -8 }, next: 14 },
+                    { text: "觉得唠叨，不耐烦", effect: { parents: -5, stress: 3 }, next: 14 }
                 ]
             },
             {
-                id: 8,
+                id: 14,
+                week: 13,
+                day: 0,
+                title: "母亲的早餐",
+                content: "连续一周，你发现早餐盒里多了张便签。今天写着：'记得吃鸡蛋，补充蛋白质。别太拼，身体要紧。'字迹是母亲的。",
+                choices: [
+                    { text: "给母亲发短信感谢", effect: { parents: 5, stress: -5 }, next: 15 },
+                    { text: "把便签小心收起来", effect: { parents: 3, stress: -3 }, next: 15 },
+                    { text: "觉得难为情，扔掉便签", effect: { stress: 2 }, next: 15 }
+                ]
+            },
+            {
+                id: 15,
+                week: 14,
+                day: 0,
+                title: "瓶颈期",
+                content: "最近几次周测成绩像卡住了一样，不进不退。你看着那些反复出错的题型，第一次对'努力就有回报'产生了怀疑。深夜，台灯的光显得格外刺眼。",
+                choices: [
+                    { text: "更疯狂刷题，突破瓶颈", effect: { energy: -15, stress: 10, math: 1 }, next: 16 },
+                    { text: "停下来，重新分析错题本", effect: { stress: -3, subjects: { all: 1 } }, next: 16 },
+                    { text: "暂时放下，去操场跑步", effect: { energy: 10, stress: -8 }, next: 16 }
+                ]
+            },
+            {
+                id: 16,
+                week: 15,
+                day: 3,
+                title: "同桌的求助",
+                content: "'卷王'同桌罕见地找你求助：'这道数学压轴题，你的解法比我简洁多了，能教我吗？'你们花了整个午休时间一起钻研。",
+                choices: [
+                    { text: "耐心讲解，分享思路", effect: { classmateA: 8, math: 1, stress: -3 }, next: 17 },
+                    { text: "匆匆讲完，继续刷题", effect: { classmateA: 2 }, next: 17 },
+                    { text: "借此机会讨论更多难题", effect: { classmateA: 5, math: 2, energy: -5 }, next: 17 }
+                ]
+            },
+            {
+                id: 17,
                 week: 16,
                 day: 2,
                 title: "回响",
                 content: "收到曾经OI教练的邮件：'听说你转文化课了，无论选择什么，都要像解题一样，找到最优解。'你突然明白，竞赛教会你的不只是算法，更是思维方式。",
                 choices: [
-                    { text: "重拾信心，应用算法思维", effect: { math: 3, physics: 2, stress: -5 }, next: 9 },
-                    { text: "感到遗憾，回不去了", effect: { stress: 8 }, next: 9 },
-                    { text: "释然，感谢那段经历", effect: { stress: -8, energy: 5 }, next: 9 }
+                    { text: "重拾信心，应用算法思维", effect: { math: 3, physics: 2, stress: -5 }, next: 18 },
+                    { text: "感到遗憾，回不去了", effect: { stress: 8 }, next: 18 },
+                    { text: "释然，感谢那段经历", effect: { stress: -8, energy: 5 }, next: 18 }
                 ]
             },
             {
-                id: 9,
+                id: 18,
+                week: 17,
+                day: 6,
+                title: "周日的篮球场",
+                content: "父亲难得休息，问你要不要去打球。你已经很久没摸篮球了，上一次还是竞赛集训前。",
+                choices: [
+                    { text: "放下书本，去打一场", effect: { parents: 5, energy: 10, stress: -8 }, next: 19 },
+                    { text: "拒绝，说作业太多", effect: { parents: -2, stress: 3 }, next: 19 },
+                    { text: "折中，只打半小时", effect: { parents: 3, energy: 5, stress: -3 }, next: 19 }
+                ]
+            },
+            {
+                id: 19,
+                week: 18,
+                day: 4,
+                title: "父亲的书房",
+                content: "你找资料时，无意看到父亲抽屉里一个旧笔记本。里面竟记录着他年轻时自学无线电的电路图，还有一行小字：'给未来的儿子：找到你的频率。'",
+                choices: [
+                    { text: "深受触动，与父亲深夜长谈", effect: { parents: 5, stress: -10, energy: 5 }, next: 20 },
+                    { text: "默默放回，但内心泛起波澜", effect: { parents: 2, stress: -5 }, next: 20 },
+                    { text: "觉得无关，继续自己的焦虑", effect: { stress: 10 }, next: 20 }
+                ]
+            },
+            {
+                id: 20,
+                week: 19,
+                day: 2,
+                title: "英语演讲",
+                content: "英语课要求每人做三分钟演讲。你选择了'算法与人生'这个题目，用计算机术语比喻学习过程。讲完后，同学们若有所思。",
+                choices: [
+                    { text: "感到自信，收获掌声", effect: { english: 2, stress: -5, teacher: 3 }, next: 21 },
+                    { text: "紧张过度，发挥不佳", effect: { stress: 5 }, next: 21 },
+                    { text: "平淡完成，但内心满足", effect: { stress: -3 }, next: 21 }
+                ]
+            },
+            {
+                id: 21,
                 week: 20,
                 day: 1,
                 title: "回应",
                 content: "她递来一张纸条：'谢谢你一直帮我...。我们一起努力，考同一所大学吧！'",
                 choices: [
-                    { text: "开心接受，动力满满", effect: { crush: 15, stress: -10, energy: 30 }, next: 10 },
-                    { text: "紧张不知所措", effect: { stress: 10 }, next: 10 },
-                    { text: "拒绝，说要专心学习", effect: { crush: -10, stress: 5 }, next: 10 }
+                    { text: "开心接受，动力满满", effect: { crush: 15, stress: -10, energy: 30 }, next: 22 },
+                    { text: "紧张不知所措", effect: { stress: 10 }, next: 22 },
+                    { text: "拒绝，说要专心学习", effect: { crush: -20, stress: 5 }, next: 22 }
                 ]
             },
             {
-                id: 10,
+                id: 22,
+                week: 21,
+                day: 5,
+                title: "晚自习的停电",
+                content: "晚自习时突然停电，教室陷入黑暗和短暂的骚动。有人打开了手机手电筒，微光中，你看到她正就着光继续看书。",
+                choices: [
+                    { text: "也打开手机，继续学习", effect: { crush: 1, stress: -2 }, next: 23 },
+                    { text: "提议大家休息聊天", effect: { classmateA: 5, stress: -8 }, next: 23 },
+                    { text: "默默看着窗外，思考", effect: { stress: -5 }, next: 23 }
+                ]
+            },
+            {
+                id: 23,
+                week: 22,
+                day: 2,
+                title: "她的生日",
+                content: "你听说今天是她的生日。犹豫再三，你在她常问问题的那本物理习题集扉页，用铅笔轻轻写下'Happy Birthday'。",
+                choices: [
+                    { text: "鼓起勇气，当面送给她并祝她生日快乐", effect: { crush: 5, stress: 5 }, next: 24 },
+                    { text: "趁她不注意，悄悄放回她书桌", effect: { crush: 2, stress: -2 }, next: 24 },
+                    { text: "最终擦掉，没有行动", effect: { stress: 3, crush: -5 }, next: 24 }
+                ]
+            },
+            {
+                id: 24,
+                week: 23,
+                day: 1,
+                title: "模拟志愿填报",
+                content: "学校组织模拟填报志愿。你看着那些曾经梦想的计算机强校，又看了看自己现在的成绩，在理想与现实间犹豫。",
+                choices: [
+                    { text: "坚持梦想，填报强校", effect: { energy: 10, stress: 8 }, next: 25 },
+                    { text: "务实选择，保证录取", effect: { stress: -5 }, next: 25 },
+                    { text: "征求老师和父母意见", effect: { parents: 3, teacher: 3, stress: -3 }, next: 25 }
+                ]
+            },
+            {
+                id: 25,
                 week: 24,
                 day: 3,
                 title: "寒假前夜",
                 content: "期末考试结束，你考进了班级前10。寒假来临，但你知道，真正的冲刺才刚刚开始。",
                 choices: [
-                    { text: "制定寒假计划，全力冲刺", effect: { energy: 5, stress: -5 }, next: 11 },
-                    { text: "先放松几天，再学习", effect: { energy: 10, stress: -10 }, next: 11 },
-                    { text: "感到疲惫，想放弃", effect: { stress: 10 }, next: 11 }
+                    { text: "制定寒假计划，全力冲刺", effect: { energy: 5, stress: -5 }, next: 26 },
+                    { text: "先放松几天，再学习", effect: { energy: 10, stress: -10 }, next: 26 },
+                    { text: "感到疲惫，想放弃", effect: { stress: 10 }, next: 26 }
                 ]
             },
             {
-                id: 11,
+                id: 26,
+                week: 26,
+                day: 6,
+                title: "寒假自习室",
+                content: "你发现'卷王'同桌和几个同学组了个线上自习室，互相监督。她也在里面。犹豫了一下，你发送了加入申请。",
+                choices: [
+                    { text: "打开摄像头，沉浸学习", effect: { energy: 5, crush: 3, classmateA: 5 }, next: 27 },
+                    { text: "只开麦，偶尔讨论问题", effect: { stress: -3, subjects: { all: 1 } }, next: 27 },
+                    { text: "潜水中，感受氛围", effect: { stress: -5 }, next: 27 }
+                ]
+            },
+            {
+                id: 27,
                 week: 30,
                 day: 5,
-                title: "春节的感悟",
+                title: "感悟",
                 content: "亲戚们问起你的成绩，父母骄傲地说：'进步很大！'你突然意识到，自己的努力不仅是为了自己，也为了不辜负他们的期望。",
                 choices: [
-                    { text: "感到责任重大", effect: { parents: 5, stress: 5 }, next: 12 },
-                    { text: "感到温暖和支持", effect: { parents: 8, stress: -5 }, next: 12 },
-                    { text: "感到压力倍增", effect: { stress: 10 }, next: 12 }
+                    { text: "感到责任重大", effect: { parents: 5, stress: 5 }, next: 28 },
+                    { text: "感到温暖和支持", effect: { parents: 8, stress: -5 }, next: 28 },
+                    { text: "感到压力倍增", effect: { stress: 10 }, next: 28 }
                 ]
             },
             {
-                id: 12,
+                id: 28,
+                week: 32,
+                day: 1,
+                title: "二模之后",
+                content: "第二次模拟考排名稳中有进，但离梦想学校还有距离。老师在分析试卷时说：'有些人的潜力，会在最后两个月才真正爆发。'你感觉他在看你。",
+                choices: [
+                    { text: "备受鼓舞，细化每日计划", effect: { energy: 10, teacher: 5, stress: 3 }, next: 29 },
+                    { text: "压力倍增，害怕辜负期望", effect: { stress: 10 }, next: 29 },
+                    { text: "平静分析，查漏补缺", effect: { stress: -2, subjects: { all: 1 } }, next: 29 }
+                ]
+            },
+            {
+                id: 29,
                 week: 35,
                 day: 2,
                 title: "倒计时100天",
                 content: "黑板上的数字变成100。教室里弥漫着紧张的气氛，但你感到一种奇怪的平静。两年竞赛，一年WHK，你已经准备好了。",
                 choices: [
-                    { text: "充满信心，迎接挑战", effect: { stress: 10, energy: 20 }, next: 13 },
-                    { text: "按部就班，保持节奏", effect: { stress: 5 }, next: 13 },
-                    { text: "紧张不安，难以入眠", effect: { stress: 10, energy: -5 }, next: 13 }
+                    { text: "充满信心，迎接挑战", effect: { stress: 10, energy: 20 }, next: 30 },
+                    { text: "按部就班，保持节奏", effect: { stress: 5 }, next: 30 },
+                    { text: "紧张不安，难以入眠", effect: { stress: 10, energy: -5 }, next: 30 }
                 ]
             },
             {
-                id: 13,
+                id: 30,
+                week: 38,
+                day: 5,
+                title: "战友的约定",
+                content: "'卷王'同桌在放学后叫住你：'最后几十天了，比比看谁下次周考数学高？输了请喝奶茶。'你看到他眼里的认真，不只是玩笑。",
+                choices: [
+                    { text: "欣然应战，击掌为誓", effect: { classmateA: 10, energy: 8, stress: -3 }, next: 31 },
+                    { text: "苦笑说压力好大，但接受", effect: { stress: 5, classmateA: 5 }, next: 31 },
+                    { text: "拒绝，说不想分心", effect: { stress: -2, classmateA: -3 }, next: 31 }
+                ]
+            },
+            {
+                id: 31,
                 week: 40,
                 day: 4,
                 title: "最后的冲刺",
-                content: "五一假期，你拒绝了所有邀约，每天学习12小时。虽然辛苦，但你知道，这是最后的冲刺。",
+                content: "小假期，你拒绝了所有邀约，每天学习16小时。虽然辛苦，但你知道，这是最后的冲刺。",
                 choices: [
-                    { text: "坚持到底，不放弃", effect: { energy: -10, stress: 5, subjects: { all: 2 } }, next: 14 },
-                    { text: "适当休息，劳逸结合", effect: { energy: 5, stress: -5 }, next: 14 },
-                    { text: "感到崩溃，想放弃", effect: { stress: 15, energy: -15 }, next: 14 }
+                    { text: "坚持到底，不放弃", effect: { energy: -10, stress: 5, subjects: { all: 2 }, health: -5 }, next: 32 },
+                    { text: "适当休息，劳逸结合", effect: { energy: 5, stress: -5 }, next: 32 },
+                    { text: "感到崩溃，想放弃", effect: { stress: 15, energy: -15 }, next: 32 }
                 ]
             },
             {
-                id: 14,
+                id: 32,
+                week: 42,
+                day: 0,
+                title: "一场重感冒",
+                content: "连日的疲劳积累，你终于病倒了。高烧时迷迷糊糊，想起以前竞赛前也总这样。母亲守在床边，用湿毛巾给你敷额头，就像小时候一样。",
+                choices: [
+                    { text: "愧疚又温暖，乖乖休息", effect: { parents: 8, energy: 15, stress: -10 }, next: 33 },
+                    { text: "心急如焚，想爬起来看书", effect: { energy: -10, stress: 10, parents: -2, health: -30 }, next: 33 },
+                    { text: "昏昏沉沉，只想睡觉", effect: { energy: 20, stress: -5 }, next: 33 }
+                ]
+            },
+            {
+                id: 33,
                 week: 45,
                 day: 1,
                 title: "最后的告别",
                 content: "高考前60天，你整理书桌，翻出那张合影。照片背面写着：'To be continued...'你笑了笑，把它收进抽屉。是的，故事还在继续。",
                 choices: [
-                    { text: "充满期待，迎接挑战", effect: { stress: -10, energy: 10 }, next: 15 },
-                    { text: "平静接受，顺其自然", effect: { stress: -5 }, next: 15 },
-                    { text: "紧张不安，难以入眠", effect: { stress: 10, energy: -5 }, next: 15 }
+                    { text: "充满期待，迎接挑战", effect: { stress: -10, energy: 10 }, next: 34 },
+                    { text: "平静接受，顺其自然", effect: { stress: -5 }, next: 34 },
+                    { text: "紧张不安，难以入眠", effect: { stress: 10, energy: -5, health: -10 }, next: 34 }
                 ]
             },
             {
-                id: 15,
+                id: 34,
+                week: 48,
+                day: 3,
+                title: "最后的答疑",
+                content: "放学后，你鼓起勇气向暗恋的她问了道一直没弄懂的语文古诗鉴赏题。她讲得很仔细，夕阳把两个人的影子拉得很长。讲完后，两人都沉默了一会儿。",
+                choices: [
+                    { text: "轻声说'谢谢，一起加油'", effect: { crush: 5, stress: -8, energy: 5 }, next: 35 },
+                    { text: "开玩笑缓解气氛'考完再谢你'", effect: { crush: 3, stress: -5 }, next: 35 },
+                    { text: "点点头，匆忙收拾书包离开", effect: { stress: 3, crush: -3 }, next: 35 }
+                ]
+            },
+            {
+                id: 35,
                 week: 50,
                 day: 6,
                 title: "高考前夜",
                 content: "你躺在床上，回想这一年。从迷茫到坚定，从失落到希望。无论结果如何，你都已经成长。马上就是检验的时刻。",
                 choices: [
-                    { text: "充满信心，安然入睡", effect: { stress: -10, energy: 5 }, next: 16 },
-                    { text: "平静接受，顺其自然", effect: { stress: -5 }, next: 16 },
-                    { text: "紧张复习，最后冲刺", effect: { energy: -10, stress: 10 }, next: 16 }
+                    { text: "充满信心，安然入睡", effect: { stress: -10, energy: 5 }, next: 36 },
+                    { text: "平静接受，顺其自然", effect: { stress: -5 }, next: 36 },
+                    { text: "紧张复习，最后冲刺", effect: { energy: -10, stress: 10 }, next: 36 }
                 ]
             },
             {
-                id: 16,
+                id: 36,
                 week: 51,
                 day: 6,
                 title: "承诺",
@@ -2871,6 +3316,10 @@
             },
         ];
 
+
+
+
+
         // 隐藏剧情（特殊条件触发）
         const hiddenEvents = [
             {
@@ -2878,7 +3327,7 @@
                 condition: (state) => state.relationships.crush >= 60 && state.week >= 20,
                 title: "秘密基地",
                 content: "她带你来到学校天台，说这是她的秘密基地。你们靠在一起一起看夕阳，聊未来。这是你AFO后最放松的时刻。",
-                effect: { crush: 20, stress: -15, energy: 5 }
+                effect: { crush: 5, stress: -15, energy: 5 }
             },
             {
                 id: 'h2',
@@ -3152,9 +3601,9 @@
                 if (item.completed) div.classList.add('completed');
 
                 div.innerHTML = `
-                    <span>${item.dayName} ${item.time}</span>
-                    <span class="time">${item.subject}</span>
-                `;
+                                                                                                                                <span>${item.dayName} ${item.time}</span>
+                                                                                                                                <span class="time">${item.subject}</span>
+                                                                                                                            `;
 
                 elements.scheduleList.appendChild(div);
             });
@@ -4518,12 +4967,12 @@
         function showGoalModal(goal) {
             const modal = document.getElementById('goal-modal');
             elements.goalContent.innerHTML = `
-                <div class="goal-item">
-                    <h4>${goal.title}</h4>
-                    <p>${goal.desc}</p>
-                    <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
-                </div>
-            `;
+                                                                                                                            <div class="goal-item">
+                                                                                                                                <h4>${goal.title}</h4>
+                                                                                                                                <p>${goal.desc}</p>
+                                                                                                                                <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
+                                                                                                                            </div>
+                                                                                                                        `;
             modal.style.display = 'flex';
         }
 
@@ -4537,12 +4986,12 @@
                 '';
 
             elements.goalContent.innerHTML = `
-                <div class="goal-item ${className}">
-                    <h4>${goal.title} ${statusText}</h4>
-                    <p>${goal.desc}</p>
-                    ${rewardText}
-                </div>
-            `;
+                                                                                                                            <div class="goal-item ${className}">
+                                                                                                                                <h4>${goal.title} ${statusText}</h4>
+                                                                                                                                <p>${goal.desc}</p>
+                                                                                                                                ${rewardText}
+                                                                                                                            </div>
+                                                                                                                        `;
             modal.style.display = 'flex';
         }
 
@@ -4594,11 +5043,11 @@
         function showAchievementUnlockModal(achievement) {
             const modal = document.getElementById('achievement-modal');
             elements.achievementDetailContent.innerHTML = `
-                <div class="achievement-detail-item">
-                    <div class="name">🏆 ${achievement.name}</div>
-                    <div class="desc">${achievement.desc}</div>
-                </div>
-            `;
+                                                                                                                            <div class="achievement-detail-item">
+                                                                                                                                <div class="name">🏆 ${achievement.name}</div>
+                                                                                                                                <div class="desc">${achievement.desc}</div>
+                                                                                                                            </div>
+                                                                                                                        `;
             modal.style.display = 'flex';
         }
 
@@ -4617,11 +5066,11 @@
                 html += '<div style="margin-bottom:10px;font-weight:bold;color:var(--secondary);">已解锁成就：</div>';
                 unlocked.forEach(a => {
                     html += `
-                        <div class="achievement-detail-item">
-                            <div class="name">🏆 ${a.name}</div>
-                            <div class="desc">${a.desc}</div>
-                        </div>
-                    `;
+                                                                                                                                    <div class="achievement-detail-item">
+                                                                                                                                        <div class="name">🏆 ${a.name}</div>
+                                                                                                                                        <div class="desc">${a.desc}</div>
+                                                                                                                                    </div>
+                                                                                                                                `;
                 });
             }
 
@@ -4629,11 +5078,11 @@
                 html += '<div style="margin:15px 0 10px 0;font-weight:bold;color:var(--purple);">未解锁隐藏成就：</div>';
                 hidden.forEach(([id, a]) => {
                     html += `
-                        <div class="achievement-detail-item hidden">
-                            <div class="name">🔒 ???</div>
-                            <div class="desc">隐藏成就，需要特殊条件解锁</div>
-                        </div>
-                    `;
+                                                                                                                                    <div class="achievement-detail-item hidden">
+                                                                                                                                        <div class="name">🔒 ???</div>
+                                                                                                                                        <div class="desc">隐藏成就，需要特殊条件解锁</div>
+                                                                                                                                    </div>
+                                                                                                                                `;
                 });
             }
 
@@ -4816,46 +5265,46 @@
             // 显示结束画面
             const mainDiv = document.querySelector('.main');
             mainDiv.innerHTML = `
-                <div class="end-screen">
-                    <h2>🎓 高考结束</h2>
-                    <div class="final-score">${totalScore}分</div>
-                    <p>最终平均能力值</p>
-                    <h3>结果：${result}</h3>
-                    <div class="ending-text">${ending}</div>
-                    <div class="stats-summary">
-                        <div class="stat-box">
-                            <div class="label">总学习时长</div>
-                            <div class="value">${gameState.totalStudyHours}h</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="label">总休息时长</div>
-                            <div class="value">${gameState.totalRestHours}h</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="label">参加模考</div>
-                            <div class="value">${gameState.examCount}次</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="label">完成作业</div>
-                            <div class="value">${Object.values(gameState.homework).filter(v => v).length}次</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="label">参加活动</div>
-                            <div class="value">${gameState.totalActivities}次</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="label">回忆往事</div>
-                            <div class="value">${gameState.memoryCount}次</div>
-                        </div>
-                    </div>
-                    <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
-                        你的高中生涯画上了句号。无论结果如何，这段旅程都将成为你人生中宝贵的经历。<br>
-                        感谢游玩！本游戏采用<a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans"
-                        target="_blank" style="color: rgb(196, 196, 196)">CC BY-NC-ND 4.0</a>协议，作者：wujiahaocoder
-                    </p>
-                    <button class="restart-btn" onclick="location.reload()">🔄 重新开始</button>
-                </div>
-            `;
+                                                                                                                            <div class="end-screen">
+                                                                                                                                <h2>🎓 高考结束</h2>
+                                                                                                                                <div class="final-score">${totalScore}分</div>
+                                                                                                                                <p>最终平均能力值</p>
+                                                                                                                                <h3>结果：${result}</h3>
+                                                                                                                                <div class="ending-text">${ending}</div>
+                                                                                                                                <div class="stats-summary">
+                                                                                                                                    <div class="stat-box">
+                                                                                                                                        <div class="label">总学习时长</div>
+                                                                                                                                        <div class="value">${gameState.totalStudyHours}h</div>
+                                                                                                                                    </div>
+                                                                                                                                    <div class="stat-box">
+                                                                                                                                        <div class="label">总休息时长</div>
+                                                                                                                                        <div class="value">${gameState.totalRestHours}h</div>
+                                                                                                                                    </div>
+                                                                                                                                    <div class="stat-box">
+                                                                                                                                        <div class="label">参加模考</div>
+                                                                                                                                        <div class="value">${gameState.examCount}次</div>
+                                                                                                                                    </div>
+                                                                                                                                    <div class="stat-box">
+                                                                                                                                        <div class="label">完成作业</div>
+                                                                                                                                        <div class="value">${Object.values(gameState.homework).filter(v => v).length}次</div>
+                                                                                                                                    </div>
+                                                                                                                                    <div class="stat-box">
+                                                                                                                                        <div class="label">参加活动</div>
+                                                                                                                                        <div class="value">${gameState.totalActivities}次</div>
+                                                                                                                                    </div>
+                                                                                                                                    <div class="stat-box">
+                                                                                                                                        <div class="label">回忆往事</div>
+                                                                                                                                        <div class="value">${gameState.memoryCount}次</div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                                <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
+                                                                                                                                    你的高中生涯画上了句号。无论结果如何，这段旅程都将成为你人生中宝贵的经历。<br>
+                                                                                                                                    感谢游玩！本游戏采用<a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans"
+                                                                                                                                    target="_blank" style="color: rgb(196, 196, 196)">CC BY-NC-ND 4.0</a>协议，作者：wujiahaocoder
+                                                                                                                                </p>
+                                                                                                                                <button class="restart-btn" onclick="location.reload()">🔄 重新开始</button>
+                                                                                                                            </div>
+                                                                                                                        `;
 
             // 隐藏操作按钮和计数器
             document.querySelector('.actions').style.display = 'none';
