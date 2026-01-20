@@ -189,7 +189,8 @@ https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans
 	大量添加学习相关随机事件。
 ### 2026.1.20 v1.2.1
 	添加 README.md
-
+### 2026.1.20 v1.2.2
+	添加友谊相关随机事件。
 ---
 
 **祝您游戏愉快，在AFO的旅程中找到属于自己的成长与救赎！** 🎓✨
