@@ -1434,7 +1434,7 @@
                 </span>
                 <span>作者: wujiahaocoder</span>
                 <a href="https://github.com/wujiahaocoder/AFO-Simulator" target="_blank">GitHub</a>
-                <span>v1.14.514</span>
+                <span>v1.2.1</span>
             </div>
             <div id="game-status" style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">准备开始你的文化课之旅...</div>
         </header>
@@ -2206,7 +2206,659 @@
                     type: "good",
                     weight: 5,
                     condition: (s) => true
+                }, {
+                    text: "英语阅读理解全对，信心大增",
+                    effect: { english: 3, stress: -5 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.subjects.english >= 20
+                },
+                {
+                    text: "物理电磁学部分怎么也听不懂",
+                    effect: { physics: -2, stress: 5 },
+                    type: "bad",
+                    weight: 9,
+                    condition: (s) => s.subjects.physics >= 10
+                },
+                {
+                    text: "数学晚自习做竞赛题，沉浸其中忘了时间",
+                    effect: { math: 3, energy: -8, stress: -3 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.math >= 25
+                },
+                {
+                    text: "语文古文默写错了一大半",
+                    effect: { chinese: -1, stress: 4 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "化学方程式配平比赛获得第一名",
+                    effect: { chemistry: 3, classmateA: 5, stress: -5 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.chemistry >= 15
+                },
+                {
+                    text: "生物遗传图解画错，被扣分",
+                    effect: { biology: -1, stress: 3 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.biology >= 10
+                },
+                {
+                    text: "早自习背诵效率超高",
+                    effect: { english: 2, chinese: 1, energy: 3 },
+                    type: "good",
+                    weight: 9,
+                    condition: (s) => s.energy >= 60
+                },
+                {
+                    text: "作业太多，熬夜到凌晨两点",
+                    effect: { energy: -15, health: -3, stress: 8 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "找到一种新的错题整理方法",
+                    effect: { stress: -3, math: 1, physics: 1, chemistry: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "考试时笔突然没水了，影响发挥",
+                    effect: { stress: 8 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "和同桌组队完成研究性学习，配合默契",
+                    effect: { classmateA: 5, stress: -4 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "解析几何大题思路卡壳，浪费一节课",
+                    effect: { math: -1, stress: 5 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.math >= 20
+                },
+                {
+                    text: "英语老师额外指导你的发音",
+                    effect: { english: 2, englishTeacher: 3, stress: -2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.englishTeacher >= 30
+                },
+                {
+                    text: "模拟考试排名下降十名",
+                    effect: { stress: 10, parents: -5 },
+                    type: "bad",
+                    weight: 9,
+                    condition: (s) => s.relationships.parents >= 20
+                },
+                {
+                    text: "弄懂了困扰一周的化学平衡问题",
+                    effect: { chemistry: 3, stress: -8, energy: 5 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.subjects.chemistry >= 15
+                },
+                {
+                    text: "上课走神被老师点名批评",
+                    effect: { teacher: -2, stress: 5 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "利用课间十分钟背了十个单词",
+                    effect: { english: 1, stress: -1 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "重要的复习资料忘在家里了",
+                    effect: { stress: 6, energy: -3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "在数学课上提出新颖解法，得到老师赞赏",
+                    effect: { math: 2, mathTeacher: 5, stress: -4 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.math >= 25
+                },
+                {
+                    text: "语文阅读理解与标准答案完全不符",
+                    effect: { chinese: -1, stress: 4 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.subjects.chinese >= 15
+                },
+                {
+                    text: "独立推导出物理公式，成就感满满",
+                    effect: { physics: 3, stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.physics >= 20
+                },
+                {
+                    text: "小组讨论时没人听你的意见",
+                    effect: { stress: 4, classmateA: -2 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "考前突击复习，效果意外地好",
+                    effect: { stress: -2, energy: -5 },
+                    type: "neutral",
+                    weight: 8,
+                    condition: (s) => s.stress > 40
+                },
+                {
+                    text: "买到了一本讲解透彻的物理习题集",
+                    effect: { physics: 2, money: -80 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.money >= 80
+                },
+                {
+                    text: "生物实验报告被要求重写",
+                    effect: { biology: -1, stress: 5, energy: -5 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.biology >= 10
+                },
+                {
+                    text: "给同学讲题，自己也巩固了知识",
+                    effect: { math: 1, classmateA: 3, stress: -3 },
+                    type: "good",
+                    weight: 9,
+                    condition: (s) => s.subjects.math >= 20
+                },
+                {
+                    text: "默写时偷看课本，被老师发现",
+                    effect: { teacher: -3, stress: 8 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "英语听力突然开窍，能听懂大半",
+                    effect: { english: 3, stress: -5 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.english >= 15
+                },
+                {
+                    text: "作文偏题，得了低分",
+                    effect: { chinese: -2, stress: 6 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.subjects.chinese >= 15
+                },
+                {
+                    text: "用编程思维解数学题，速度飞快",
+                    effect: { math: 2, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.memoryCount >= 1
+                },
+                {
+                    text: "连续考试，身心俱疲",
+                    effect: { stress: 10, health: -2, energy: -10 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.week >= 6
+                },
+                {
+                    text: "整理错题本时发现进步明显",
+                    effect: { stress: -8, mental: 3 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "向老师请教问题，得到耐心解答",
+                    effect: { teacher: 3, stress: -2 },
+                    type: "good",
+                    weight: 9,
+                    condition: (s) => true
+                },
+                {
+                    text: "考试时肚子疼，发挥失常",
+                    effect: { stress: 8, health: -3 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.health < 70
+                },
+                {
+                    text: "提前完成作业，获得自由时间",
+                    effect: { stress: -10, energy: 5 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.energy >= 50
+                },
+                {
+                    text: "数学压轴题太难，完全没思路",
+                    effect: { math: -1, stress: 7 },
+                    type: "bad",
+                    weight: 9,
+                    condition: (s) => s.subjects.math >= 20
+                },
+                {
+                    text: "英语演讲比赛获得二等奖",
+                    effect: { english: 5, stress: -10, teacher: 5 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.english >= 30
+                },
+                {
+                    text: "化学试剂气味刺鼻，头疼了一节课",
+                    effect: { health: -2, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "和同学比赛背课文，赢了",
+                    effect: { chinese: 2, classmateA: 2, stress: -4 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.chinese >= 15
+                },
+                {
+                    text: "重要的课堂笔记被水浸湿了",
+                    effect: { stress: 6 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "掌握了高效记忆历史年代的方法",
+                    effect: { stress: -3, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "被选为课代表，事务繁多",
+                    effect: { stress: 5, teacher: 3, energy: -5 },
+                    type: "neutral",
+                    weight: 7,
+                    condition: (s) => s.teacher >= 40
+                },
+                {
+                    text: "解答出一道同学都不会的难题",
+                    effect: { math: 1, classmateA: 5, stress: -5 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.subjects.math >= 30 && s.relationships.classmateA >= 20
+                },
+                {
+                    text: "熬夜复习导致第二天状态全无",
+                    effect: { energy: -15, stress: 5, health: -2 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.energy < 30
+                },
+                {
+                    text: "父母给你请了家教，成绩有起色",
+                    effect: { math: 2, english: 2, parents: 3, money: -300 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.money >= 300 && s.relationships.parents >= 30
+                },
+                {
+                    text: "考试时看错时间，没做完卷子",
+                    effect: { stress: 10 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "建立学习小组，大家互相监督",
+                    effect: { stress: -5, classmateA: 5, energy: 3 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "沉迷钻研难题，忽略了其他科目",
+                    effect: { math: 2, physics: 2, english: -1, chinese: -1 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.subjects.math >= 25 && s.subjects.physics >= 20
+                },
+                {
+                    text: "在学校开放日给家长讲解你的学习成果",
+                    effect: { parents: 5, stress: -5, teacher: 3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.parents >= 40 && s.week >= 10
+                },
+                {
+                    text: "学习计划被打乱，感到焦虑",
+                    effect: { stress: 7, mental: -2 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "找到志同道合的学习伙伴，动力十足",
+                    effect: { energy: 10, stress: -8, classmateA: 5 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 50
+                },
+                {
+                    text: "长时间低头刷题，颈椎酸痛",
+                    effect: { health: -3, stress: 2 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.energy < 50
+                },
+                {
+                    text: "为了保持清醒站着听课，效果不错",
+                    effect: { energy: 3, health: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.energy < 60
+                },
+                {
+                    text: "crush向你借数学笔记，你精心整理后给他/她",
+                    effect: { crush: 5, math: 1, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.math >= 20 && s.relationships.crush >= 20
+                },
+                {
+                    text: "课间和crush讨论一道物理题，聊得很开心",
+                    effect: { crush: 3, physics: 1, stress: -4 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.physics >= 15 && s.relationships.crush >= 15
+                },
+                {
+                    text: "因学习压力大，没胃口吃午饭",
+                    effect: { health: -2, energy: -5 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.stress > 60
+                },
+                {
+                    text: "发现边听轻音乐边学习能缓解焦虑",
+                    effect: { stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.stress > 40
+                },
+                {
+                    text: "crush在英语课上回答问题时卡壳，你小声提示了他/她",
+                    effect: { crush: 4, english: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.english >= 20 && s.relationships.crush >= 10
+                },
+                {
+                    text: "担心考试成绩，学习时心慌手抖",
+                    effect: { stress: 6, health: -1 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.stress > 70
+                },
+                {
+                    text: "午休时趴在桌上小睡，下午精神好多了",
+                    effect: { energy: 8, health: 1 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.energy < 70
+                },
+                {
+                    text: "和crush分到同一个学习小组，你格外努力准备",
+                    effect: { crush: 6, stress: 3, energy: -4 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.crush >= 25
+                },
+                {
+                    text: "意识到坐姿不对，赶紧调整，避免了腰痛",
+                    effect: { health: 2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "crush夸你解题思路清晰，你开心了一整天",
+                    effect: { crush: 3, stress: -6, math: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.math >= 25 && s.relationships.crush >= 30
+                },
+                {
+                    text: "连续用眼过度，眼睛干涩疼痛",
+                    effect: { health: -3, energy: -2 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.energy < 40
+                },
+                {
+                    text: "学习间隙做了几组伸展运动，身体轻松不少",
+                    effect: { health: 2, energy: 3, stress: -2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "看到crush和别的同学讨论题目很热烈，有点走神",
+                    effect: { stress: 4 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.crush >= 20
+                },
+                {
+                    text: "因为熬夜学习，第二天感冒了",
+                    effect: { health: -5, energy: -10, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.health < 65 && s.energy < 30
+                },
+                {
+                    text: "crush问你生物题，你发现自己这块知识也不牢，一起查书弄懂了",
+                    effect: { crush: 2, biology: 2, stress: -2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.biology >= 10 && s.relationships.crush >= 15
+                },
+                {
+                    text: "课间去走廊远眺，放松了眼睛和心情",
+                    effect: { stress: -3, health: 1 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "担心下次考试考不好会让crush看不起，压力倍增",
+                    effect: { stress: 8 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.crush >= 35 && s.stress > 50
+                },
+                {
+                    text: "按照健康作息表学习一周，感觉精力更充沛了",
+                    effect: { health: 3, energy: 5, stress: -4 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.health >= 60 && s.week >= 2
+                },
+                {
+                    text: "和crush一起报名参加化学竞赛辅导班",
+                    effect: { crush: 4, chemistry: 2, stress: 2, money: -100 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.crush >= 40 && s.subjects.chemistry >= 15 && s.money >= 100
+                },
+                {
+                    text: "自习室空气不流通，感到头晕",
+                    effect: { health: -2, energy: -3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时注意每小时起来活动，颈椎没再疼",
+                    effect: { health: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.health < 80
+                },
+                {
+                    text: "crush的数学作业得了满分，你由衷地感到佩服",
+                    effect: { crush: 2, stress: -1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.crush >= 20
+                },
+                {
+                    text: "因学习焦虑，晚上失眠，白天学习效率低下",
+                    effect: { energy: -12, stress: 7, health: -2 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.stress > 65 && s.mental < 60
+                },
+                {
+                    text: "向crush推荐了一本对你帮助很大的参考书",
+                    effect: { crush: 3, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.crush >= 25 && s.money >= 50
+                },
+                {
+                    text: "课间喝了一杯温水，感觉身体和思维都清醒了",
+                    effect: { energy: 2, health: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "想到如果和crush考上同一所大学，学习更有动力了",
+                    effect: { energy: 8, stress: -5 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.crush >= 50
+                },
+                {
+                    text: "忘记吃早餐，上午第三节课饿得心慌无法集中精神",
+                    effect: { energy: -8, health: -2 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.energy < 50
+                },
+                {
+                    text: "和crush在图书馆偶遇，各自安静学习了一下午",
+                    effect: { crush: 2, stress: -4, energy: 3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.crush >= 30
+                },
+                {
+                    text: "意识到压力大时深呼吸很有效，学会了随时调节",
+                    effect: { stress: -6, mental: 3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.stress > 40
+                },
+                {
+                    text: "crush问你一道题，你恰好也不会，约好一起研究",
+                    effect: { crush: 4, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.crush >= 20
+                },
+                {
+                    text: "晚自习后和同学一起慢走回宿舍，放松了身心",
+                    effect: { health: 1, stress: -3, classmateA: 2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "看到crush在认真背单词，你也默默拿出了单词书",
+                    effect: { english: 1, crush: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.crush >= 15
+                },
+                {
+                    text: "因考试临近，紧张到胃痛",
+                    effect: { health: -3, stress: 5 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.stress > 75
+                },
+                {
+                    text: "学习计划顺利完成，奖励自己早点休息，睡眠质量高",
+                    effect: { energy: 10, health: 2, stress: -8 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.energy < 80
+                },
+                {
+                    text: "小组作业和crush搭档，你担心自己拖后腿而加倍努力",
+                    effect: { crush: 3, stress: 4, energy: -6 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.crush >= 30
+                },
+                {
+                    text: "课间做眼保健操，眼睛舒服多了",
+                    effect: { health: 1 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "crush的作文被贴在优秀作品栏，你仔细读了好几遍",
+                    effect: { crush: 2, chinese: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.crush >= 25 && s.subjects.chinese >= 15
+                },
+                {
+                    text: "在图书馆找到一本关于学习与压力管理的书，很有启发",
+                    effect: { stress: -7, mental: 3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.stress > 50
+                },
+                {
+                    text: "担心频繁问crush题目会打扰他/她，有些纠结",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 4,
+                    condition: (s) => s.relationships.crush >= 40
+                },
+                {
+                    text: "坚持每天学习后复盘，心态更平稳了",
+                    effect: { mental: 4, stress: -5 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
                 }
+
+
             ],
 
             relationship: [
@@ -3419,7 +4071,7 @@
             'specialization': { name: '专精之路', desc: '选择专精方向', hidden: false },
 
             // 故事成就
-            'story-5': { name: '故事过半', desc: '完成5个故事事件', hidden: false },
+            'story-5': { name: '故事开始', desc: '完成5个故事事件', hidden: false },
             'story-10': { name: '故事大师', desc: '完成10个故事事件', hidden: false },
             'story-15': { name: '史诗旅程', desc: '完成所有故事事件', hidden: false },
             'hidden-1': { name: '隐藏剧情1', desc: '触发隐藏剧情', hidden: true },
@@ -3601,9 +4253,9 @@
                 if (item.completed) div.classList.add('completed');
 
                 div.innerHTML = `
-                                                                                                                                <span>${item.dayName} ${item.time}</span>
-                                                                                                                                <span class="time">${item.subject}</span>
-                                                                                                                            `;
+                                                                                                                                                                                                                                                                                        <span>${item.dayName} ${item.time}</span>
+                                                                                                                                                                                                                                                                                        <span class="time">${item.subject}</span>
+                                                                                                                                                                                                                                                                                    `;
 
                 elements.scheduleList.appendChild(div);
             });
@@ -4790,7 +5442,7 @@
                     // 检查故事完成
                     if (gameState.storyProgress >= 5) {
                         unlockAchievement('story-5');
-                        showNotification("🎉 成就解锁：故事过半！", "good");
+                        showNotification("🎉 成就解锁：故事开始！", "good");
                     }
                     if (gameState.storyProgress >= 10) {
                         unlockAchievement('story-10');
@@ -4967,12 +5619,12 @@
         function showGoalModal(goal) {
             const modal = document.getElementById('goal-modal');
             elements.goalContent.innerHTML = `
-                                                                                                                            <div class="goal-item">
-                                                                                                                                <h4>${goal.title}</h4>
-                                                                                                                                <p>${goal.desc}</p>
-                                                                                                                                <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
-                                                                                                                            </div>
-                                                                                                                        `;
+                                                                                                                                                                                                                                                                                    <div class="goal-item">
+                                                                                                                                                                                                                                                                                        <h4>${goal.title}</h4>
+                                                                                                                                                                                                                                                                                        <p>${goal.desc}</p>
+                                                                                                                                                                                                                                                                                        <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
+                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                `;
             modal.style.display = 'flex';
         }
 
@@ -4986,12 +5638,12 @@
                 '';
 
             elements.goalContent.innerHTML = `
-                                                                                                                            <div class="goal-item ${className}">
-                                                                                                                                <h4>${goal.title} ${statusText}</h4>
-                                                                                                                                <p>${goal.desc}</p>
-                                                                                                                                ${rewardText}
-                                                                                                                            </div>
-                                                                                                                        `;
+                                                                                                                                                                                                                                                                                    <div class="goal-item ${className}">
+                                                                                                                                                                                                                                                                                        <h4>${goal.title} ${statusText}</h4>
+                                                                                                                                                                                                                                                                                        <p>${goal.desc}</p>
+                                                                                                                                                                                                                                                                                        ${rewardText}
+                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                `;
             modal.style.display = 'flex';
         }
 
@@ -5043,11 +5695,11 @@
         function showAchievementUnlockModal(achievement) {
             const modal = document.getElementById('achievement-modal');
             elements.achievementDetailContent.innerHTML = `
-                                                                                                                            <div class="achievement-detail-item">
-                                                                                                                                <div class="name">🏆 ${achievement.name}</div>
-                                                                                                                                <div class="desc">${achievement.desc}</div>
-                                                                                                                            </div>
-                                                                                                                        `;
+                                                                                                                                                                                                                                                                                    <div class="achievement-detail-item">
+                                                                                                                                                                                                                                                                                        <div class="name">🏆 ${achievement.name}</div>
+                                                                                                                                                                                                                                                                                        <div class="desc">${achievement.desc}</div>
+                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                `;
             modal.style.display = 'flex';
         }
 
@@ -5066,11 +5718,11 @@
                 html += '<div style="margin-bottom:10px;font-weight:bold;color:var(--secondary);">已解锁成就：</div>';
                 unlocked.forEach(a => {
                     html += `
-                                                                                                                                    <div class="achievement-detail-item">
-                                                                                                                                        <div class="name">🏆 ${a.name}</div>
-                                                                                                                                        <div class="desc">${a.desc}</div>
-                                                                                                                                    </div>
-                                                                                                                                `;
+                                                                                                                                                                                                                                                                                            <div class="achievement-detail-item">
+                                                                                                                                                                                                                                                                                                <div class="name">🏆 ${a.name}</div>
+                                                                                                                                                                                                                                                                                                <div class="desc">${a.desc}</div>
+                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                        `;
                 });
             }
 
@@ -5078,11 +5730,11 @@
                 html += '<div style="margin:15px 0 10px 0;font-weight:bold;color:var(--purple);">未解锁隐藏成就：</div>';
                 hidden.forEach(([id, a]) => {
                     html += `
-                                                                                                                                    <div class="achievement-detail-item hidden">
-                                                                                                                                        <div class="name">🔒 ???</div>
-                                                                                                                                        <div class="desc">隐藏成就，需要特殊条件解锁</div>
-                                                                                                                                    </div>
-                                                                                                                                `;
+                                                                                                                                                                                                                                                                                            <div class="achievement-detail-item hidden">
+                                                                                                                                                                                                                                                                                                <div class="name">🔒 ???</div>
+                                                                                                                                                                                                                                                                                                <div class="desc">隐藏成就，需要特殊条件解锁</div>
+                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                        `;
                 });
             }
 
@@ -5265,46 +5917,45 @@
             // 显示结束画面
             const mainDiv = document.querySelector('.main');
             mainDiv.innerHTML = `
-                                                                                                                            <div class="end-screen">
-                                                                                                                                <h2>🎓 高考结束</h2>
-                                                                                                                                <div class="final-score">${totalScore}分</div>
-                                                                                                                                <p>最终平均能力值</p>
-                                                                                                                                <h3>结果：${result}</h3>
-                                                                                                                                <div class="ending-text">${ending}</div>
-                                                                                                                                <div class="stats-summary">
-                                                                                                                                    <div class="stat-box">
-                                                                                                                                        <div class="label">总学习时长</div>
-                                                                                                                                        <div class="value">${gameState.totalStudyHours}h</div>
-                                                                                                                                    </div>
-                                                                                                                                    <div class="stat-box">
-                                                                                                                                        <div class="label">总休息时长</div>
-                                                                                                                                        <div class="value">${gameState.totalRestHours}h</div>
-                                                                                                                                    </div>
-                                                                                                                                    <div class="stat-box">
-                                                                                                                                        <div class="label">参加模考</div>
-                                                                                                                                        <div class="value">${gameState.examCount}次</div>
-                                                                                                                                    </div>
-                                                                                                                                    <div class="stat-box">
-                                                                                                                                        <div class="label">完成作业</div>
-                                                                                                                                        <div class="value">${Object.values(gameState.homework).filter(v => v).length}次</div>
-                                                                                                                                    </div>
-                                                                                                                                    <div class="stat-box">
-                                                                                                                                        <div class="label">参加活动</div>
-                                                                                                                                        <div class="value">${gameState.totalActivities}次</div>
-                                                                                                                                    </div>
-                                                                                                                                    <div class="stat-box">
-                                                                                                                                        <div class="label">回忆往事</div>
-                                                                                                                                        <div class="value">${gameState.memoryCount}次</div>
-                                                                                                                                    </div>
-                                                                                                                                </div>
-                                                                                                                                <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
-                                                                                                                                    你的高中生涯画上了句号。无论结果如何，这段旅程都将成为你人生中宝贵的经历。<br>
-                                                                                                                                    感谢游玩！本游戏采用<a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans"
-                                                                                                                                    target="_blank" style="color: rgb(196, 196, 196)">CC BY-NC-ND 4.0</a>协议，作者：wujiahaocoder
-                                                                                                                                </p>
-                                                                                                                                <button class="restart-btn" onclick="location.reload()">🔄 重新开始</button>
-                                                                                                                            </div>
-                                                                                                                        `;
+<div class="end-screen">
+<h2>🎓 高考结束</h2>
+<div class="final-score">${totalScore}分</div>
+<p>最终平均能力值</p>
+<h3>结果：${result}</h3>
+<div class="ending-text">${ending}</div>
+<div class="stats-summary">
+<div class="stat-box">
+<div class="label">总学习时长</div>
+<div class="value">${gameState.totalStudyHours}h</div>
+</div>
+<div class="stat-box">
+<div class="label">总休息时长</div>
+<div class="value">${gameState.totalRestHours}h</div>
+</div>
+<div class="stat-box">
+<div class="label">参加模考</div>
+<div class="value">${gameState.examCount}次</div>
+</div>
+<div class="stat-box">
+<div class="label">完成作业</div>
+<div class="value">${Object.values(gameState.homework).filter(v => v).length}次</div>
+</div>
+<div class="stat-box">
+<div class="label">参加活动</div>
+<div class="value">${gameState.totalActivities}次</div>
+</div>
+<div class="stat-box">
+<div class="label">回忆往事</div>
+<div class="value">${gameState.memoryCount}次</div>
+</div>
+</div>
+<p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
+你的高中生涯画上了句号。无论结果如何，这段旅程都将成为你人生中宝贵的经历。<br>
+感谢游玩！本游戏采用<a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans"
+target="_blank" style="color: rgb(196, 196, 196)">CC BY-NC-ND 4.0</a>协议，作者：wujiahaocoder
+</p>
+<button class="restart-btn" onclick="location.reload()">🔄 重新开始</button>
+</div>`;
 
             // 隐藏操作按钮和计数器
             document.querySelector('.actions').style.display = 'none';
