@@ -191,6 +191,8 @@ https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans
 	添加 README.md
 ### 2026.1.20 v1.2.2
 	添加友谊相关随机事件。
+### 2026.1.20 v1.2.3
+	暂时移除v1.1中添加的故事线事件，因为其导致了一些致命bug？
 ---
 
 **祝您游戏愉快，在AFO的旅程中找到属于自己的成长与救赎！** 🎓✨
