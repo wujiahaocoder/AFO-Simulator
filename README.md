@@ -1,7 +1,7 @@
 ﻿# AFO：结束？开始？ - 文化课学习模拟游戏
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey)
-![Version](https://img.shields.io/badge/Version-1.2.2-blue)
+![Version](https://img.shields.io/badge/Version-1.2.4-blue)
 ![Status](https://img.shields.io/badge/Status-Complete-green)
 
 ## 🎮 游戏简介
@@ -193,6 +193,8 @@ https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans
 	添加友谊相关随机事件。
 ### 2026.1.20 v1.2.3
 	暂时移除v1.1中添加的故事线事件，因为其导致了一些致命bug？
+### 2026.1.21 v1.2.4
+	恢复故事线事件，bug已修复。（其原因为在代码中使用了全角逗号）
 ---
 
 **祝您游戏愉快，在AFO的旅程中找到属于自己的成长与救赎！** 🎓✨
