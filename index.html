@@ -1434,7 +1434,7 @@
                 </span>
                 <span>作者: wujiahaocoder</span>
                 <a href="https://github.com/wujiahaocoder/AFO-Simulator" target="_blank">GitHub</a>
-                <span>v1.2.6</span>
+                <span>v1.2.7</span>
             </div>
             <div id="game-status" style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">准备开始你的文化课之旅...</div>
         </header>
@@ -2138,12 +2138,3194 @@
         // 随机事件库（优化版：加入合理性检查）
         const randomEvents = {
             study: [
-
+                {
+                    text: "数学老师额外布置了5道难题,说'竞赛生应该轻松搞定'",
+                    effect: { stress: 5, math: 1 },
+                    type: "bad",
+                    weight: 10,
+                    condition: (s) => s.subjects.math >= 15
+                },
+                {
+                    text: "发现一道数学题有三种解法,豁然开朗",
+                    effect: { math: 2, energy: 3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.math >= 20
+                },
+                {
+                    text: "数学测验最后一题全班只有你做对了",
+                    effect: { math: 3, teacher: 5, stress: -5 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.math >= 35
+                },
+                {
+                    text: "数学作业太多,熬夜到凌晨两点",
+                    effect: { math: 1, energy: -10, stress: 8 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.subjects.math >= 25
+                },
+                {
+                    text: "数学课代表主动分享他的错题本",
+                    effect: { math: 2, classmateA: 2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "数学老师用你的解法当范例讲解",
+                    effect: { math: 3, teacher: 5, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.math >= 30
+                },
+                {
+                    text: "数学竞赛报名截止,你犹豫不决",
+                    effect: { stress: 5 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.subjects.math >= 25 && s.week <= 8
+                },
+                {
+                    text: "数学公式突然想不起来,考试卡壳",
+                    effect: { math: -2, stress: 8 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.math >= 20
+                },
+                {
+                    text: "数学老师推荐了一本很好的参考书",
+                    effect: { math: 2, teacher: 3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.mathTeacher >= 40
+                },
+                {
+                    text: "数学课上打瞌睡,错过了关键知识点",
+                    effect: { math: -1, energy: -3, stress: 3 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.energy < 50
+                },
+                // 语文相关
+                {
+                    text: "语文作文被当作范文朗读",
+                    effect: { chinese: 2, teacher: 5 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.chinese >= 20
+                },
+                {
+                    text: "古文默写错了一个字,被扣分",
+                    effect: { chinese: -1, stress: 3 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.subjects.chinese >= 15
+                },
+                {
+                    text: "语文老师推荐你参加作文比赛",
+                    effect: { chinese: 3, teacher: 5, stress: 5 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.chinese >= 30
+                },
+                {
+                    text: "阅读理解题完全理解了作者的意图",
+                    effect: { chinese: 2, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.chinese >= 25
+                },
+                {
+                    text: "语文课上讨论《红楼梦》,你发言精彩",
+                    effect: { chinese: 2, classmateA: 3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.chinese >= 20
+                },
+                {
+                    text: "语文作业是抄写课文,枯燥乏味",
+                    effect: { chinese: 1, stress: 2 },
+                    type: "neutral",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "语文考试作文跑题,分数不理想",
+                    effect: { chinese: -2, stress: 5 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.subjects.chinese >= 15
+                },
+                {
+                    text: "语文老师表扬你的文笔有进步",
+                    effect: { chinese: 2, teacher: 3, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.chinese >= 18
+                },
+                {
+                    text: "文言文翻译遇到生僻字,查字典花了很久",
+                    effect: { chinese: 1, energy: -2 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.subjects.chinese >= 20
+                },
+                {
+                    text: "语文课上分享读书心得,获得掌声",
+                    effect: { chinese: 2, classmateA: 2, stress: -2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.chinese >= 25
+                },
+                // 英语相关
+                {
+                    text: "同学分享了高效英语单词记忆法,很有用",
+                    effect: { english: 2, stress: -2 },
+                    type: "good",
+                    weight: 10,
+                    condition: (s) => true
+                },
+                {
+                    text: "英语听力考试完全听懂了,很自信",
+                    effect: { english: 3, stress: -5 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.english >= 25
+                },
+                {
+                    text: "英语作文用了高级句型,被老师圈出表扬",
+                    effect: { english: 2, teacher: 3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.english >= 30
+                },
+                {
+                    text: "英语单词背了又忘,很沮丧",
+                    effect: { english: -1, stress: 3 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.subjects.english >= 15
+                },
+                {
+                    text: "英语老师让你当小老师,教同学发音",
+                    effect: { english: 3, teacher: 5, stress: 2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.english >= 35
+                },
+                {
+                    text: "英语课上和外教对话,虽然紧张但完成了",
+                    effect: { english: 2, stress: 3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.english >= 20
+                },
+                {
+                    text: "英语阅读理解遇到生词太多,影响理解",
+                    effect: { english: -1, stress: 4 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.english >= 18
+                },
+                {
+                    text: "英语老师送你一本原版小说",
+                    effect: { english: 2, englishTeacher: 5 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.englishTeacher >= 40
+                },
+                {
+                    text: "英语口语练习时,同学纠正了你的发音",
+                    effect: { english: 1, classmateA: 1 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.subjects.english >= 15
+                },
+                {
+                    text: "英语考试时间不够,最后几题乱填",
+                    effect: { english: -2, stress: 5 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.subjects.english >= 20
+                },
+                // 物理相关
+                {
+                    text: "物理课上突然被点名解题,幸好以前竞赛学过",
+                    effect: { physics: 1, teacher: 3 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.subjects.physics >= 15
+                },
+                {
+                    text: "物理实验数据误差很大,被老师指出",
+                    effect: { physics: -1, stress: 3 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.physics >= 10
+                },
+                {
+                    text: "物理老师用生动的比喻讲解电磁学,恍然大悟",
+                    effect: { physics: 3, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.physics >= 20
+                },
+                {
+                    text: "物理竞赛模拟题太难,只做出来一半",
+                    effect: { physics: 1, stress: 5 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.subjects.physics >= 25
+                },
+                {
+                    text: "物理课代表组织讨论,你提出了新思路",
+                    effect: { physics: 2, classmateA: 3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.physics >= 30
+                },
+                {
+                    text: "物理公式推导卡在关键步骤,很烦躁",
+                    effect: { physics: -1, stress: 4 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.physics >= 20
+                },
+                {
+                    text: "物理老师表扬你实验操作规范",
+                    effect: { physics: 2, teacher: 3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.physics >= 15
+                },
+                {
+                    text: "物理考试选择题全对,大题却不会",
+                    effect: { physics: 1, stress: 3 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.subjects.physics >= 18
+                },
+                {
+                    text: "物理实验器材损坏,实验课取消",
+                    effect: { physics: -1, stress: 2 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.subjects.physics >= 10
+                },
+                {
+                    text: "物理老师推荐你参加物理竞赛培训",
+                    effect: { physics: 3, teacher: 5, stress: 5 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.subjects.physics >= 35
+                },
+                // 化学相关
+                {
+                    text: "化学实验失败,被老师批评",
+                    effect: { chemistry: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.subjects.chemistry >= 10
+                },
+                {
+                    text: "化学方程式配平突然开窍,一气呵成",
+                    effect: { chemistry: 2, energy: 2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.chemistry >= 15
+                },
+                {
+                    text: "化学老师演示了有趣的颜色变化实验",
+                    effect: { chemistry: 2, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.chemistry >= 10
+                },
+                {
+                    text: "化学有机化学部分完全听不懂",
+                    effect: { chemistry: -2, stress: 5 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.subjects.chemistry >= 15
+                },
+                {
+                    text: "化学实验制备成功,产率很高",
+                    effect: { chemistry: 3, teacher: 3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.chemistry >= 20
+                },
+                {
+                    text: "化学考试计算题单位换算错误,全错",
+                    effect: { chemistry: -2, stress: 4 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.subjects.chemistry >= 18
+                },
+                {
+                    text: "化学老师用生活例子讲解酸碱中和",
+                    effect: { chemistry: 2, energy: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.chemistry >= 12
+                },
+                {
+                    text: "化学元素周期表背诵比赛,你得了第二",
+                    effect: { chemistry: 2, classmateA: 2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.chemistry >= 25
+                },
+                {
+                    text: "化学实验报告被当作优秀范例展示",
+                    effect: { chemistry: 3, teacher: 5 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.subjects.chemistry >= 30
+                },
+                {
+                    text: "化学课上闻到刺激性气味,头晕",
+                    effect: { chemistry: -1, health: -2, stress: 2 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.subjects.chemistry >= 10
+                },
+                // 生物相关
+                {
+                    text: "生物课代表主动帮你复习遗传学",
+                    effect: { biology: 2, classmateA: 2 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "生物实验显微镜操作不熟练,视野模糊",
+                    effect: { biology: -1, stress: 3 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.biology >= 10
+                },
+                {
+                    text: "生物老师用动画演示细胞分裂,印象深刻",
+                    effect: { biology: 3, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.subjects.biology >= 15
+                },
+                {
+                    text: "生物遗传题概率计算错误,答案全错",
+                    effect: { biology: -2, stress: 4 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.biology >= 20
+                },
+                {
+                    text: "生物实验观察植物细胞,发现有趣现象",
+                    effect: { biology: 2, classmateA: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.biology >= 15
+                },
+                {
+                    text: "生物课上讨论生态系统,你发言有深度",
+                    effect: { biology: 2, teacher: 3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.biology >= 25
+                },
+                {
+                    text: "生物考试填空题记混了专业术语",
+                    effect: { biology: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.subjects.biology >= 18
+                },
+                {
+                    text: "生物老师推荐你参加生物奥赛培训",
+                    effect: { biology: 3, teacher: 5, stress: 5 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.subjects.biology >= 35
+                },
+                {
+                    text: "生物实验解剖青蛙,心理压力大",
+                    effect: { biology: 1, stress: 5, mental: -2 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.subjects.biology >= 20
+                },
+                {
+                    text: "生物课上小组合作完成实验,效率很高",
+                    effect: { biology: 2, classmateA: 2, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                // 综合学习事件
+                {
+                    text: "发现一本绝版参考书,如获至宝",
+                    effect: { chinese: 1, math: 1, physics: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.money >= 100
+                },
+                {
+                    text: "自习室空调坏了,闷热难耐",
+                    effect: { energy: -5, stress: 5 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "图书馆座位被占,只好回教室",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "发现一个超好用的学习APP",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习小组讨论激烈,收获很多",
+                    effect: { math: 1, physics: 1, chemistry: 1, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "考试前一天复习到深夜,效率低下",
+                    effect: { energy: -8, stress: 5 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.week >= 4
+                },
+                {
+                    text: "课间向老师请教问题,得到耐心解答",
+                    effect: { teacher: 3, stress: -2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习计划被打乱,感到焦虑",
+                    effect: { stress: 5 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "提前预习了新课,上课轻松很多",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "发现自己的笔记系统需要改进",
+                    effect: { stress: 2 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "数学和物理都考了高分,信心大增",
+                    effect: { math: 2, physics: 2, stress: -5, energy: 3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.math >= 30 && s.subjects.physics >= 30
+                },
+                {
+                    text: "化学和生物实验冲突,时间紧张",
+                    effect: { chemistry: -1, biology: -1, stress: 4 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.subjects.chemistry >= 15 && s.subjects.biology >= 15
+                },
+                {
+                    text: "语文和英语作文都写得不错,老师表扬",
+                    effect: { chinese: 2, english: 2, teacher: 3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.chinese >= 25 && s.subjects.english >= 25
+                },
+                {
+                    text: "学习时手机干扰严重,效率低下",
+                    effect: { energy: -3, stress: 3 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "找到适合自己的学习节奏,事半功倍",
+                    effect: { energy: 5, stress: -5 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师突然宣布小测验,措手不及",
+                    effect: { stress: 5 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时窗外风景很美,心情愉悦",
+                    effect: { stress: -3, energy: 2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "发现自己的错题本整理得很乱",
+                    effect: { stress: 2 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时突然停电,被迫休息",
+                    effect: { energy: 3, stress: 2 },
+                    type: "neutral",
+                    weight: 4,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师布置的作业量突然减少",
+                    effect: { stress: -5, energy: 3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时被同学打扰,很烦躁",
+                    effect: { stress: 4 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "发现一个安静的学习角落,效率提升",
+                    effect: { energy: 3, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时突然想通一个难题,很兴奋",
+                    effect: { energy: 5, stress: -5 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师讲课声音太小,听不清",
+                    effect: { stress: 3 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的知识体系有漏洞",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用幽默的方式讲解枯燥内容",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的笔记记得很详细",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师突然提问,你答不上来",
+                    effect: { stress: 4 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的进步很明显",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师布置的作业需要查很多资料",
+                    effect: { energy: -3, stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的时间管理有问题",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用实物演示抽象概念,理解加深",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的专注力下降",
+                    effect: { energy: -2, stress: 2 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师鼓励大家多提问,氛围很好",
+                    effect: { stress: -3, energy: 2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的知识面很窄",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用思维导图梳理知识,清晰明了",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习方法需要调整",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师分享了自己的学习经历,很受启发",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的基础不牢固",
+                    effect: { stress: 4 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用游戏的方式复习,有趣又有效",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的知识遗忘很快",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用对比法讲解易混淆概念,印象深刻",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的理解能力有待提高",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用故事引入新课,吸引注意力",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的计算能力不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用图表展示数据,一目了然",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的逻辑思维需要训练",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用实验验证理论,加深理解",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的记忆力需要提升",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用类比法讲解抽象概念,容易理解",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的表达能力不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用分组讨论的方式,互相学习",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的时间分配不合理",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用思维训练题,锻炼大脑",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习动力不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用成功案例激励大家,充满希望",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的自信心不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用错误案例分析,避免踩坑",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的抗压能力需要提高",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用阶段性目标设定,有成就感",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习习惯需要培养",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用正向反馈鼓励,进步明显",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习方法需要优化",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用知识图谱串联知识点,系统性强",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习效率需要提高",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用思维导图总结,一目了然",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习态度需要端正",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用成功经验分享,少走弯路",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习目标不明确",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用失败教训警示,避免重蹈覆辙",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习计划不切实际",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用科学方法指导,事半功倍",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习环境不佳",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用心理辅导缓解焦虑,心态平稳",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习资源不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习策略指导,提升效率",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习方法不适合",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习技巧分享,快速提升",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习动力来源单一",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习目标分解,循序渐进",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习反馈不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习评估方法,及时调整",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习监控不够",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习反思指导,持续改进",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习迁移能力弱",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习应用指导,学以致用",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习创新能力不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习拓展指导,开阔视野",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习批判性思维弱",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习思辨指导,提升思维",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习合作能力差",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习协作指导,团队进步",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习沟通能力弱",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习表达指导,清晰传达",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习领导能力不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习组织指导,提升效率",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习适应能力差",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习调整指导,灵活应对",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习抗挫折能力弱",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习坚持指导,克服困难",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习自我管理能力差",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习自律指导,提升自制力",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习自我激励能力弱",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习自信指导,增强信心",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习自我反思能力不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习总结指导,提升认知",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习自我评估能力弱",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习诊断指导,精准改进",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习自我调节能力差",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习优化指导,持续提升",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习自我发展能力不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习规划指导,明确方向",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习自我实现能力弱",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习目标指导,激发潜能",
+                    effect: { energy: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "学习时发现自己的学习自我超越能力不足",
+                    effect: { stress: 3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师用学习愿景指导,追求卓越",
+                    effect: { energy: 3, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                }
             ],
 
             relationship: [
 
+                {
+                    text: "朋友主动借你课堂笔记,字迹工整",
+                    effect: { classmateA: 3, stress: -2 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "和朋友一起刷题,效率翻倍",
+                    effect: { classmateA: 2, math: 1, energy: -2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.math >= 10
+                },
+                {
+                    text: "朋友发现你漏记了重点,及时提醒",
+                    effect: { classmateA: 4, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友的解题思路很独特,让你豁然开朗",
+                    effect: { classmateA: 3, physics: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.physics >= 15
+                },
+                {
+                    text: "朋友约你周末一起复习,你答应了",
+                    effect: { classmateA: 2, stress: 2 },
+                    type: "neutral",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友的英语作文被老师表扬,你为他高兴",
+                    effect: { classmateA: 3, english: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友在你生病时帮忙抄了笔记",
+                    effect: { classmateA: 5, stress: -5 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.health < 70
+                },
+                {
+                    text: "朋友的化学实验数据给你参考",
+                    effect: { classmateA: 2, chemistry: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.chemistry >= 10
+                },
+                {
+                    text: "朋友提醒你明天有小测",
+                    effect: { classmateA: 3, stress: 3 },
+                    type: "neutral",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的生物笔记有彩色图解,很清晰",
+                    effect: { classmateA: 2, biology: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友和你比赛背单词,输了请奶茶",
+                    effect: { classmateA: 2, english: 1, stress: 2 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友的作文思路启发了你",
+                    effect: { classmateA: 3, chinese: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.chinese >= 15
+                },
+                {
+                    text: "朋友的物理错题本借你参考",
+                    effect: { classmateA: 2, physics: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.physics >= 10
+                },
+                {
+                    text: "朋友的数学竞赛题解法很巧妙",
+                    effect: { classmateA: 3, math: 2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.math >= 25
+                },
+                {
+                    text: "朋友的生物实验报告写得详细",
+                    effect: { classmateA: 2, biology: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友的语文阅读笔记很有见解",
+                    effect: { classmateA: 2, chinese: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.chinese >= 20
+                },
+                {
+                    text: "朋友的英语听力技巧很实用",
+                    effect: { classmateA: 2, english: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友的化学方程式记忆法很有效",
+                    effect: { classmateA: 2, chemistry: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.chemistry >= 15
+                },
+                {
+                    text: "朋友的历史时间轴整理得很清晰",
+                    effect: { classmateA: 2, history: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友的地理地图册借你复习",
+                    effect: { classmateA: 2, geography: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
 
+                {
+                    text: "朋友分享了喜欢的音乐,很好听",
+                    effect: { classmateA: 2, stress: -3 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友约你一起去食堂吃饭",
+                    effect: { classmateA: 2, energy: 3 },
+                    type: "good",
+                    weight: 9,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友的笑话让你笑出声",
+                    effect: { classmateA: 2, stress: -5 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友借你充电宝,手机没电了",
+                    effect: { classmateA: 3, stress: -2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友帮你占了图书馆座位",
+                    effect: { classmateA: 3, stress: -3 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友的雨伞借你用,下雨了",
+                    effect: { classmateA: 3, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的纸巾借你用,打了个喷嚏",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的创可贴借你用,擦伤了",
+                    effect: { classmateA: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的橡皮借你用,笔没墨了",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的修正带借你用,写错了",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的尺子借你用,画图需要",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的圆规借你用,几何题需要",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的量角器借你用,角度测量",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的计算器借你用,复杂计算",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的荧光笔借你用,划重点",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的便利贴借你用,记临时事项",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的订书机借你用,整理资料",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的打孔器借你用,做笔记",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的文件夹借你用,分类试卷",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的书立借你用,整理书本",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+
+                {
+                    text: "朋友在你低落时安慰你",
+                    effect: { classmateA: 4, stress: -8, mental: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.stress > 40
+                },
+                {
+                    text: "朋友为你庆祝生日,送了小礼物",
+                    effect: { classmateA: 5, stress: -5, energy: 3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 50
+                },
+                {
+                    text: "朋友在你考试失利时鼓励你",
+                    effect: { classmateA: 3, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友分享了自己的烦恼,你倾听了",
+                    effect: { classmateA: 3, stress: 2 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友在你被批评时为你辩护",
+                    effect: { classmateA: 5, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 45
+                },
+                {
+                    text: "朋友在你生病时发消息关心",
+                    effect: { classmateA: 3, stress: -2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.health < 80
+                },
+                {
+                    text: "朋友在你熬夜时提醒你早点休息",
+                    effect: { classmateA: 2, stress: -1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.energy < 50
+                },
+                {
+                    text: "朋友在你压力大时陪你散步",
+                    effect: { classmateA: 3, stress: -6, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.stress > 50
+                },
+                {
+                    text: "朋友在你迷茫时给你建议",
+                    effect: { classmateA: 3, stress: -3, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友在你成功时真心为你高兴",
+                    effect: { classmateA: 4, stress: -3, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友在你失败时说'下次会更好'",
+                    effect: { classmateA: 3, stress: -4, mental: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友在你孤独时陪你聊天",
+                    effect: { classmateA: 3, stress: -4, mental: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友在你焦虑时教你深呼吸",
+                    effect: { classmateA: 2, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.stress > 45
+                },
+                {
+                    text: "朋友在你失眠时分享助眠音乐",
+                    effect: { classmateA: 2, stress: -3, energy: 2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.energy < 40
+                },
+                {
+                    text: "朋友在你饥饿时分你零食",
+                    effect: { classmateA: 2, energy: 3, stress: -2 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友在你口渴时分你水",
+                    effect: { classmateA: 2, energy: 2, stress: -1 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友在你冷时借你外套",
+                    effect: { classmateA: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友在你热时借你扇子",
+                    effect: { classmateA: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友在你困时借你风油精",
+                    effect: { classmateA: 2, energy: 2, stress: -1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友在你头疼时借你止痛药",
+                    effect: { classmateA: 2, stress: -3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => true
+                },
+
+                {
+                    text: "朋友误会你,说了气话",
+                    effect: { classmateA: -5, stress: 8 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "你和朋友因为小事争吵",
+                    effect: { classmateA: -3, stress: 5 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友的玩笑开过了,你感到不舒服",
+                    effect: { classmateA: -2, stress: 3 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友忘记答应你的事,你有点失望",
+                    effect: { classmateA: -2, stress: 2 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "你和朋友竞争同一个奖项,气氛紧张",
+                    effect: { classmateA: -3, stress: 5 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友在背后说你坏话,被你听到",
+                    effect: { classmateA: -8, stress: 10, mental: -2 },
+                    type: "bad",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "你和朋友因为观点不同而争论",
+                    effect: { classmateA: -2, stress: 4 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友借你钱却迟迟不还",
+                    effect: { classmateA: -4, stress: 5, money: -50 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友在你忙时打扰你,你有点烦躁",
+                    effect: { classmateA: -1, stress: 3 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友的承诺没做到,你感到失望",
+                    effect: { classmateA: -3, stress: 4 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "你和朋友冷战了,互不理睬",
+                    effect: { classmateA: -5, stress: 6, mental: -1 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友向你道歉,承认错误",
+                    effect: { classmateA: 4, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "你主动和朋友和解,关系修复",
+                    effect: { classmateA: 5, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 10
+                },
+                {
+                    text: "朋友送你小礼物表示歉意",
+                    effect: { classmateA: 4, stress: -4 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友在你生日时主动和好",
+                    effect: { classmateA: 6, stress: -6 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 15
+                },
+
+                {
+                    text: "朋友邀请你参加班级篮球赛",
+                    effect: { classmateA: 3, energy: -5, stress: 2 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友和你一起参加社团活动",
+                    effect: { classmateA: 3, energy: -3, stress: -2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友和你组队参加知识竞赛",
+                    effect: { classmateA: 4, stress: 5, energy: -3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友和你一起排练文艺汇演",
+                    effect: { classmateA: 3, stress: 3, energy: -4 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友和你一起做志愿者活动",
+                    effect: { classmateA: 4, stress: -3, energy: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友和你一起准备班级黑板报",
+                    effect: { classmateA: 3, stress: 2, energy: -3 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友和你一起参加运动会",
+                    effect: { classmateA: 3, energy: -8, stress: 2 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友和你一起准备演讲比赛",
+                    effect: { classmateA: 4, stress: 5, energy: -4 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友和你一起策划班级活动",
+                    effect: { classmateA: 3, stress: 3, energy: -3 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友和你一起参加辩论赛",
+                    effect: { classmateA: 4, stress: 6, energy: -5 },
+                    type: "neutral",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友和你一起参加合唱比赛",
+                    effect: { classmateA: 3, stress: 2, energy: -3 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友和你一起参加美术展览",
+                    effect: { classmateA: 3, stress: -2, energy: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友和你一起参加科技制作",
+                    effect: { classmateA: 4, stress: 3, energy: -4 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友和你一起参加数学建模",
+                    effect: { classmateA: 4, stress: 5, energy: -5 },
+                    type: "neutral",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友和你一起参加物理实验竞赛",
+                    effect: { classmateA: 4, stress: 4, energy: -4 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+
+                {
+                    text: "朋友在你转学时送你纪念册",
+                    effect: { classmateA: 6, stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 50
+                },
+                {
+                    text: "朋友在你毕业时送你毕业礼物",
+                    effect: { classmateA: 5, stress: -3, energy: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.week >= 12
+                },
+                {
+                    text: "朋友在你获奖时第一个祝贺你",
+                    effect: { classmateA: 4, stress: -4, energy: 3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友在你落选时安慰你",
+                    effect: { classmateA: 4, stress: -6, mental: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友在你生病时帮你请假",
+                    effect: { classmateA: 5, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.health < 70
+                },
+                {
+                    text: "朋友在你忘带作业时帮你解释",
+                    effect: { classmateA: 3, stress: -2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友在你迟到时帮你打掩护",
+                    effect: { classmateA: 3, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友在你被老师误会时为你作证",
+                    effect: { classmateA: 5, stress: -5 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友在你被批评时为你说话",
+                    effect: { classmateA: 4, stress: -4 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友在你被孤立时主动接近你",
+                    effect: { classmateA: 6, stress: -8, mental: 2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友在你被欺负时站出来保护你",
+                    effect: { classmateA: 7, stress: -6, mental: 3 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 45
+                },
+                {
+                    text: "朋友在你被嘲笑时为你辩护",
+                    effect: { classmateA: 5, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友在你被误解时为你澄清",
+                    effect: { classmateA: 4, stress: -4 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友在你被忽视时注意到你",
+                    effect: { classmateA: 3, stress: -3, mental: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友在你被冷落时邀请你加入",
+                    effect: { classmateA: 4, stress: -4, mental: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+
+                {
+                    text: "朋友和你竞争同一个排名,压力很大",
+                    effect: { classmateA: -2, stress: 5 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友的成绩超过你,你感到失落",
+                    effect: { classmateA: -1, stress: 4, mental: -1 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友的解题速度比你快,你有点着急",
+                    effect: { classmateA: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友的笔记比你详细,你感到压力",
+                    effect: { classmateA: -1, stress: 2 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友的复习进度比你快,你有点焦虑",
+                    effect: { classmateA: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友的错题本比你厚,你感到压力",
+                    effect: { classmateA: -1, stress: 2 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友的复习时间比你长,你有点着急",
+                    effect: { classmateA: -1, stress: 3 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友的模拟考分数比你高,你感到失落",
+                    effect: { classmateA: -2, stress: 4, mental: -1 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友的解题方法比你巧妙,你有点沮丧",
+                    effect: { classmateA: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友的复习效率比你高,你感到压力",
+                    effect: { classmateA: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+
+                {
+                    text: "朋友和你分享了秘密",
+                    effect: { classmateA: 5, stress: -2, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 45
+                },
+                {
+                    text: "朋友和你聊到深夜,关系更近",
+                    effect: { classmateA: 4, energy: -5, stress: -3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友和你一起规划未来",
+                    effect: { classmateA: 4, stress: -2, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 50
+                },
+                {
+                    text: "朋友和你约定考上同一所大学",
+                    effect: { classmateA: 6, stress: 5, energy: 3 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 55
+                },
+                {
+                    text: "朋友和你成为最好的朋友",
+                    effect: { classmateA: 8, stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 2,
+                    condition: (s) => s.relationships.classmateA >= 60
+                },
+                {
+                    text: "朋友在你生日时为你准备惊喜",
+                    effect: { classmateA: 6, stress: -8, energy: 3 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 50
+                },
+                {
+                    text: "朋友在你重要时刻陪伴你",
+                    effect: { classmateA: 5, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 45
+                },
+                {
+                    text: "朋友在你需要时总是出现",
+                    effect: { classmateA: 4, stress: -4, mental: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友的理解让你感到温暖",
+                    effect: { classmateA: 3, stress: -3, mental: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友的信任让你感到责任",
+                    effect: { classmateA: 3, stress: 2, mental: 1 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+
+                {
+                    text: "朋友在你困难时犹豫是否帮忙",
+                    effect: { classmateA: -3, stress: 4 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友在你求助时找借口推脱",
+                    effect: { classmateA: -4, stress: 5 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友在你成功时表现出嫉妒",
+                    effect: { classmateA: -3, stress: 3, mental: -1 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友在你失败时表现出轻视",
+                    effect: { classmateA: -4, stress: 5, mental: -1 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友在你面前炫耀成绩",
+                    effect: { classmateA: -2, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友在你面前贬低你的努力",
+                    effect: { classmateA: -3, stress: 4, mental: -1 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友在你面前传播你的谣言",
+                    effect: { classmateA: -6, stress: 8, mental: -2 },
+                    type: "bad",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友在你背后说你的坏话",
+                    effect: { classmateA: -5, stress: 6, mental: -1 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 35
+                },
+                {
+                    text: "朋友在你不知情时利用你",
+                    effect: { classmateA: -7, stress: 7, mental: -2 },
+                    type: "bad",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 45
+                },
+                {
+                    text: "朋友在你信任时背叛你",
+                    effect: { classmateA: -8, stress: 10, mental: -3 },
+                    type: "bad",
+                    weight: 2,
+                    condition: (s) => s.relationships.classmateA >= 50
+                },
+
+
+                {
+                    text: "朋友主动找你谈心,化解误会",
+                    effect: { classmateA: 5, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友写信向你道歉,情真意切",
+                    effect: { classmateA: 6, stress: -6, mental: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友送你亲手做的礼物表示歉意",
+                    effect: { classmateA: 5, stress: -4 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+                {
+                    text: "朋友在你生日时主动和好",
+                    effect: { classmateA: 7, stress: -7 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 15
+                },
+                {
+                    text: "朋友在你困难时伸出援手,关系修复",
+                    effect: { classmateA: 6, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友在你成功时真心祝贺,冰释前嫌",
+                    effect: { classmateA: 5, stress: -4 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友在你失败时安慰你,重归于好",
+                    effect: { classmateA: 5, stress: -6, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 20
+                },
+                {
+                    text: "朋友在你被批评时为你说话,关系缓和",
+                    effect: { classmateA: 4, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 25
+                },
+                {
+                    text: "朋友在你被孤立时接近你,友谊重建",
+                    effect: { classmateA: 6, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 15
+                },
+                {
+                    text: "朋友在你被欺负时保护你,友谊加深",
+                    effect: { classmateA: 7, stress: -6, mental: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 30
+                },
+
+
+                {
+                    text: "朋友在你最需要时出现,成为知己",
+                    effect: { classmateA: 8, stress: -8, mental: 3 },
+                    type: "good",
+                    weight: 2,
+                    condition: (s) => s.relationships.classmateA >= 55
+                },
+                {
+                    text: "朋友在你迷茫时指引你,成为导师",
+                    effect: { classmateA: 6, stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 50
+                },
+                {
+                    text: "朋友在你跌倒时扶起你,成为依靠",
+                    effect: { classmateA: 7, stress: -7, mental: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 55
+                }, {
+                    text: "朋友的地理地图册借你复习,画满了重点",
+                    effect: { classmateB: 3, geography: 1, stress: -2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友的历史时间轴整理得非常清晰",
+                    effect: { classmateB: 2, history: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友的语文阅读理解技巧很实用",
+                    effect: { classmateB: 2, chinese: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.chinese >= 15
+                },
+                {
+                    text: "朋友的英语作文模板借你参考",
+                    effect: { classmateB: 3, english: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友的化学实验报告写得详细",
+                    effect: { classmateB: 2, chemistry: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.chemistry >= 10
+                },
+                {
+                    text: "朋友的生物笔记有手绘图解",
+                    effect: { classmateB: 2, biology: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友的物理错题本借你参考",
+                    effect: { classmateB: 2, physics: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.subjects.physics >= 10
+                },
+                {
+                    text: "朋友的数学竞赛题解法很巧妙",
+                    effect: { classmateB: 3, math: 2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.math >= 25
+                },
+                {
+                    text: "朋友的英语听力技巧很实用",
+                    effect: { classmateB: 2, english: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友的语文作文思路启发了你",
+                    effect: { classmateB: 3, chinese: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.subjects.chinese >= 20
+                },
+
+                {
+                    text: "朋友分享了喜欢的电影,很好看",
+                    effect: { classmateB: 2, stress: -3 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友约你一起去图书馆自习",
+                    effect: { classmateB: 2, energy: -2, stress: -1 },
+                    type: "good",
+                    weight: 9,
+                    condition: (s) => s.relationships.classmateB >= 20
+                },
+                {
+                    text: "朋友的冷笑话让你笑出声",
+                    effect: { classmateB: 2, stress: -5 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友借你充电宝,手机没电了",
+                    effect: { classmateB: 3, stress: -2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友帮你占了自习室座位",
+                    effect: { classmateB: 3, stress: -3 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友的雨伞借你用,下雨了",
+                    effect: { classmateB: 3, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的纸巾借你用,打了个喷嚏",
+                    effect: { classmateB: 2, stress: -1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的创可贴借你用,擦伤了",
+                    effect: { classmateB: 2, stress: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的橡皮借你用,笔没墨了",
+                    effect: { classmateB: 2, stress: -1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友的修正带借你用,写错了",
+                    effect: { classmateB: 2, stress: -1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => true
+                },
+                {
+                    text: "朋友在你低落时安慰你",
+                    effect: { classmateB: 4, stress: -8, mental: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.stress > 40
+                },
+                {
+                    text: "朋友为你庆祝生日,送了小礼物",
+                    effect: { classmateB: 5, stress: -5, energy: 3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 50
+                },
+                {
+                    text: "朋友在你考试失利时鼓励你",
+                    effect: { classmateB: 3, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友分享了自己的烦恼,你倾听了",
+                    effect: { classmateB: 3, stress: 2 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在你被批评时为你辩护",
+                    effect: { classmateB: 5, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 45
+                },
+                {
+                    text: "朋友在你生病时发消息关心",
+                    effect: { classmateB: 3, stress: -2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.health < 80
+                },
+                {
+                    text: "朋友在你熬夜时提醒你早点休息",
+                    effect: { classmateB: 2, stress: -1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.energy < 50
+                },
+                {
+                    text: "朋友在你压力大时陪你散步",
+                    effect: { classmateB: 3, stress: -6, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.stress > 50
+                },
+                {
+                    text: "朋友在你迷茫时给你建议",
+                    effect: { classmateB: 3, stress: -3, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友在你成功时真心为你高兴",
+                    effect: { classmateB: 4, stress: -3, energy: 2 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友误会你,说了气话",
+                    effect: { classmateB: -5, stress: 8 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "你和朋友因为小事争吵",
+                    effect: { classmateB: -3, stress: 5 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 20
+                },
+                {
+                    text: "朋友的玩笑开过了,你感到不舒服",
+                    effect: { classmateB: -2, stress: 3 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友忘记答应你的事,你有点失望",
+                    effect: { classmateB: -2, stress: 2 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "你和朋友竞争同一个奖项,气氛紧张",
+                    effect: { classmateB: -3, stress: 5 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在背后说你坏话,被你听到",
+                    effect: { classmateB: -8, stress: 10, mental: -2 },
+                    type: "bad",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "你和朋友因为观点不同而争论",
+                    effect: { classmateB: -2, stress: 4 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友借你钱却迟迟不还",
+                    effect: { classmateB: -4, stress: 5, money: -50 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在你忙时打扰你,你有点烦躁",
+                    effect: { classmateB: -1, stress: 3 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 20
+                },
+                {
+                    text: "朋友的承诺没做到,你感到失望",
+                    effect: { classmateB: -3, stress: 4 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友邀请你参加班级篮球赛",
+                    effect: { classmateB: 3, energy: -5, stress: 2 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友和你一起参加社团活动",
+                    effect: { classmateB: 3, energy: -3, stress: -2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友和你组队参加知识竞赛",
+                    effect: { classmateB: 4, stress: 5, energy: -3 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友和你一起排练文艺汇演",
+                    effect: { classmateB: 3, stress: 3, energy: -4 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友和你一起做志愿者活动",
+                    effect: { classmateB: 4, stress: -3, energy: -2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友和你一起准备班级黑板报",
+                    effect: { classmateB: 3, stress: 2, energy: -3 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友和你一起参加运动会",
+                    effect: { classmateB: 3, energy: -8, stress: 2 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友和你一起准备演讲比赛",
+                    effect: { classmateB: 4, stress: 5, energy: -4 },
+                    type: "neutral",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友和你一起策划班级活动",
+                    effect: { classmateB: 3, stress: 3, energy: -3 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友和你一起参加辩论赛",
+                    effect: { classmateB: 4, stress: 6, energy: -5 },
+                    type: "neutral",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在你转学时送你纪念册",
+                    effect: { classmateB: 6, stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 50
+                },
+                {
+                    text: "朋友在你毕业时送你毕业礼物",
+                    effect: { classmateB: 5, stress: -3, energy: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.week >= 12
+                },
+                {
+                    text: "朋友在你获奖时第一个祝贺你",
+                    effect: { classmateB: 4, stress: -4, energy: 3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友在你落选时安慰你",
+                    effect: { classmateB: 4, stress: -6, mental: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友在你生病时帮你请假",
+                    effect: { classmateB: 5, stress: -3 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.health < 70
+                },
+                {
+                    text: "朋友在你忘带作业时帮你解释",
+                    effect: { classmateB: 3, stress: -2 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友在你迟到时帮你打掩护",
+                    effect: { classmateB: 3, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友在你被老师误会时为你作证",
+                    effect: { classmateB: 5, stress: -5 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在你被批评时为你说话",
+                    effect: { classmateB: 4, stress: -4 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友在你被孤立时主动接近你",
+                    effect: { classmateB: 6, stress: -8, mental: 2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 20
+                },
+                {
+                    text: "朋友和你竞争同一个排名,压力很大",
+                    effect: { classmateB: -2, stress: 5 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友的成绩超过你,你感到失落",
+                    effect: { classmateB: -1, stress: 4, mental: -1 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友的解题速度比你快,你有点着急",
+                    effect: { classmateB: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友的笔记比你详细,你感到压力",
+                    effect: { classmateB: -1, stress: 2 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 20
+                },
+                {
+                    text: "朋友的复习进度比你快,你有点焦虑",
+                    effect: { classmateB: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友的错题本比你厚,你感到压力",
+                    effect: { classmateB: -1, stress: 2 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 20
+                },
+                {
+                    text: "朋友的复习时间比你长,你有点着急",
+                    effect: { classmateB: -1, stress: 3 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友的模拟考分数比你高,你感到失落",
+                    effect: { classmateB: -2, stress: 4, mental: -1 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友的解题方法比你巧妙,你有点沮丧",
+                    effect: { classmateB: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友的复习效率比你高,你感到压力",
+                    effect: { classmateB: -1, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友和你分享了秘密",
+                    effect: { classmateB: 5, stress: -2, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 45
+                },
+                {
+                    text: "朋友和你聊到深夜,关系更近",
+                    effect: { classmateB: 4, energy: -5, stress: -3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友和你一起规划未来",
+                    effect: { classmateB: 4, stress: -2, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 50
+                },
+                {
+                    text: "朋友和你约定考上同一所大学",
+                    effect: { classmateB: 6, stress: 5, energy: 3 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 55
+                },
+                {
+                    text: "朋友和你成为最好的朋友",
+                    effect: { classmateB: 8, stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 2,
+                    condition: (s) => s.relationships.classmateB >= 60
+                },
+                {
+                    text: "朋友在你生日时为你准备惊喜",
+                    effect: { classmateB: 6, stress: -8, energy: 3 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 50
+                },
+                {
+                    text: "朋友在你重要时刻陪伴你",
+                    effect: { classmateB: 5, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 45
+                },
+                {
+                    text: "朋友在你需要时总是出现",
+                    effect: { classmateB: 4, stress: -4, mental: 1 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友的理解让你感到温暖",
+                    effect: { classmateB: 3, stress: -3, mental: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友的信任让你感到责任",
+                    effect: { classmateB: 3, stress: 2, mental: 1 },
+                    type: "neutral",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在你困难时犹豫是否帮忙",
+                    effect: { classmateB: -3, stress: 4 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友在你求助时找借口推脱",
+                    effect: { classmateB: -4, stress: 5 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友在你成功时表现出嫉妒",
+                    effect: { classmateB: -3, stress: 3, mental: -1 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在你失败时表现出轻视",
+                    effect: { classmateB: -4, stress: 5, mental: -1 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友在你面前炫耀成绩",
+                    effect: { classmateB: -2, stress: 3 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友在你面前贬低你的努力",
+                    effect: { classmateB: -3, stress: 4, mental: -1 },
+                    type: "bad",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友在你面前传播你的谣言",
+                    effect: { classmateB: -6, stress: 8, mental: -2 },
+                    type: "bad",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在你背后说你的坏话",
+                    effect: { classmateB: -5, stress: 6, mental: -1 },
+                    type: "bad",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 35
+                },
+                {
+                    text: "朋友在你不知情时利用你",
+                    effect: { classmateB: -7, stress: 7, mental: -2 },
+                    type: "bad",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 45
+                },
+                {
+                    text: "朋友在你信任时背叛你",
+                    effect: { classmateB: -8, stress: 10, mental: -3 },
+                    type: "bad",
+                    weight: 2,
+                    condition: (s) => s.relationships.classmateB >= 50
+                },
+
+                {
+                    text: "朋友主动找你谈心,化解误会",
+                    effect: { classmateB: 5, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 20
+                },
+                {
+                    text: "朋友写信向你道歉,情真意切",
+                    effect: { classmateB: 6, stress: -6, mental: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友送你亲手做的礼物表示歉意",
+                    effect: { classmateB: 5, stress: -4 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+                {
+                    text: "朋友在你生日时主动和好",
+                    effect: { classmateB: 7, stress: -7 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 15
+                },
+                {
+                    text: "朋友在你困难时伸出援手,关系修复",
+                    effect: { classmateB: 6, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 20
+                },
+                {
+                    text: "朋友在你成功时真心祝贺,冰释前嫌",
+                    effect: { classmateB: 5, stress: -4 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友在你失败时安慰你,重归于好",
+                    effect: { classmateB: 5, stress: -6, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 20
+                },
+                {
+                    text: "朋友在你被批评时为你说话,关系缓和",
+                    effect: { classmateB: 4, stress: -3 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateB >= 25
+                },
+                {
+                    text: "朋友在你被孤立时接近你,友谊重建",
+                    effect: { classmateB: 6, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 15
+                },
+                {
+                    text: "朋友在你被欺负时保护你,友谊加深",
+                    effect: { classmateB: 7, stress: -6, mental: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 30
+                },
+
+                {
+                    text: "朋友在你最需要时出现,成为知己",
+                    effect: { classmateB: 8, stress: -8, mental: 3 },
+                    type: "good",
+                    weight: 2,
+                    condition: (s) => s.relationships.classmateB >= 55
+                },
+                {
+                    text: "朋友在你迷茫时指引你,成为导师",
+                    effect: { classmateB: 6, stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 50
+                },
+                {
+                    text: "朋友在你跌倒时扶起你,成为依靠",
+                    effect: { classmateB: 7, stress: -7, mental: 2 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 55
+                },
+                {
+                    text: "朋友在你成功时为你骄傲,成为见证者",
+                    effect: { classmateB: 5, stress: -4, energy: 3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 45
+                },
+                {
+                    text: "朋友在你失败时陪你振作,成为支撑",
+                    effect: { classmateB: 6, stress: -6, mental: 2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 50
+                },
+                {
+                    text: "朋友在你孤独时陪伴你,成为温暖",
+                    effect: { classmateB: 5, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在你焦虑时安抚你,成为镇定剂",
+                    effect: { classmateB: 5, stress: -7, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 45
+                },
+                {
+                    text: "朋友在你恐惧时鼓励你,成为勇气",
+                    effect: { classmateB: 5, stress: -6, mental: 2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateB >= 40
+                },
+                {
+                    text: "朋友在你绝望时拉你一把,成为希望",
+                    effect: { classmateB: 7, stress: -8, mental: 3 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateB >= 50
+                },
+                {
+                    text: "朋友在你迷茫时点亮灯塔,成为方向",
+                    effect: { classmateB: 6, stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateB >= 45
+                },
+                {
+                    text: "朋友在你成功时为你骄傲,成为见证者",
+                    effect: { classmateA: 5, stress: -4, energy: 3 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 45
+                },
+                {
+                    text: "朋友在你失败时陪你振作,成为支撑",
+                    effect: { classmateA: 6, stress: -6, mental: 2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 50
+                },
+                {
+                    text: "朋友在你孤独时陪伴你,成为温暖",
+                    effect: { classmateA: 5, stress: -5, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友在你焦虑时安抚你,成为镇定剂",
+                    effect: { classmateA: 5, stress: -7, mental: 1 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 45
+                },
+                {
+                    text: "朋友在你恐惧时鼓励你,成为勇气",
+                    effect: { classmateA: 5, stress: -6, mental: 2 },
+                    type: "good",
+                    weight: 5,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "朋友在你绝望时拉你一把,成为希望",
+                    effect: { classmateA: 7, stress: -8, mental: 3 },
+                    type: "good",
+                    weight: 3,
+                    condition: (s) => s.relationships.classmateA >= 50
+                },
+                {
+                    text: "朋友在你迷茫时点亮灯塔,成为方向",
+                    effect: { classmateA: 6, stress: -5, mental: 2 },
+                    type: "good",
+                    weight: 4,
+                    condition: (s) => s.relationships.classmateA >= 45
+                },
+                {
+                    text: "父母看到你的成绩单,叹了口气没说话",
+                    effect: { stress: 5, parents: -3 },
+                    type: "bad",
+                    weight: 8,
+                    condition: (s) => s.relationships.parents >= 30
+                },
+                {
+                    text: "妈妈给你炖了鸡汤,说'别太累了'",
+                    effect: { energy: 5, stress: -5, parents: 3 },
+                    type: "good",
+                    weight: 10,
+                    condition: (s) => true
+                },
+                {
+                    text: "爸爸突然问起OI的事,你沉默了",
+                    effect: { stress: 8 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.memoryCount >= 1
+                },
+                {
+                    text: "暗恋的同学问你一道数学题,你轻松解答",
+                    effect: { crush: 5, math: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.subjects.math >= 30
+                },
+                {
+                    text: "暗恋的请你一起出去玩,你同意了。",
+                    effect: { crush: 5, math: 1 },
+                    type: "good",
+                    weight: 7,
+                    condition: (s) => s.relationships.crush >= 25
+                },
+                {
+                    text: "同学邀请你一起打篮球,但你拒绝了",
+                    effect: { classmateA: -2, stress: 2 },
+                    type: "bad",
+                    weight: 6,
+                    condition: (s) => s.relationships.classmateA >= 40
+                },
+                {
+                    text: "和同学讨论题目,发现大家都很努力",
+                    effect: { classmateA: 3, stress: -3 },
+                    type: "good",
+                    weight: 9,
+                    condition: (s) => true
+                },
+                {
+                    text: "老师在办公室表扬你进步明显",
+                    effect: { teacher: 5, stress: -5 },
+                    type: "good",
+                    weight: 8,
+                    condition: (s) => s.week >= 4
+                },
+                {
+                    text: "班主任找你谈话,提醒你注意偏科",
+                    effect: { stress: 3, teacher: 2 },
+                    type: "neutral",
+                    weight: 7,
+                    condition: (s) => true
+                },
+                {
+                    text: "英语老师送你一本单词书",
+                    effect: { english: 2, englishTeacher: 5 },
+                    type: "good",
+                    weight: 6,
+                    condition: (s) => s.relationships.englishTeacher >= 40
+                },
+                {
+                    text: "数学老师批评你作业不认真",
+                    effect: { math: -1, mathTeacher: -3, stress: 3 },
+                    type: "bad",
+                    weight: 7,
+                    condition: (s) => s.subjects.math >= 20
+                }
             ],
 
             health: [
@@ -3460,9 +6642,9 @@
                 if (item.completed) div.classList.add('completed');
 
                 div.innerHTML = `
-                                                                                                                                                                                                                                                                                                                    <span>${item.dayName} ${item.time}</span>
-                                                                                                                                                                                                                                                                                                                    <span class="time">${item.subject}</span>
-                                                                                                                                                                                                                                                                                                                `;
+                                                                                                                                                                                                                                                                                                                        <span>${item.dayName} ${item.time}</span>
+                                                                                                                                                                                                                                                                                                                        <span class="time">${item.subject}</span>
+                                                                                                                                                                                                                                                                                                                    `;
 
                 elements.scheduleList.appendChild(div);
             });
@@ -4826,12 +8008,12 @@
         function showGoalModal(goal) {
             const modal = document.getElementById('goal-modal');
             elements.goalContent.innerHTML = `
-                                                                                                                                                                                                                                                                                                                <div class="goal-item">
-                                                                                                                                                                                                                                                                                                                    <h4>${goal.title}</h4>
-                                                                                                                                                                                                                                                                                                                    <p>${goal.desc}</p>
-                                                                                                                                                                                                                                                                                                                    <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
-                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                    <div class="goal-item">
+                                                                                                                                                                                                                                                                                                                        <h4>${goal.title}</h4>
+                                                                                                                                                                                                                                                                                                                        <p>${goal.desc}</p>
+                                                                                                                                                                                                                                                                                                                        <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
+                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                `;
             modal.style.display = 'flex';
         }
 
@@ -4845,12 +8027,12 @@
                 '';
 
             elements.goalContent.innerHTML = `
-                                                                                                                                                                                                                                                                                                                <div class="goal-item ${className}">
-                                                                                                                                                                                                                                                                                                                    <h4>${goal.title} ${statusText}</h4>
-                                                                                                                                                                                                                                                                                                                    <p>${goal.desc}</p>
-                                                                                                                                                                                                                                                                                                                    ${rewardText}
-                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                    <div class="goal-item ${className}">
+                                                                                                                                                                                                                                                                                                                        <h4>${goal.title} ${statusText}</h4>
+                                                                                                                                                                                                                                                                                                                        <p>${goal.desc}</p>
+                                                                                                                                                                                                                                                                                                                        ${rewardText}
+                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                `;
             modal.style.display = 'flex';
         }
 
@@ -4902,11 +8084,11 @@
         function showAchievementUnlockModal(achievement) {
             const modal = document.getElementById('achievement-modal');
             elements.achievementDetailContent.innerHTML = `
-                                                                                                                                                                                                                                                                                                                <div class="achievement-detail-item">
-                                                                                                                                                                                                                                                                                                                    <div class="name">🏆 ${achievement.name}</div>
-                                                                                                                                                                                                                                                                                                                    <div class="desc">${achievement.desc}</div>
-                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                    <div class="achievement-detail-item">
+                                                                                                                                                                                                                                                                                                                        <div class="name">🏆 ${achievement.name}</div>
+                                                                                                                                                                                                                                                                                                                        <div class="desc">${achievement.desc}</div>
+                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                `;
             modal.style.display = 'flex';
         }
 
@@ -4925,11 +8107,11 @@
                 html += '<div style="margin-bottom:10px;font-weight:bold;color:var(--secondary);">已解锁成就：</div>';
                 unlocked.forEach(a => {
                     html += `
-                                                                                                                                                                                                                                                                                                                        <div class="achievement-detail-item">
-                                                                                                                                                                                                                                                                                                                            <div class="name">🏆 ${a.name}</div>
-                                                                                                                                                                                                                                                                                                                            <div class="desc">${a.desc}</div>
-                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                    `;
+                                                                                                                                                                                                                                                                                                                            <div class="achievement-detail-item">
+                                                                                                                                                                                                                                                                                                                                <div class="name">🏆 ${a.name}</div>
+                                                                                                                                                                                                                                                                                                                                <div class="desc">${a.desc}</div>
+                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                        `;
                 });
             }
 
@@ -4937,11 +8119,11 @@
                 html += '<div style="margin:15px 0 10px 0;font-weight:bold;color:var(--purple);">未解锁隐藏成就：</div>';
                 hidden.forEach(([id, a]) => {
                     html += `
-                                                                                                                                                                                                                                                                                                                        <div class="achievement-detail-item hidden">
-                                                                                                                                                                                                                                                                                                                            <div class="name">🔒 ???</div>
-                                                                                                                                                                                                                                                                                                                            <div class="desc">隐藏成就,需要特殊条件解锁</div>
-                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                    `;
+                                                                                                                                                                                                                                                                                                                            <div class="achievement-detail-item hidden">
+                                                                                                                                                                                                                                                                                                                                <div class="name">🔒 ???</div>
+                                                                                                                                                                                                                                                                                                                                <div class="desc">隐藏成就,需要特殊条件解锁</div>
+                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                        `;
                 });
             }
 

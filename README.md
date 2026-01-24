@@ -1,7 +1,7 @@
 ﻿# AFO：结束？开始？ - 文化课学习模拟游戏
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey)
-![Version](https://img.shields.io/badge/Version-1.2.6-blue)
+![Version](https://img.shields.io/badge/Version-1.2.7-blue)
 ![Status](https://img.shields.io/badge/Status-Complete-green)
 
 ## 🎮 游戏简介
@@ -199,6 +199,8 @@ https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans
 	修复了一个导致卡死的bug。
 ### 2026.1.24 v1.2.6
 	优化游戏平衡性，修复了资料购买过于超模的问题。
+### 2026.1.24 v1.2.7
+	优化随机事件。
 ---
 
 **祝您游戏愉快，在AFO的旅程中找到属于自己的成长与救赎！** 🎓✨
