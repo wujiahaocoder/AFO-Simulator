@@ -1434,7 +1434,7 @@
                 </span>
                 <span>作者: wujiahaocoder</span>
                 <a href="https://github.com/wujiahaocoder/AFO-Simulator" target="_blank">GitHub</a>
-                <span>v1.2.5</span>
+                <span>v1.2.6</span>
             </div>
             <div id="game-status" style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">准备开始你的文化课之旅...</div>
         </header>
@@ -1807,7 +1807,7 @@
                     </button>
                     <button class="study-btn" onclick="economy('buy-books')">
                         购买资料
-                        <small>消耗100元 | 全科+1 | 提升效率</small>
+                        <small>消耗1000元 | 全科+1 | 提升效率</small>
                     </button>
                     <button class="study-btn" onclick="economy('buy-course')">
                         网课补习
@@ -2138,12 +2138,12 @@
         // 随机事件库（优化版：加入合理性检查）
         const randomEvents = {
             study: [
-                
+
             ],
 
             relationship: [
 
-                
+
             ],
 
             health: [
@@ -2747,7 +2747,7 @@
                 title: "AFO第一天",
                 content: "你站在教室门口,深吸一口气。曾经的OI队友在隔壁班,听说他还在坚持竞赛。你握紧书包带,走进了新班级。",
                 choices: [
-                    { text: "找个角落坐下,低调开始", effect: { stress: 5 }, next: 2 },
+                    { text: "找个角落坐下,低调开始", effect: { stress: 0.5 }, next: 2 },
                     { text: "主动和同桌打招呼", effect: { classmateA: 5, stress: -3 }, next: 2 }
                 ]
             },
@@ -2759,7 +2759,7 @@
                 content:
                     "数学老师布置了20道题,你发现大部分都是竞赛难度。你熬夜到凌晨,终于完成。",
                 choices: [
-                    { text: "按时交作业,展示实力", effect: { math: 2, mathTeacher: 5, energy: -10 }, next: 3 },
+                    { text: "按时交作业,展示实力", effect: { math: 2, mathTeacher: 5, energy: -10, stress: 0.5 }, next: 3 },
                     { text: "只做一半,保留实力", effect: { stress: 3, mathTeacher: -5 }, next: 3 }
                 ]
             },
@@ -3460,9 +3460,9 @@
                 if (item.completed) div.classList.add('completed');
 
                 div.innerHTML = `
-                                                                                                                                                                                                                                                                                                                <span>${item.dayName} ${item.time}</span>
-                                                                                                                                                                                                                                                                                                                <span class="time">${item.subject}</span>
-                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                    <span>${item.dayName} ${item.time}</span>
+                                                                                                                                                                                                                                                                                                                    <span class="time">${item.subject}</span>
+                                                                                                                                                                                                                                                                                                                `;
 
                 elements.scheduleList.appendChild(div);
             });
@@ -4352,11 +4352,11 @@
                     showNotification("兼职成功！获得200元,压力+5", "good");
                     break;
                 case 'buy-books':
-                    if (gameState.money < 100) {
+                    if (gameState.money < 1000) {
                         showNotification("钱不够！", "bad");
                         return;
                     }
-                    gameState.money -= 100;
+                    gameState.money -= 1000;
                     for (let sub in gameState.subjects) {
                         gameState.subjects[sub] = Math.min(100, gameState.subjects[sub] + 1);
                     }
@@ -4826,12 +4826,12 @@
         function showGoalModal(goal) {
             const modal = document.getElementById('goal-modal');
             elements.goalContent.innerHTML = `
-                                                                                                                                                                                                                                                                                                            <div class="goal-item">
-                                                                                                                                                                                                                                                                                                                <h4>${goal.title}</h4>
-                                                                                                                                                                                                                                                                                                                <p>${goal.desc}</p>
-                                                                                                                                                                                                                                                                                                                <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
-                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                                                                                                <div class="goal-item">
+                                                                                                                                                                                                                                                                                                                    <h4>${goal.title}</h4>
+                                                                                                                                                                                                                                                                                                                    <p>${goal.desc}</p>
+                                                                                                                                                                                                                                                                                                                    <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
+                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                            `;
             modal.style.display = 'flex';
         }
 
@@ -4845,12 +4845,12 @@
                 '';
 
             elements.goalContent.innerHTML = `
-                                                                                                                                                                                                                                                                                                            <div class="goal-item ${className}">
-                                                                                                                                                                                                                                                                                                                <h4>${goal.title} ${statusText}</h4>
-                                                                                                                                                                                                                                                                                                                <p>${goal.desc}</p>
-                                                                                                                                                                                                                                                                                                                ${rewardText}
-                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                                                                                                <div class="goal-item ${className}">
+                                                                                                                                                                                                                                                                                                                    <h4>${goal.title} ${statusText}</h4>
+                                                                                                                                                                                                                                                                                                                    <p>${goal.desc}</p>
+                                                                                                                                                                                                                                                                                                                    ${rewardText}
+                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                            `;
             modal.style.display = 'flex';
         }
 
@@ -4902,11 +4902,11 @@
         function showAchievementUnlockModal(achievement) {
             const modal = document.getElementById('achievement-modal');
             elements.achievementDetailContent.innerHTML = `
-                                                                                                                                                                                                                                                                                                            <div class="achievement-detail-item">
-                                                                                                                                                                                                                                                                                                                <div class="name">🏆 ${achievement.name}</div>
-                                                                                                                                                                                                                                                                                                                <div class="desc">${achievement.desc}</div>
-                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                                                                                                <div class="achievement-detail-item">
+                                                                                                                                                                                                                                                                                                                    <div class="name">🏆 ${achievement.name}</div>
+                                                                                                                                                                                                                                                                                                                    <div class="desc">${achievement.desc}</div>
+                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                            `;
             modal.style.display = 'flex';
         }
 
@@ -4925,11 +4925,11 @@
                 html += '<div style="margin-bottom:10px;font-weight:bold;color:var(--secondary);">已解锁成就：</div>';
                 unlocked.forEach(a => {
                     html += `
-                                                                                                                                                                                                                                                                                                                    <div class="achievement-detail-item">
-                                                                                                                                                                                                                                                                                                                        <div class="name">🏆 ${a.name}</div>
-                                                                                                                                                                                                                                                                                                                        <div class="desc">${a.desc}</div>
-                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                `;
+                                                                                                                                                                                                                                                                                                                        <div class="achievement-detail-item">
+                                                                                                                                                                                                                                                                                                                            <div class="name">🏆 ${a.name}</div>
+                                                                                                                                                                                                                                                                                                                            <div class="desc">${a.desc}</div>
+                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                    `;
                 });
             }
 
@@ -4937,11 +4937,11 @@
                 html += '<div style="margin:15px 0 10px 0;font-weight:bold;color:var(--purple);">未解锁隐藏成就：</div>';
                 hidden.forEach(([id, a]) => {
                     html += `
-                                                                                                                                                                                                                                                                                                                    <div class="achievement-detail-item hidden">
-                                                                                                                                                                                                                                                                                                                        <div class="name">🔒 ???</div>
-                                                                                                                                                                                                                                                                                                                        <div class="desc">隐藏成就,需要特殊条件解锁</div>
-                                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                                `;
+                                                                                                                                                                                                                                                                                                                        <div class="achievement-detail-item hidden">
+                                                                                                                                                                                                                                                                                                                            <div class="name">🔒 ???</div>
+                                                                                                                                                                                                                                                                                                                            <div class="desc">隐藏成就,需要特殊条件解锁</div>
+                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                    `;
                 });
             }
 
