@@ -1,7 +1,7 @@
 ﻿# AFO：结束？开始？ - 文化课学习模拟游戏
 
 ![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey)
-![Version](https://img.shields.io/badge/Version-1.2.7-blue)
+![Version](https://img.shields.io/badge/Version-2.0.0-blue)
 ![Status](https://img.shields.io/badge/Status-Complete-green)
 
 ## 🎮 游戏简介
