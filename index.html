@@ -1705,7 +1705,6 @@
                     <p><strong>优化效率计算公式：</strong>更严谨的计算</p>
                     <p><strong>重写开始界面：</strong>美化并增加更新日志</p>
                     <p><strong>数值平衡：</strong>重构数值，极大增强平衡性</p>
-                    <p><strong>行动次数调整：</strong>本周结束时的心理，健康，焦虑度将会影响下周可进行的操作数</p>
                     <p><strong>修复bug:</strong>修复了已知bug，优化了用户体验</p>
                 </div>
 
@@ -7855,221 +7854,120 @@
         }
 
         // 结束本周
-        // function endWeek() {
-        //     if (gameState.gameOver) return;
+         function endWeek() {
+             if (gameState.gameOver) return;
 
-        //     // 检查是否有未完成的操作
-        //     if (gameState.actionsThisWeek < gameState.maxActionsPerWeek) {
-        //         if (!confirm(`本周还有${gameState.maxActionsPerWeek - gameState.actionsThisWeek}次操作机会,确定要结束本周吗？`)) {
-        //             return;
-        //         }
-        //     }
+             // 检查是否有未完成的操作
+             if (gameState.actionsThisWeek < gameState.maxActionsPerWeek) {
+                 if (!confirm(`本周还有${gameState.maxActionsPerWeek - gameState.actionsThisWeek}次操作机会,确定要结束本周吗？`)) {
+                     return;
+                 }
+             }
 
-        //     // 检查是否还有未完成的故事
-        //     const currentStory = storyEvents.find(s => s.week === gameState.week && !gameState.events.includes(s.id));
-        //     if (currentStory) {
-        //         showNotification("本周有重要事件发生！", "neutral");
-        //         triggerStoryEvent(currentStory);
-        //         return;
-        //     }
+             // 检查是否还有未完成的故事
+             const currentStory = storyEvents.find(s => s.week === gameState.week && !gameState.events.includes(s.id));
+             if (currentStory) {
+                 showNotification("本周有重要事件发生！", "neutral");
+                 triggerStoryEvent(currentStory);
+                 return;
+             }
 
-        //     // 检查隐藏剧情
-        //     checkHiddenEvents();
+             // 检查隐藏剧情
+             checkHiddenEvents();
 
-        //     // 焦虑机制生效：将焦虑转化为压力，扣除心理值
-        //     const anxietyStressEffect = Math.floor(gameState.anxiety * 0.2);
-        //     const anxietyMentalEffect = Math.floor(gameState.anxiety * 0.1);
+             // 焦虑机制生效：将焦虑转化为压力，扣除心理值
+             const anxietyStressEffect = Math.floor(gameState.anxiety * 0.2);
+             const anxietyMentalEffect = Math.floor(gameState.anxiety * 0.1);
 
-        //     // 自然恢复和消耗 (稍微增加恢复量以平衡焦虑机制)
-        //     gameState.energy = Math.min(100, gameState.energy + 8);
+             // 自然恢复和消耗 (稍微增加恢复量以平衡焦虑机制)
+             gameState.energy = Math.min(100, gameState.energy + 8);
 
-        //     // 压力计算：自然恢复 - 焦虑带来的增加
-        //     let netStressChange = -5 + anxietyStressEffect;
-        //     if (netStressChange > 0) {
-        //         gameState.stress = Math.min(100, gameState.stress + netStressChange);
-        //         addToLog(`焦虑导致压力增加 ${netStressChange}`, "bad");
-        //     } else {
-        //         gameState.stress = Math.max(0, gameState.stress + netStressChange);
-        //     }
+             // 压力计算：自然恢复 - 焦虑带来的增加
+             let netStressChange = -5 + anxietyStressEffect;
+             if (netStressChange > 0) {
+                 gameState.stress = Math.min(100, gameState.stress + netStressChange);
+                 addToLog(`焦虑导致压力增加 ${netStressChange}`, "bad");
+             } else {
+                 gameState.stress = Math.max(0, gameState.stress + netStressChange);
+             }
 
-        //     gameState.health = Math.min(100, gameState.health + 2);
-        //     gameState.mental = Math.min(100, Math.max(0, gameState.mental + 2 - anxietyMentalEffect));
+             gameState.health = Math.min(100, gameState.health + 2);
+             gameState.mental = Math.min(100, Math.max(0, gameState.mental + 2 - anxietyMentalEffect));
 
-        //     if (anxietyMentalEffect > 2) {
-        //         addToLog(`焦虑侵蚀了你的心理健康`, "bad");
-        //     }
+             if (anxietyMentalEffect > 2) {
+                 addToLog(`焦虑侵蚀了你的心理健康`, "bad");
+             }
 
-        //     // 焦虑自然增长
-        //     gameState.anxiety = Math.min(100, gameState.anxiety + 2);
+             // 焦虑自然增长
+             gameState.anxiety = Math.min(100, gameState.anxiety + 2);
 
-        //     // 作业系统：新一周生成新作业
-        //     if (gameState.week < 52) {
-        //         for (let sub in gameState.homework) {
-        //             gameState.homework[sub] = false; // 重置作业
-        //         }
-        //         addToLog("新一周开始,作业重新布置", "neutral");
-        //     }
+             // 作业系统：新一周生成新作业
+             if (gameState.week < 52) {
+                 for (let sub in gameState.homework) {
+                     gameState.homework[sub] = false; // 重置作业
+                 }
+                 addToLog("新一周开始,作业重新布置", "neutral");
+             }
 
-        //     // 随机事件
-        //     if (Math.random() < 0.6) {
-        //         triggerRandomEvent();
-        //     }
+             // 随机事件
+             if (Math.random() < 0.6) {
+                 triggerRandomEvent();
+             }
 
-        //     // 检查完美一周
-        //     const hasNegativeEvent = gameState.lastAction === 'bad' || gameState.stress > 50 || gameState.anxiety > 60;
-        //     if (!hasNegativeEvent && gameState.actionsThisWeek > 0) {
-        //         gameState.perfectWeeks++;
-        //         if (gameState.perfectWeeks >= 2) {
-        //             unlockAchievement('perfect-week');
-        //             showNotification("🎉 成就解锁：完美一周！", "good");
-        //         }
-        //     }
+             // 检查完美一周
+             const hasNegativeEvent = gameState.lastAction === 'bad' || gameState.stress > 50 || gameState.anxiety > 60;
+             if (!hasNegativeEvent && gameState.actionsThisWeek > 0) {
+                 gameState.perfectWeeks++;
+                 if (gameState.perfectWeeks >= 2) {
+                     unlockAchievement('perfect-week');
+                     showNotification("🎉 成就解锁：完美一周！", "good");
+                 }
+             }
 
-        //     // 时间推进
-        //     gameState.week++;
-        //     gameState.dayOfWeek = 0;
-        //     gameState.period = 0;
-        //     gameState.daysLeft -= 7;
-        //     gameState.actionsThisWeek = 0; // 重置操作计数
+             // 时间推进
+             gameState.week++;
+             gameState.dayOfWeek = 0;
+             gameState.period = 0;
+             gameState.daysLeft -= 7;
+             gameState.actionsThisWeek = 0; // 重置操作计数
 
-        //     // 季节变化
-        //     if (gameState.week <= 13) gameState.season = 0; // 春
-        //     else if (gameState.week <= 26) gameState.season = 1; // 夏
-        //     else if (gameState.week <= 39) gameState.season = 2; // 秋
-        //     else gameState.season = 3; // 冬
+             // 季节变化
+             if (gameState.week <= 13) gameState.season = 0; // 春
+             else if (gameState.week <= 26) gameState.season = 1; // 夏
+             else if (gameState.week <= 39) gameState.season = 2; // 秋
+             else gameState.season = 3; // 冬
 
-        //     // 检查假期
-        //     checkHolidays();
+             // 检查假期
+             checkHolidays();
 
-        //     // 检查特殊日子
-        //     checkSpecialDay();
+             // 检查特殊日子
+             checkSpecialDay();
 
-        //     // 检查阶段目标
-        //     checkStageGoals();
+             // 检查阶段目标
+             checkStageGoals();
 
-        //     // 检查成就
-        //     checkAchievements();
+             // 检查成就
+             checkAchievements();
 
-        //     // 检查游戏结束
-        //     if (gameState.week > 52 || gameState.daysLeft <= 0) {
-        //         endGame();
-        //         return;
-        //     }
+             // 检查游戏结束
+             if (gameState.week > 52 || gameState.daysLeft <= 0) {
+                 endGame();
+                 return;
+             }
 
-        //     // 生成新课程表
-        //     generateSchedule();
+             // 生成新课程表
+             generateSchedule();
 
-        //     // 天气变化
-        //     changeWeather();
+             // 天气变化
+             changeWeather();
 
-        //     addToLog(`第${gameState.week}周开始,距离高考还有${gameState.daysLeft}天`, "neutral");
-        //     showNotification(`新的一周：${gameState.weather} ${getWeatherName()} | 季节：${seasons[gameState.season].name}`, "neutral");
+             addToLog(`第${gameState.week}周开始,距离高考还有${gameState.daysLeft}天`, "neutral");
+             showNotification(`新的一周：${gameState.weather} ${getWeatherName()} | 季节：${seasons[gameState.season].name}`, "neutral");
 
-        //     updateUI();
-        // }
-        // 学习效率计算（焦虑影响更显著）
+             updateUI();
+         }
 
-        function calculateMaxActions() {
-            let base = 3;
-            if (gameState.health >= 75 && gameState.energy >= 70) base++;
-            if (gameState.mental >= 65) base++;
-            if (gameState.anxiety > 75) base--; // 高焦虑降低行动力
-            // return Math.max(1, Math.min(4, base));
-            Math.max(1, base);
-        }
-        // 每周结束逻辑（焦虑系统重平衡）
-        function endWeek() {
-            if (gameState.gameOver) return;
-
-            // 焦虑自然增长：基础+2，多种因素加成
-            let anxietyGain = 2;
-            if (gameState.stress > 60) anxietyGain += 2;
-            if (gameState.money < 100) anxietyGain += 1;      // 贫困焦虑
-            if (gameState.daysLeft < 100) anxietyGain += 2;   // 高考临近
-            if (gameState.daysLeft < 30) anxietyGain += 3;    // 最后冲刺
-            if (gameState.relationships.parents < 40) anxietyGain += 1;
-            if (gameState.examCount > 0 && gameState.stress > 50) anxietyGain += 1; // 考后焦虑
-
-            gameState.anxiety = Math.min(100, gameState.anxiety + anxietyGain);
-
-            // 焦虑转化机制（更合理）
-            if (gameState.anxiety > 60) {
-                // 高焦虑持续消耗心理值
-                const mentalDrain = Math.floor((gameState.anxiety - 60) / 6);
-                gameState.mental = Math.max(0, gameState.mental - mentalDrain);
-                // 并转化为压力
-                gameState.stress = Math.min(100, gameState.stress + Math.floor(gameState.anxiety / 20));
-            }
-
-            // 动态操作次数计算
-            gameState.maxActionsPerWeek = calculateMaxActions();
-
-            // 自然恢复（降低）
-            gameState.health = Math.min(100, gameState.health + 2);
-            gameState.mental = Math.min(100, gameState.mental + 1);
-
-            // 精力恢复受焦虑影响
-            const energyRecovery = Math.max(3, 7 - Math.floor(gameState.anxiety / 20));
-            gameState.energy = Math.min(100, gameState.energy + energyRecovery);
-
-            // 压力自然消退（轻微）
-            gameState.stress = Math.max(0, gameState.stress - 3);
-
-            // 作业重置
-            if (gameState.week < 52) {
-                for (let sub in gameState.homework) {
-                    gameState.homework[sub] = false;
-                }
-            }
-
-            // 检查故事事件
-            const currentStory = storyEvents.find(s => s.week === gameState.week && !gameState.events.includes(s.id));
-            if (currentStory) {
-                triggerStoryEvent(currentStory);
-            }
-
-            // 检查隐藏事件
-            checkHiddenEvents();
-
-            // 随机事件触发（概率降低，避免信息过载）
-            if (Math.random() < 0.4) {
-                triggerRandomEvent();
-            }
-
-            // 检查阶段目标
-            checkStageGoals();
-
-            // 检查成就
-            checkAchievements();
-
-            // 时间推进
-            gameState.week++;
-            gameState.dayOfWeek = 0;
-            gameState.period = 0;
-            gameState.daysLeft -= 7;
-            gameState.actionsThisWeek = 0;
-
-            // 季节变化
-            if (gameState.week <= 13) gameState.season = 0;
-            else if (gameState.week <= 26) gameState.season = 1;
-            else if (gameState.week <= 39) gameState.season = 2;
-            else gameState.season = 3;
-
-            // 检查假期和特殊日期
-            checkHolidays();
-            checkSpecialDay();
-            changeWeather();
-
-            // 生成新课程表
-            generateSchedule();
-
-            if (gameState.week > 52 || gameState.daysLeft <= 0) {
-                endGame();
-            }
-
-            updateUI();
-        }
-
+       
 
         // 推进时间（用于单次活动）
         function advanceTime() {

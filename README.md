@@ -207,7 +207,6 @@ https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans
 	优化效率计算公式：更严谨的计算
 	重写开始界面：美化并增加更新日志
 	数值平衡：重构数值，极大增强平衡性
-	行动次数调整：本周结束时的心理，健康，焦虑度将会影响下周可进行的操作数
 	修复bug：修复了已知bug，优化了用户体验
 ---
 
