@@ -1446,7 +1446,7 @@
                 </span>
                 <span>作者: wujiahaocoder</span>
                 <a href="https://github.com/wujiahaocoder/AFO-Simulator" target="_blank">GitHub</a>
-                <span>v2.0.0</span>
+                <span>v2.0.1</span>
             </div>
             <div id="game-status" style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">准备开始你的文化课之旅...</div>
         </header>
@@ -1699,13 +1699,9 @@
                 <h3>游戏介绍</h3>
                 <p>这是一个AFO后进行文化学习的模拟游戏。你将扮演一位退役OI选手,在52周的时间内,通过策略性的选择,平衡学习、休息、社交、经济等多维度状态,最终在高考中取得理想成绩。</p>
                 <div style="margin-top: 20px; font-size: 0.85rem; opacity: 0.7; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
-                    <p><strong>更新日志 </strong>2026.2.9 v2.0.0</p>
-                    <p><strong>新增焦虑系统：</strong>焦虑值会随着时间推移不断增加,持续侵蚀心理值并降低效率。</p>
-                    <p><strong>重写随机事件：</strong>重写全部随机事件，增强了合理性</p>
-                    <p><strong>优化效率计算公式：</strong>更严谨的计算</p>
-                    <p><strong>重写开始界面：</strong>美化并增加更新日志</p>
-                    <p><strong>数值平衡：</strong>重构数值，极大增强平衡性</p>
-                    <p><strong>修复bug:</strong>修复了已知bug，优化了用户体验</p>
+                    <p><strong>更新日志 </strong>2026.2.10 v2.0.1</p>
+                    <p><strong>数值平衡性调整：</strong>增加了学习操作的压力加成和焦虑加成，提升了技能的提升量。</p>
+                    
                 </div>
 
                 <h3 style="margin-top: 20px;">❤️ 支持开发</h3>
@@ -1758,27 +1754,27 @@
                 <div class="study-options">
                     <button class="study-btn" onclick="study('chinese')">
                         语文
-                        <small>消耗15精力</small>
+                        <small>消耗中等精力</small>
                     </button>
                     <button class="study-btn" onclick="study('math')">
                         数学
-                        <small>消耗20精力</small>
+                        <small>消耗大量精力</small>
                     </button>
                     <button class="study-btn" onclick="study('english')">
                         英语
-                        <small>消耗15精力</small>
+                        <small>消耗中等精力</small>
                     </button>
                     <button class="study-btn" onclick="study('physics')">
                         物理
-                        <small>消耗20精力</small>
+                        <small>消耗大量精力</small>
                     </button>
                     <button class="study-btn" onclick="study('chemistry')">
                         化学
-                        <small>消耗15精力</small>
+                        <small>消耗较少精力</small>
                     </button>
                     <button class="study-btn" onclick="study('biology')">
                         生物
-                        <small>消耗15精力</small>
+                        <small>消耗较少精力</small>
                     </button>
                 </div>
                 <div style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8;">
@@ -6826,9 +6822,9 @@
                 if (item.completed) div.classList.add('completed');
 
                 div.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                            <span>${item.dayName} ${item.time}</span>
-                                                                                                                                                                                                                                                                                                                                            <span class="time">${item.subject}</span>
-                                                                                                                                                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                                                                                                                                <span>${item.dayName} ${item.time}</span>
+                                                                                                                                                                                                                                                                                                                                                <span class="time">${item.subject}</span>
+                                                                                                                                                                                                                                                                                                                                            `;
 
                 elements.scheduleList.appendChild(div);
             });
@@ -7210,31 +7206,31 @@
             }
 
             const config = {
-                chinese: { cost: 15, baseGain: [2, 4], name: "语文" },
-                math: { cost: 20, baseGain: [3, 6], name: "数学" },
-                english: { cost: 15, baseGain: [2, 4], name: "英语" },
-                physics: { cost: 20, baseGain: [3, 5], name: "物理" },
-                chemistry: { cost: 15, baseGain: [2, 4], name: "化学" },
-                biology: { cost: 15, baseGain: [2, 4], name: "生物" }
+                chinese: { cost: 25, baseGain: [2, 3], name: "语文" },
+                math: { cost: 35, baseGain: [3, 6], name: "数学" },
+                english: { cost: 25, baseGain: [2, 3], name: "英语" },
+                physics: { cost: 35, baseGain: [3, 6], name: "物理" },
+                chemistry: { cost: 20, baseGain: [2, 4], name: "化学" },
+                biology: { cost: 20, baseGain: [2, 4], name: "生物" }
             };
 
             const cfg = config[subject];
 
             // 消耗资源
             gameState.energy -= cfg.cost;
-            gameState.stress += 2;
-            gameState.health -= 1;
+            gameState.stress += (Math.random() * 10);
+            gameState.health -= 2;
             gameState.totalStudyHours++;
 
             // 学习略微增加焦虑
-            gameState.anxiety = Math.min(100, gameState.anxiety + 0.5);
+            gameState.anxiety = Math.min(100, gameState.anxiety + (Math.random() * 5));
 
             // 计算增益
-            let gain = Math.random() * (cfg.baseGain[1] - cfg.baseGain[0]) + cfg.baseGain[0];
+            let gain = 3 * (Math.random() * (cfg.baseGain[1] - cfg.baseGain[0]) + cfg.baseGain[0]);
 
             // 竞赛背景加成
             if (subject === 'math' || subject === 'physics') {
-                gain *= 1.3; // 30%加成
+                gain *= 1.4; // 40%加成
             }
 
             // 当前水平影响（越高越难提升）
@@ -7260,7 +7256,7 @@
             }
 
             // 随机事件
-            if (Math.random() < 0.35) {
+            if (Math.random() < 0.4) {
                 triggerRandomEvent();
             }
 
@@ -7854,120 +7850,120 @@
         }
 
         // 结束本周
-         function endWeek() {
-             if (gameState.gameOver) return;
+        function endWeek() {
+            if (gameState.gameOver) return;
 
-             // 检查是否有未完成的操作
-             if (gameState.actionsThisWeek < gameState.maxActionsPerWeek) {
-                 if (!confirm(`本周还有${gameState.maxActionsPerWeek - gameState.actionsThisWeek}次操作机会,确定要结束本周吗？`)) {
-                     return;
-                 }
-             }
+            // 检查是否有未完成的操作
+            if (gameState.actionsThisWeek < gameState.maxActionsPerWeek) {
+                if (!confirm(`本周还有${gameState.maxActionsPerWeek - gameState.actionsThisWeek}次操作机会,确定要结束本周吗？`)) {
+                    return;
+                }
+            }
 
-             // 检查是否还有未完成的故事
-             const currentStory = storyEvents.find(s => s.week === gameState.week && !gameState.events.includes(s.id));
-             if (currentStory) {
-                 showNotification("本周有重要事件发生！", "neutral");
-                 triggerStoryEvent(currentStory);
-                 return;
-             }
+            // 检查是否还有未完成的故事
+            const currentStory = storyEvents.find(s => s.week === gameState.week && !gameState.events.includes(s.id));
+            if (currentStory) {
+                showNotification("本周有重要事件发生！", "neutral");
+                triggerStoryEvent(currentStory);
+                return;
+            }
 
-             // 检查隐藏剧情
-             checkHiddenEvents();
+            // 检查隐藏剧情
+            checkHiddenEvents();
 
-             // 焦虑机制生效：将焦虑转化为压力，扣除心理值
-             const anxietyStressEffect = Math.floor(gameState.anxiety * 0.2);
-             const anxietyMentalEffect = Math.floor(gameState.anxiety * 0.1);
+            // 焦虑机制生效：将焦虑转化为压力，扣除心理值
+            const anxietyStressEffect = Math.floor(gameState.anxiety * 0.2);
+            const anxietyMentalEffect = Math.floor(gameState.anxiety * 0.1);
 
-             // 自然恢复和消耗 (稍微增加恢复量以平衡焦虑机制)
-             gameState.energy = Math.min(100, gameState.energy + 8);
+            // 自然恢复和消耗 (稍微增加恢复量以平衡焦虑机制)
+            gameState.energy = Math.min(100, gameState.energy + 8);
 
-             // 压力计算：自然恢复 - 焦虑带来的增加
-             let netStressChange = -5 + anxietyStressEffect;
-             if (netStressChange > 0) {
-                 gameState.stress = Math.min(100, gameState.stress + netStressChange);
-                 addToLog(`焦虑导致压力增加 ${netStressChange}`, "bad");
-             } else {
-                 gameState.stress = Math.max(0, gameState.stress + netStressChange);
-             }
+            // 压力计算：自然恢复 - 焦虑带来的增加
+            let netStressChange = -5 + anxietyStressEffect;
+            if (netStressChange > 0) {
+                gameState.stress = Math.min(100, gameState.stress + netStressChange);
+                addToLog(`焦虑导致压力增加 ${netStressChange}`, "bad");
+            } else {
+                gameState.stress = Math.max(0, gameState.stress + netStressChange);
+            }
 
-             gameState.health = Math.min(100, gameState.health + 2);
-             gameState.mental = Math.min(100, Math.max(0, gameState.mental + 2 - anxietyMentalEffect));
+            gameState.health = Math.min(100, gameState.health + 2);
+            gameState.mental = Math.min(100, Math.max(0, gameState.mental + 2 - anxietyMentalEffect));
 
-             if (anxietyMentalEffect > 2) {
-                 addToLog(`焦虑侵蚀了你的心理健康`, "bad");
-             }
+            if (anxietyMentalEffect > 2) {
+                addToLog(`焦虑侵蚀了你的心理健康`, "bad");
+            }
 
-             // 焦虑自然增长
-             gameState.anxiety = Math.min(100, gameState.anxiety + 2);
+            // 焦虑自然增长
+            gameState.anxiety = Math.min(100, gameState.anxiety + 2);
 
-             // 作业系统：新一周生成新作业
-             if (gameState.week < 52) {
-                 for (let sub in gameState.homework) {
-                     gameState.homework[sub] = false; // 重置作业
-                 }
-                 addToLog("新一周开始,作业重新布置", "neutral");
-             }
+            // 作业系统：新一周生成新作业
+            if (gameState.week < 52) {
+                for (let sub in gameState.homework) {
+                    gameState.homework[sub] = false; // 重置作业
+                }
+                addToLog("新一周开始,作业重新布置", "neutral");
+            }
 
-             // 随机事件
-             if (Math.random() < 0.6) {
-                 triggerRandomEvent();
-             }
+            // 随机事件
+            if (Math.random() < 0.6) {
+                triggerRandomEvent();
+            }
 
-             // 检查完美一周
-             const hasNegativeEvent = gameState.lastAction === 'bad' || gameState.stress > 50 || gameState.anxiety > 60;
-             if (!hasNegativeEvent && gameState.actionsThisWeek > 0) {
-                 gameState.perfectWeeks++;
-                 if (gameState.perfectWeeks >= 2) {
-                     unlockAchievement('perfect-week');
-                     showNotification("🎉 成就解锁：完美一周！", "good");
-                 }
-             }
+            // 检查完美一周
+            const hasNegativeEvent = gameState.lastAction === 'bad' || gameState.stress > 50 || gameState.anxiety > 60;
+            if (!hasNegativeEvent && gameState.actionsThisWeek > 0) {
+                gameState.perfectWeeks++;
+                if (gameState.perfectWeeks >= 2) {
+                    unlockAchievement('perfect-week');
+                    showNotification("🎉 成就解锁：完美一周！", "good");
+                }
+            }
 
-             // 时间推进
-             gameState.week++;
-             gameState.dayOfWeek = 0;
-             gameState.period = 0;
-             gameState.daysLeft -= 7;
-             gameState.actionsThisWeek = 0; // 重置操作计数
+            // 时间推进
+            gameState.week++;
+            gameState.dayOfWeek = 0;
+            gameState.period = 0;
+            gameState.daysLeft -= 7;
+            gameState.actionsThisWeek = 0; // 重置操作计数
 
-             // 季节变化
-             if (gameState.week <= 13) gameState.season = 0; // 春
-             else if (gameState.week <= 26) gameState.season = 1; // 夏
-             else if (gameState.week <= 39) gameState.season = 2; // 秋
-             else gameState.season = 3; // 冬
+            // 季节变化
+            if (gameState.week <= 13) gameState.season = 0; // 春
+            else if (gameState.week <= 26) gameState.season = 1; // 夏
+            else if (gameState.week <= 39) gameState.season = 2; // 秋
+            else gameState.season = 3; // 冬
 
-             // 检查假期
-             checkHolidays();
+            // 检查假期
+            checkHolidays();
 
-             // 检查特殊日子
-             checkSpecialDay();
+            // 检查特殊日子
+            checkSpecialDay();
 
-             // 检查阶段目标
-             checkStageGoals();
+            // 检查阶段目标
+            checkStageGoals();
 
-             // 检查成就
-             checkAchievements();
+            // 检查成就
+            checkAchievements();
 
-             // 检查游戏结束
-             if (gameState.week > 52 || gameState.daysLeft <= 0) {
-                 endGame();
-                 return;
-             }
+            // 检查游戏结束
+            if (gameState.week > 52 || gameState.daysLeft <= 0) {
+                endGame();
+                return;
+            }
 
-             // 生成新课程表
-             generateSchedule();
+            // 生成新课程表
+            generateSchedule();
 
-             // 天气变化
-             changeWeather();
+            // 天气变化
+            changeWeather();
 
-             addToLog(`第${gameState.week}周开始,距离高考还有${gameState.daysLeft}天`, "neutral");
-             showNotification(`新的一周：${gameState.weather} ${getWeatherName()} | 季节：${seasons[gameState.season].name}`, "neutral");
+            addToLog(`第${gameState.week}周开始,距离高考还有${gameState.daysLeft}天`, "neutral");
+            showNotification(`新的一周：${gameState.weather} ${getWeatherName()} | 季节：${seasons[gameState.season].name}`, "neutral");
 
-             updateUI();
-         }
+            updateUI();
+        }
 
-       
+
 
         // 推进时间（用于单次活动）
         function advanceTime() {
@@ -8300,12 +8296,12 @@
         function showGoalModal(goal) {
             const modal = document.getElementById('goal-modal');
             elements.goalContent.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                        <div class="goal-item">
-                                                                                                                                                                                                                                                                                                                                            <h4>${goal.title}</h4>
-                                                                                                                                                                                                                                                                                                                                            <p>${goal.desc}</p>
-                                                                                                                                                                                                                                                                                                                                            <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
-                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                    `;
+                                                                                                                                                                                                                                                                                                                                            <div class="goal-item">
+                                                                                                                                                                                                                                                                                                                                                <h4>${goal.title}</h4>
+                                                                                                                                                                                                                                                                                                                                                <p>${goal.desc}</p>
+                                                                                                                                                                                                                                                                                                                                                <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
+                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                        `;
             modal.style.display = 'flex';
         }
 
@@ -8319,12 +8315,12 @@
                 '';
 
             elements.goalContent.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                        <div class="goal-item ${className}">
-                                                                                                                                                                                                                                                                                                                                            <h4>${goal.title} ${statusText}</h4>
-                                                                                                                                                                                                                                                                                                                                            <p>${goal.desc}</p>
-                                                                                                                                                                                                                                                                                                                                            ${rewardText}
-                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                    `;
+                                                                                                                                                                                                                                                                                                                                            <div class="goal-item ${className}">
+                                                                                                                                                                                                                                                                                                                                                <h4>${goal.title} ${statusText}</h4>
+                                                                                                                                                                                                                                                                                                                                                <p>${goal.desc}</p>
+                                                                                                                                                                                                                                                                                                                                                ${rewardText}
+                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                        `;
             modal.style.display = 'flex';
         }
 
@@ -8376,11 +8372,11 @@
         function showAchievementUnlockModal(achievement) {
             const modal = document.getElementById('achievement-modal');
             elements.achievementDetailContent.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                        <div class="achievement-detail-item">
-                                                                                                                                                                                                                                                                                                                                            <div class="name">🏆 ${achievement.name}</div>
-                                                                                                                                                                                                                                                                                                                                            <div class="desc">${achievement.desc}</div>
-                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                    `;
+                                                                                                                                                                                                                                                                                                                                            <div class="achievement-detail-item">
+                                                                                                                                                                                                                                                                                                                                                <div class="name">🏆 ${achievement.name}</div>
+                                                                                                                                                                                                                                                                                                                                                <div class="desc">${achievement.desc}</div>
+                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                        `;
             modal.style.display = 'flex';
         }
 
@@ -8399,11 +8395,11 @@
                 html += '<div style="margin-bottom:10px;font-weight:bold;color:var(--secondary);">已解锁成就：</div>';
                 unlocked.forEach(a => {
                     html += `
-                                                                                                                                                                                                                                                                                                                                                <div class="achievement-detail-item">
-                                                                                                                                                                                                                                                                                                                                                    <div class="name">🏆 ${a.name}</div>
-                                                                                                                                                                                                                                                                                                                                                    <div class="desc">${a.desc}</div>
-                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                                                    <div class="achievement-detail-item">
+                                                                                                                                                                                                                                                                                                                                                        <div class="name">🏆 ${a.name}</div>
+                                                                                                                                                                                                                                                                                                                                                        <div class="desc">${a.desc}</div>
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                `;
                 });
             }
 
@@ -8411,11 +8407,11 @@
                 html += '<div style="margin:15px 0 10px 0;font-weight:bold;color:var(--purple);">未解锁隐藏成就：</div>';
                 hidden.forEach(([id, a]) => {
                     html += `
-                                                                                                                                                                                                                                                                                                                                                <div class="achievement-detail-item hidden">
-                                                                                                                                                                                                                                                                                                                                                    <div class="name">🔒 ???</div>
-                                                                                                                                                                                                                                                                                                                                                    <div class="desc">隐藏成就,需要特殊条件解锁</div>
-                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                                                    <div class="achievement-detail-item hidden">
+                                                                                                                                                                                                                                                                                                                                                        <div class="name">🔒 ???</div>
+                                                                                                                                                                                                                                                                                                                                                        <div class="desc">隐藏成就,需要特殊条件解锁</div>
+                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                `;
                 });
             }
 
