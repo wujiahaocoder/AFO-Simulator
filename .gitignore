@@ -364,3 +364,9 @@ FodyWeavers.xsd
 
 # Local simulation reports and historical snapshots
 /analysis/
+
+# Local authoring material and verification tools
+/scripts/
+/剧情.md
+/结局.md
+/随机事件.md
