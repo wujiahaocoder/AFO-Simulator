@@ -289,6 +289,7 @@
             flex-direction: column;
             gap: 12px;
             max-height: 650px;
+            min-width: 0;
         }
 
         .time-info {
@@ -1392,10 +1393,30 @@
         .story-choice-btn { white-space: pre-line; }
         .story-choice-btn:disabled { opacity: 0.45; cursor: not-allowed; }
         .narrative-note { font-size: 0.85rem; opacity: 0.8; }
+        .goal-note { font-size: 0.85rem; opacity: 0.85; margin: 8px 0; line-height: 1.6; }
+        .goal-checklist { list-style: none; padding: 0; margin: 8px 0; }
+        .goal-checklist li { padding: 5px 0; line-height: 1.6; overflow-wrap: anywhere; }
+        .goal-checklist .goal-met { color: var(--secondary); }
+        .goal-checklist .goal-pending { color: inherit; }
+        .goal-extra { border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px; }
+        #goal-latest-result { margin-top: 12px; line-height: 1.6; }
+        #goal-latest-result summary { cursor: pointer; }
         .end-screen .ending-text { text-align: left; line-height: 1.9; }
         .epilogue { margin-top: 20px; }
         .epilogue summary { cursor: pointer; font-weight: bold; }
         .end-screen .restart-btn { margin: 5px; }
+        .container > * { min-width: 0; }
+        .container.post-exam {
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-areas: "header" "main" "stats" "events" "schedule" "achievements" "footer";
+        }
+        .post-exam .main { max-height: none; }
+        .end-screen { overflow-wrap: anywhere; padding: clamp(12px, 3vw, 30px); }
+        .end-screen .restart-btn { max-width: 100%; white-space: normal; }
+        .end-screen .restart-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .route-plan { text-align: left; line-height: 1.8; margin: 24px 0; }
+        .plan-choice[aria-pressed="true"] { outline: 3px solid var(--warning); }
+        .route-confirm { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
     </style>
 </head>
 
@@ -1425,7 +1446,7 @@
                 </span>
                 <span>作者: wujiahaocoder</span>
                 <a href="https://github.com/wujiahaocoder/AFO-Simulator" target="_blank">GitHub</a>
-                <span>v3.0.1</span>
+                <span>v3.1.0</span>
             </div>
             <div id="game-status" style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">准备开始你的文化课之旅...</div>
         </header>
@@ -1509,7 +1530,8 @@
                 </div>
             </div>
 
-            <div class="stat-section-title">👥 人际关系</div>
+            <div class="stat-section-title">👥 熟悉程度</div>
+            <p class="narrative-note">表示平时的熟悉程度；人物起点不同。喜欢、约定和支持以实际对话为准。</p>
             <div class="stat-card">
                 <h3>班主任 <span class="stat-value" id="teacher-value">50</span></h3>
                 <div class="relationship-bar">
@@ -1617,9 +1639,16 @@
             <div class="event-card">
                 <h3>🎯 当前阶段目标</h3>
                 <p id="current-goal">暂无目标</p>
+                <p id="goal-progress-status" class="goal-note" aria-live="polite"></p>
                 <div class="progress-bar">
-                    <div class="progress-fill" id="goal-progress" style="width: 0%; background: var(--warning)"></div>
+                    <div class="progress-fill" id="goal-progress" role="progressbar" aria-label="阶段主要目标进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%; background: var(--warning)"></div>
                 </div>
+                <ul id="goal-requirements" class="goal-checklist"></ul>
+                <div id="goal-challenges" class="goal-extra"></div>
+                <details id="goal-latest-result" style="display: none;">
+                    <summary id="goal-latest-summary">上次阶段结算</summary>
+                    <div id="goal-latest-detail"></div>
+                </details>
             </div>
             <div class="event-card">
                 <h3>🎲 随机事件</h3>
@@ -1686,9 +1715,11 @@
                 <h3>游戏介绍</h3>
                 <p>这是一个AFO后进行文化学习的模拟游戏。你将扮演一位退役OI选手,在52周的时间内,通过策略性的选择,平衡学习、休息、社交、经济等多维度状态,最终在高考中取得理想成绩。</p>
                 <div style="margin-top: 20px; font-size: 0.85rem; opacity: 0.7; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
-                    <p><strong>更新日志 </strong>2026.10.13 v3.0.1</p>
+                    <p><strong>更新日志 </strong>2026.10.15 v3.1.0</p>
+                    <p><strong>遗憾与去向：</strong>新增有前置约定、困难与结果的人物支线；认真努力也可能落空。两项具体申请、四种去向筹备与独立后记，记录这一年确实没能实现的事。</p>
                     <p><strong>剧情更新：</strong>蓝色活页本主线、可选支线、随机事件、考后去向与独立后记；新增自动保存，修复剧情与时间结算。</p>
                     <p><strong>玩法调优：</strong>心理收益在85封顶，减轻焦虑与低精力的学习惩罚；新增模考复盘与每周共同学习。</p>
+                    <p><strong>阶段目标：</strong>按实际成长节奏调整门槛；作业、关系与模考作为选做挑战，新增分项进度和结算原因。</p>
                     
                 </div>
 
@@ -2063,64 +2094,49 @@
         };
 
         // 阶段目标系统
+        const stageAverage = (s) => Object.values(s.subjects).reduce((a, b) => a + b, 0) / 6;
+        const stageRequirement = (label, target, read, unit = '', operator = '≥') => ({ label, target, read, unit, operator });
+        const makeStageGoal = (title, requirements, reward, challenges = []) => ({
+            title, requirements, challenges, reward,
+            desc: requirements.map(r => `${r.label}${r.operator}${r.target}${r.unit}`).join('，'),
+            check: (s) => requirements.every(r => r.operator === '<' ? r.read(s) < r.target : r.operator === '>' ? r.read(s) > r.target : r.read(s) >= r.target)
+        });
         const stageGoals = {
-            5: {
-                title: "适应期目标（第5周）",
-                desc: "全科平均达到20分,压力低于40,健康保持80以上",
-                check: (s) => {
-                    const avg = Object.values(s.subjects).reduce((a, b) => a + b, 0) / 6;
-                    return avg >= 20 && s.stress < 40 && s.health >= 80;
-                },
-                reward: { energy: 10, stress: -5 }
-            },
-            10: {
-                title: "提升期目标（第10周）",
-                desc: "至少两科达到40分,班主任关系≥60，余额≥300元",
-                check: (s) => {
-                    const highCount = Object.values(s.subjects).filter(v => v >= 40).length;
-                    return highCount >= 2 && s.relationships.teacher >= 60 && s.money >= 300;
-                },
-                reward: { mental: 5, money: 100 }
-            },
-            15: {
-                title: "稳定期目标（第15周）",
-                desc: "全科平均达到50分,压力低于30,本周完成至少5科作业",
-                check: (s) => {
-                    const avg = Object.values(s.subjects).reduce((a, b) => a + b, 0) / 6;
-                    const homeworkCount = Object.values(s.homework).filter(v => v).length;
-                    return avg >= 50 && s.stress < 30 && homeworkCount >= 5;
-                },
-                reward: { health: 5, stress: -10 }
-            },
-            25: {
-                title: "冲刺期目标（第25周）",
-                desc: "全科平均达到65分,至少一科达到70分,校园记录同学关系≥30",
-                check: (s) => {
-                    const avg = Object.values(s.subjects).reduce((a, b) => a + b, 0) / 6;
-                    const has70 = Object.values(s.subjects).some(v => v >= 70);
-                    return avg >= 65 && has70 && s.relationships.crush >= 30;
-                },
-                reward: { energy: 15, mental: 10 }
-            },
-            35: {
-                title: "决战期目标（第35周）",
-                desc: "全科平均达到75分,心理值>70,完成至少3次模考",
-                check: (s) => {
-                    const avg = Object.values(s.subjects).reduce((a, b) => a + b, 0) / 6;
-                    return avg >= 75 && s.mental > 70 && s.examCount >= 3;
-                },
-                reward: { stress: -15, health: 10 }
-            },
-            45: {
-                title: "最终目标（第45周）",
-                desc: "全科平均达到85分,所有已有关系≥60,压力<20",
-                check: (s) => {
-                    const avg = Object.values(s.subjects).reduce((a, b) => a + b, 0) / 6;
-                    const allRel = Object.values(s.relationships).every(v => v >= 60);
-                    return avg >= 85 && allRel && s.stress < 20;
-                },
-                reward: { energy: 20, mental: 15 }
-            }
+            5: makeStageGoal('适应期目标（第5周）', [
+                stageRequirement('全科平均', 20, stageAverage, '分'),
+                stageRequirement('压力', 40, s => s.stress, '', '<'),
+                stageRequirement('健康', 80, s => s.health)
+            ], { energy: 10, stress: -5 }),
+            10: makeStageGoal('提升期目标（第10周）', [
+                stageRequirement('达到30分的科目', 2, s => Object.values(s.subjects).filter(v => v >= 30).length, '科')
+            ], { mental: 5, money: 100 }, [
+                stageRequirement('班主任关系', 60, s => s.relationships.teacher),
+                stageRequirement('余额', 300, s => s.money, '元')
+            ]),
+            15: makeStageGoal('稳定期目标（第15周）', [
+                stageRequirement('全科平均', 35, stageAverage, '分'),
+                stageRequirement('压力', 30, s => s.stress, '', '<')
+            ], { health: 5, stress: -10 }, [
+                stageRequirement('本周完成作业', 5, s => Object.values(s.homework).filter(Boolean).length, '科')
+            ]),
+            25: makeStageGoal('冲刺期目标（第25周）', [
+                stageRequirement('全科平均', 50, stageAverage, '分')
+            ], { energy: 15, mental: 10 }, [
+                stageRequirement('达到70分的科目', 1, s => Object.values(s.subjects).filter(v => v >= 70).length, '科'),
+                stageRequirement('与校园记录同学有内容的交流', 2, s => peerInteractionCount(s), '次')
+            ]),
+            35: makeStageGoal('决战期目标（第35周）', [
+                stageRequirement('全科平均', 60, stageAverage, '分'),
+                stageRequirement('心理', 70, s => s.mental, '', '>')
+            ], { stress: -15, health: 10 }, [
+                stageRequirement('累计模考', 3, s => s.examCount, '次')
+            ]),
+            45: makeStageGoal('最终目标（第45周）', [
+                stageRequirement('全科平均', 75, stageAverage, '分'),
+                stageRequirement('压力', 20, s => s.stress, '', '<')
+            ], { energy: 20, mental: 15 }, [
+                stageRequirement('熟悉程度达到60的对象', 2, s => Object.values(s.relationships).filter(v => v >= 60).length, '位')
+            ])
         };
 
         // 剧情与随机事件正文由 narrative-data.js 提供。
@@ -2180,15 +2196,15 @@
             'hidden-3': { name: '隐藏剧情3', desc: '触发隐藏剧情', hidden: true },
 
             // 结局成就：按玩家确认的去向解锁。
-            'ending-E01': { name: '结局：观澜的第一场讨论', desc: '确认对应去向并阅读主结局', hidden: false },
-            'ending-E02': { name: '结局：两封回信', desc: '确认对应去向并阅读主结局', hidden: false },
-            'ending-E03': { name: '结局：榆桥的街口', desc: '确认对应去向并阅读主结局', hidden: false },
-            'ending-E04': { name: '结局：城南的末班车', desc: '确认对应去向并阅读主结局', hidden: false },
-            'ending-E05': { name: '结局：青禾的一盏小灯', desc: '确认对应去向并阅读主结局', hidden: false },
-            'ending-E06': { name: '结局：傍晚的基础课', desc: '确认对应去向并阅读主结局', hidden: false },
-            'ending-E07': { name: '结局：看过教室以后', desc: '确认对应去向并阅读主结局', hidden: false },
-            'ending-E08': { name: '结局：一袋湿掉的菜', desc: '确认对应去向并阅读主结局', hidden: false },
-            'ending-E09': { name: '结局：先问清这一份工作', desc: '确认对应去向并阅读主结局', hidden: false },
+            'ending-E01': { name: '升学后记：95分及以上', desc: '已确认升学方向并阅读后记；具体项目答复另按申请记录呈现', hidden: false },
+            'ending-E02': { name: '升学后记：90—94分', desc: '已确认升学方向并阅读后记；具体项目答复另按申请记录呈现', hidden: false },
+            'ending-E03': { name: '升学后记：80—89分', desc: '已确认升学方向并阅读后记；具体项目答复另按申请记录呈现', hidden: false },
+            'ending-E04': { name: '升学后记：70—79分', desc: '已确认升学方向并阅读后记；具体项目答复另按申请记录呈现', hidden: false },
+            'ending-E05': { name: '升学后记：60—69分', desc: '已确认升学方向并阅读后记；具体项目答复另按申请记录呈现', hidden: false },
+            'ending-E06': { name: '升学后记：60分以下', desc: '已确认升学方向并阅读后记；具体项目答复另按申请记录呈现', hidden: false },
+            'ending-E07': { name: '读过复读筹备后记', desc: '已确认方向并阅读后记，不代表筹备已经成功', hidden: false },
+            'ending-E08': { name: '读过休整筹备后记', desc: '已确认方向并阅读后记，状态和计划仍按实际记录呈现', hidden: false },
+            'ending-E09': { name: '读过工作与学习后记', desc: '已确认方向并阅读后记，不代表工作和课程都已落实', hidden: false },
             'exam-perfect': { name: '模考高分', desc: '模考成绩指数达到90', hidden: false }
         };
 
@@ -2499,19 +2515,19 @@
 
             let text = "";
 
-            if (t > 70) text += "老师很器重你。";
-            else if (t < 30) text += "老师对你有些失望。";
-            else text += "与老师关系正常。";
+            if (t > 70) text += "与班主任较熟悉。";
+            else if (t < 30) text += "与班主任交流较少。";
+            else text += "与班主任保持日常交流。";
 
-            if (ca > 70 || cb > 70) text += " 同学们很认可你。";
-            else if (ca < 30 && cb < 30) text += " 与同学有些疏远。";
-            else text += " 同学关系一般。";
+            if (ca > 70 || cb > 70) text += " 与至少一位同学较熟悉。";
+            else if (ca < 30 && cb < 30) text += " 与同学的交流较少。";
+            else text += " 与同学保持日常交流。";
 
-            if (p > 70) text += " 父母很支持。";
-            else if (p < 30) text += " 父母不太理解。";
-            else text += " 父母关系正常。";
+            if (p > 70) text += " 与父母沟通较多，具体支持仍看约定。";
+            else if (p < 30) text += " 与父母的沟通较少。";
+            else text += " 与父母保持日常沟通。";
 
-            text += ` 与校园记录同学的共识：${gameState.romance || '暂不命名'}；关系值不代替对方的回答。`;
+            text += ` 与校园记录同学的共识：${gameState.romance || '暂不命名'}；${typeof peerInteractionCount === 'function' ? `有记录的共同交流${peerInteractionCount()}次；` : ''}熟悉程度不代替对方的回答。`;
 
             elements.relationshipStatus.textContent = text;
         }
@@ -2594,7 +2610,7 @@
         // 检查操作限制
 
 
-        const studyBalance = { anxietyDivisor: 100, mentalCap: 85, energyFloor: 0.75, gainScale: 0.92, groupBase: 5.0 };
+        const studyBalance = { anxietyDivisor: 100, mentalCap: 85, energyFloor: 0.75, gainScale: 0.92, groupBase: 5.0, groupAnxietyReduction: 4 };
         function calculateStudyEfficiency() {
             let efficiency = 1.0;
 
@@ -3205,7 +3221,7 @@
                                                                                                                                                                                                                                                                                                                                             <div class="goal-item">
                                                                                                                                                                                                                                                                                                                                                 <h4>${goal.title}</h4>
                                                                                                                                                                                                                                                                                                                                                 <p>${goal.desc}</p>
-                                                                                                                                                                                                                                                                                                                                                <p style="color: var(--warning); margin-top: 5px;">⚠️ 请在下个阶段检查点前努力达成！</p>
+                                                                                                                                                                                                                                                                                                                                                <p style="color: var(--warning); margin-top: 5px;">本阶段在对应截止周结束时结算，主要目标全部满足即可获得阶段奖励。</p>
                                                                                                                                                                                                                                                                                                                                             </div>
                                                                                                                                                                                                                                                                                                                                         `;
             modal.style.display = 'flex';
@@ -3217,7 +3233,7 @@
             const className = achieved ? 'achieved' : 'failed';
             const statusText = achieved ? '✅ 已达成' : '❌ 未达成';
             const rewardText = achieved && goal.reward ?
-                `<p style="color: var(--secondary); margin-top: 8px;">奖励：${Object.entries(goal.reward).map(([k, v]) => `${k}+${v}`).join('、')}</p>` :
+                `<p style="color: var(--secondary); margin-top: 8px;">奖励：${escapeText(previewEffect(goal.reward))}</p>` :
                 '';
 
             elements.goalContent.innerHTML = `

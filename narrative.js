@@ -17,11 +17,12 @@ Object.assign(gameState, {
     storyChoices: {}, memoryChoices: {}, actionHistory: [], examHistory: [],
     randomSeen: [], randomCountThisWeek: 0, lastNegativeWeek: {},
     deferredRandom: false, weekRandomAttempted: false, weekEnding: false,
-    goalWeek: 5, goalResults: {}, totalHomework: 0, totalIncome: 0,
+    goalWeek: 5, goalResults: {}, goalDetails: {}, totalHomework: 0, totalIncome: 0,
     lowStressWeeks: 0, highEnergyWeeks: 0, finalSnapshot: null, finalRoute: null,
     romance: '暂不命名', mutualAffirmation: false, previousWeather: null,
     oldProgramAccess: false, practiceGoal: null, logHistory: [], negativeRandomThisWeek: false,
-    reviewedExams: [], reviewPlan: null, studyGroupWeek: null, totalReviews: 0, totalStudyGroups: 0
+    reviewedExams: [], reviewPlan: null, studyGroupWeek: null, totalReviews: 0, totalStudyGroups: 0,
+    sceneChoices: {}, missedScenes: {}, romanceHistory: [], wellbeingHistory: [], routePlans: {}
 });
 const initialState = JSON.parse(JSON.stringify(gameState));
 
@@ -79,7 +80,7 @@ function previewEffect(effect) {
 function saveGame() {
     try {
         const state = { ...gameState, achievements: [...gameState.achievements], currentGoal: null };
-        localStorage.setItem(saveKey, JSON.stringify({ version: '3.0.1', state }));
+        localStorage.setItem(saveKey, JSON.stringify({ version: '3.1.0', state }));
         saveAvailable = true;
         return true;
     } catch (_) {
@@ -90,7 +91,7 @@ function saveGame() {
 function restoreGame() {
     try {
         const saved = JSON.parse(localStorage.getItem(saveKey) || 'null');
-        if (!saved || !['3.0.0', '3.0.1'].includes(saved.version)) return false;
+        if (!saved || !['3.0.0', '3.0.1', '3.0.2', '3.1.0'].includes(saved.version)) return false;
         const s = saved.state;
         if (!s || !Number.isInteger(s.week) || s.week < 1 || s.week > 52 ||
             !['playing', 'postExam', 'ending'].includes(s.phase) ||
@@ -107,13 +108,27 @@ function restoreGame() {
         const fresh = JSON.parse(JSON.stringify(initialState));
         const restoredAchievements = new Set(s.achievements);
         Object.assign(gameState, fresh, s, { achievements: restoredAchievements });
+        restoreNarrativeEvidence();
         gameState.reviewedExams = Array.isArray(gameState.reviewedExams) ? gameState.reviewedExams : [];
         if (gameState.reviewPlan && (!Array.isArray(gameState.reviewPlan.subjects) ||
             !gameState.reviewPlan.subjects.every(k => Object.hasOwn(subjectNames, k)) ||
             !Number.isInteger(gameState.reviewPlan.remaining) || gameState.reviewPlan.remaining < 0 || gameState.reviewPlan.remaining > 2 ||
             !Number.isInteger(gameState.reviewPlan.expiresWeek))) gameState.reviewPlan = null;
-        gameState.currentGoal = stageGoals[gameState.goalWeek] || null;
+        const details = gameState.goalDetails;
+        gameState.goalDetails = {};
+        if (details && typeof details === 'object' && !Array.isArray(details)) {
+            for (const [week, detail] of Object.entries(details)) {
+                const validRows = rows => Array.isArray(rows) && rows.every(row => row && typeof row.text === 'string' && typeof row.passed === 'boolean');
+                if (Object.hasOwn(stageGoals, week) && detail && detail.week === Number(week) &&
+                    typeof detail.title === 'string' && typeof detail.achieved === 'boolean' &&
+                    detail.achieved === gameState.goalResults?.[week] && typeof detail.rewardText === 'string' &&
+                    validRows(detail.requirements) && detail.requirements.length && validRows(detail.challenges)) {
+                    gameState.goalDetails[week] = detail;
+                }
+            }
+        }
         clampState();
+        checkStageGoals();
         return true;
     } catch (_) { return false; }
 }
@@ -133,13 +148,16 @@ updateUI = function() {
     legacy.updateUI();
     const total = document.getElementById('achievement-total');
     if (total) total.textContent = Object.keys(achievements).length;
-    const info = document.getElementById('narrative-status');
-    if (info) info.textContent = `主线 ${gameState.storyProgress}/36 · 当前学习效率 ${calculateStudyEfficiency().toFixed(2)} · ${saveAvailable ? '进度自动保存在本设备' : '本设备无法保存，关闭页面前请留意'}`;
+    updateNarrativeStatus();
     const resume = document.getElementById('narrative-btn');
-    if (resume) resume.textContent = gameState.activeNarrative || gameState.narrativeFeedback ? '继续未完成的剧情' : '本周剧情与支线';
+    if (resume) resume.textContent = gameState.activeNarrative || gameState.narrativeFeedback ? '继续未完成的剧情' : `本周剧情与支线（${availableSideStories().length}段可选）`;
     const plan = document.getElementById('review-plan-status');
     if (plan) plan.textContent = activeReviewPlan() ? `复盘提示：${gameState.reviewPlan.subjects.map(k => subjectNames[k]).join('、')}，还可用于${gameState.reviewPlan.remaining}次主动学习，至第${gameState.reviewPlan.expiresWeek}周结束。` : '模考后三周内可复盘一次，结合后续学习巩固薄弱科目。';
 };
+function updateNarrativeStatus() {
+    const info = document.getElementById('narrative-status');
+    if (info) info.textContent = `主线 ${gameState.storyProgress}/36 · 当前学习效率 ${calculateStudyEfficiency().toFixed(2)} · ${saveAvailable ? '进度自动保存在本设备' : '本设备无法保存，关闭页面前请留意'}`;
+}
 function checkActionLimit() {
     if (gameState.gameOver || gameState.phase !== 'playing') return false;
     if (gameState.activeNarrative || gameState.narrativeFeedback || gameState.weekEnding) {
@@ -306,7 +324,7 @@ function studyTogether(target, subject) {
     if (!checkActionLimit()) return;
     if (gameState.studyGroupWeek === gameState.week) { showNotification('本周已经共同学习过一次，把其他时间留给各自的安排。', 'neutral'); return; }
     if (!target) {
-        showMenu('一起核对一处课内问题', '每周一次，消耗一次行动、20精力，需要健康至少50、对应关系至少60。按当前学习效率和能力增长，压力 -4、焦虑 -4，关系 +2；不保证对方已经知道全部答案。',
+        showMenu('一起核对一处课内问题', `每周一次，消耗一次行动、20精力，需要健康至少50、对应关系至少60。按当前学习效率和能力增长，压力 -4、焦虑 -${studyBalance.groupAnxietyReduction}，熟悉程度 +2；不保证对方已经知道全部答案。`,
             availableStudyPartners().map(k => ({ text: relationshipNames[k], action: () => studyTogether(k) })).concat(
                 [{ text: '返回本周安排', action: () => closeModal('story-modal') }]));
         return;
@@ -321,11 +339,12 @@ function studyTogether(target, subject) {
     if (!groupSubjects(target).includes(subject) || gameState.energy < 20 || gameState.health < 50) { showNotification('共同学习需要20精力、健康至少50及对应的学科条件。', 'neutral'); return; }
     performAction('studyGroup', subject, () => {
         const gain = studyBalance.groupBase * calculateStudyEfficiency() * (1 - gameState.subjects[subject] / 200);
-        applyEffect({ energy: -20, stress: -4, anxiety: -4, [target]: 2, [subject]: gain });
+        applyEffect({ energy: -20, stress: -4, anxiety: -studyBalance.groupAnxietyReduction, [target]: 2, [subject]: gain });
         gameState.studyGroupWeek = gameState.week;
         gameState.totalStudyGroups++;
         addToLog(`与${relationshipNames[target]}一起核对${subjectNames[subject]}教材，能力 +${gain.toFixed(1)}；今天各自仍有要继续做的部分。`, 'good');
         closeModal('story-modal'); recordAction(); advanceTime();
+        gameState.actionHistory.at(-1).partner = target;
     });
 }
 function memory() {
@@ -404,7 +423,7 @@ function dueMainStories() {
 function availableSideStories() {
     const entry = { H01: 'S13', H02: 'S21', H03: 'S23', H04: 'S14', H05: 'S24' };
     return narrativeData.stories.filter(n => n.kind === 'side' && n.week <= gameState.week && gameState.week <= n.until && !gameState.events.includes(n.id) &&
-        (n.id === 'H06' ? Object.values(gameState.subjects).some(v => v < 40) : gameState.events.includes(entry[n.id])));
+        (n.revision ? sceneRequirementsMet(n) : n.id === 'H06' ? Object.values(gameState.subjects).some(v => v < 40) : gameState.events.includes(entry[n.id])));
 }
 function resumeNarrative() {
     if (gameState.phase !== 'playing') { renderPostExam(); pumpNarrative(); return; }
@@ -412,7 +431,7 @@ function resumeNarrative() {
     const due = dueMainStories();
     const sides = availableSideStories();
     showMenu('本周剧情与支线', '主线和可选支线不消耗常规行动。关闭窗口后可从这里继续；支线是否参与由你决定。',
-        [...due, ...sides].map(n => ({ text: `${n.kind === 'main' ? '主线' : '支线'}：${n.title}`, action: () => triggerStoryEvent(n) })).concat(
+        [...due, ...sides].map(n => ({ text: `${n.kind === 'main' ? '主线' : '支线'}：${n.title}${n.kind === 'side' ? `（至第${n.until}周）` : ''}`, action: () => triggerStoryEvent(n) })).concat(
             [{ text: '回到本周安排', action: () => closeModal('story-modal') }]));
 }
 function triggerStoryEvent(node) {
@@ -463,6 +482,12 @@ function renderStoryContent(node) {
     let text = node.content;
     const choice = id => gameState.storyChoices[id]?.key;
     const source = { A: '作业单', B: '页码小框', C: '夹在最前面的课表' }[choice('S01')] || '课表';
+    text = text.replace('{familyCallback}', { A: '对方带来那张三栏汇报页，纸边仍有一个分数问号。', B: '对方先问今天是不是约好的谈话时间。', C: '对方带来给班主任的提问草稿，里面有两条还没问清楚。' }[choice('S03')] || '对方只问：“现在方便聊吗？”');
+    text = text.replace('{conditionCallback}', (gameState.health < 45 || gameState.energy < 25 ? '你坐下后才发现自己一直揉着眼睛，今天需要为必要的休息留位置。' : '你看见同桌收起书，自己的计划里也需要留空。') + (gameState.anxiety >= 65 || gameState.stress >= 75 ? '你把安排看了三遍，仍担心漏掉什么。' : ''));
+    text = text.replace('{examCallback}', examTrend());
+    text = text.replace('{peerCallback}', peerInteractionCount() >= 2 ? '你们一起听过采访、改过稿，有些话已不必借一道题开头。' : '你们有过几次交谈，还没有许多一起度过的时间。你发觉自己在等一个顺便说话的时机。');
+    text = text.replace('{teamConversation}', chose('H12', 'B') ? '你想起自己把他的感受说轻的那句话，仍有机会解释。' : '上次你认真听过他的遗憾，他却也说想把下一段生活和旧队伍分开。你们的距离不全是一场误会造成的。');
+    text = text.replace('{teacherConversation}', chose('H16', 'A') ? '你按约得到过一般材料建议，期待的系统方向专门咨询却收到可能取消的通知。' : '你想谈的方向仍写在蓝本上，还没有约上这一轮面谈。');
     if (node.id === 'S07') text = text.split('按实际记录显示一段：')[0] + '\n\n' + examTrend();
     if (node.id === 'S12') text = text.replace(/若 S03[\s\S]*?当时的气话。/, ({ A: '对方问起约好的简短汇报，你指着纸上仍待核实的问号。', B: '对方问是不是到了约定谈话的时间。', C: '对方问起准备交给班主任的提问草稿，仍需核实的事留在纸上。' }[choice('S03')] || '对方只问：“现在方便聊吗？”'));
     if (node.id === 'S22') {
@@ -473,7 +498,6 @@ function renderStoryContent(node) {
     }
     if (node.id === 'S23') text = text.replace(/如果 S09 未发生[\s\S]*?。/, choice('S09') ? '' : '他补了一句：“现在的声音比刚修时有底气一点。”');
     if (node.id === 'S25') text = text.replace(/你们翻回 S05 的材料。[\s\S]*?用今天这份练笔。/, `你们翻回${choice('S05') === 'A' ? '食堂托盘与汤渍的观察' : choice('S05') === 'C' ? '叶片朝向的观察' : '今天这份练笔'}，从真实留下的句子继续看。`);
-    if (node.id === 'S27') text = text.split('状态插句：')[0] + '\n\n' + (gameState.health < 45 || gameState.energy < 25 ? '把东西放下后，你才发现自己一直揉着眼睛。必要的休息要在今天的安排里留位置。' : '你看到同桌手背上的胶带印，也发现自己的计划需要留白。') + (gameState.anxiety >= 65 || gameState.stress >= 75 ? '\n\n你盯着被划掉的事情，总觉得还漏了什么。' : '');
     if (node.id === 'S29') text = text.split('按实际材料呈现：')[0] + '\n\n' + examTrend();
     if (node.id === 'S34') text = text.split('S03、S21')[0] + '\n\n' + (gameState.relationships.parents < 50 ? '你们说话仍容易绕回旧争论，于是先只谈一项。' : '你们已经知道哪些话题需要先问是否方便。') + '哪些费用能够承担，仍要逐项核实。';
     if (node.id === 'S35') text = text.split('读取真实状态：')[0] + '\n\n' + (gameState.health < 45 ? '必要的身体照护先放在前面，其他事情可以分开处理。' : gameState.anxiety >= 65 || gameState.stress >= 75 ? '手机每一次亮屏都让你想伸手。今晚只先处理能确认的一小段。' : '你有余力整理桌面，把必要的东西留在手边。') + `\n\n蓝本里仍留着第一天的${source}。`;
@@ -495,9 +519,19 @@ function renderStoryContent(node) {
     return text.trim();
 }
 function choiceFeedback(node, c) {
-    if (node.id === 'S33' && c.key === 'A') return gameState.storyChoices.S24?.key === 'A' ?
-        '她说：“这段时间过下来，我知道我喜欢你。我想听听你的回答。”你明确回应同样的喜欢。你们确认各自的计划仍需各自安排，感情共识为明确互相喜欢。' :
-        '你提出从现在慢慢了解，她表示愿意。你们确认联系范围，感情共识为慢慢了解，不要求同校或同城。';
+    if (node.id === 'H17' && c.key === 'A') return chose('H16', 'A') ? '专门咨询最终取消，班主任给过一般材料建议，也尝试联系原定的方向老师，没能补开名额。你按约准备过，期待的那轮专门指导仍没有得到。' : '你在截止前完成预约，老师读过你的一页方向问题，给了具体材料反馈。这轮机会确实发生了。';
+    if (node.id === 'H08' && c.key === 'A') {
+        if (hasRomanceEvent('rejected')) return '你把喜欢说清，她认真回答：“我很珍惜你，但没有同样的感情。我想继续做采访伙伴，不想建立恋爱关系。”你听见了她的拒绝；之前的帮忙没有换来同样的喜欢。';
+        if (hasRomanceEvent('mutual')) return '你们从录音里的笑声说到彼此等消息的心情。她亲口说“我喜欢你”，你也明确回应了同样的喜欢。她仍想去做社区采访，你们没有因此替对方改掉计划。';
+        return '你们把上次的分歧说清。她说自己更愿意按朋友的方式继续认识你。没有人把一次好好沟通当成已经确认恋爱。';
+    }
+    if (node.id === 'S33') {
+        if (gameState.romance === '已结束') return '她说：“我们确实喜欢过，但我不想继续一段总在为陪伴时间道歉的关系。”你们回顾已经试过的安排，明确结束恋爱。这段喜欢成立过，结束也已经发生。';
+        if (hasRomanceEvent('rejected')) return gameState.romance === '被拒后朋友' ? '她没有改变之前的回答。你们另外确认愿意按朋友的范围联系，被拒的事实没有被这次友谊覆盖。' : '她明确说没有同样的喜欢，不愿建立恋爱关系。你接受这个回答，之后减少单独联系；不会靠再选一次走近把拒绝改掉。';
+        if (gameState.romance === '明确互相喜欢') return '她提起一起改稿、说清分歧的那几次相处，亲口说仍然喜欢你，你也明确回应。你们确认愿意继续这段关系，各自的采访和生活安排仍需要商量。';
+        if (gameState.romance === '慢慢了解') return '你表达仍愿意走近。她说还没有足够的共同经历来确认同样的喜欢，愿意继续慢慢了解。这次没有把两个走近选项算作恋爱成功。';
+        return c.key === 'B' ? '你们重新谈清朋友的范围，双方都答应按愿意分享的事情联系。没有一场被拒绝的告白被补写进来。' : '你们暂时不命名关系。她说明自己会继续采访与生活，也没有承诺等待一个未来答案。';
+    }
     if (node.id === 'S36') return { A: '成绩已经留在蓝本里。你先了解升学方向，也可以返回比较其他安排。', B: '升学、复读、休整、工作与继续学习同时开放，确认前可以自由返回。', C: '今天先吃一顿不必卡着下课铃的饭。去向仍未确认，回来后可继续查看全部方向。' }[c.key];
     return c.feedback.replace(/S\d{2}/g, '之前的那次选择');
 }
@@ -553,18 +587,18 @@ function commitNarrativeChoice(node, c) {
             if (node.id === 'M01' && c.key === 'A') gameState.oldProgramAccess = true;
             advanceTime();
         }
-        if (node.kind === 'side') gameState.actionHistory.push({ week: gameState.week, kind: 'side', detail: node.id });
+        if (node.kind === 'side') {
+            gameState.sceneChoices[node.id] = record;
+            gameState.actionHistory.push({ week: gameState.week, kind: 'side', detail: node.id });
+        }
     }
-    if (node.id === 'S24') gameState.romance = { A: '慢慢了解', B: '朋友', C: '暂不命名' }[c.key];
-    if (node.id === 'S33') {
-        gameState.mutualAffirmation = c.key === 'A' && gameState.storyChoices.S24?.key === 'A';
-        gameState.romance = c.key === 'A' ? gameState.mutualAffirmation ? '明确互相喜欢' : '慢慢了解' : c.key === 'B' ? '朋友' : '暂不命名';
-    }
+    recordRomanceOutcome(node, c);
     if (node.id === 'S18') gameState.practiceGoal = { week: gameState.week, subjects: c.targets?.length ? c.targets : Object.keys(subjectNames) };
     gameState.activeNarrative = null;
     gameState.narrativeFeedback = { title: node.title, text: choiceFeedback(node, c), postChoice: node.id === 'S36' ? c.key : null };
     addToLog(`${node.title}：${c.text}${c.targets?.length ? '（' + c.targets.map(k => subjectNames[k]).join('、') + '）' : ''}`, 'story');
     if (gameState.phase === 'playing') { checkAchievements(); updateUI(); }
+    updateNarrativeStatus();
     saveGame();
     pumpNarrative();
     return true;
@@ -618,6 +652,8 @@ function continueWeekEnd() {
         if (shouldDraw) { gameState.weekRandomAttempted = false; drawRandomEvent(); if (gameState.activeNarrative) return; }
     }
     applyEffect({ energy: 8, stress: -5 + Math.floor(gameState.anxiety * 0.2), health: 2, mental: 2 - Math.floor(gameState.anxiety * 0.1), anxiety: 2 });
+    settleSceneDeadlines();
+    gameState.wellbeingHistory.push({ week: gameState.week, health: gameState.health, mental: gameState.mental, anxiety: gameState.anxiety, stress: gameState.stress });
     gameState.completedWeeks++;
     gameState.lowStressWeeks = gameState.stress < 10 ? gameState.lowStressWeeks + 1 : 0;
     gameState.highEnergyWeeks = gameState.energy > 90 ? gameState.highEnergyWeeks + 1 : 0;
@@ -644,20 +680,74 @@ function checkStageGoals() {
     const next = Object.keys(stageGoals).map(Number).find(w => w >= gameState.week && !Object.hasOwn(gameState.goalResults, w));
     gameState.goalWeek = next || null;
     gameState.currentGoal = next ? stageGoals[next] : null;
-    gameState.goalProgress = 0;
+    gameState.goalProgress = gameState.currentGoal ? getStageGoalStatus(gameState.currentGoal).progress : 0;
 };
+function getStageGoalStatus(goal, state = gameState) {
+    const read = requirement => {
+        const current = requirement.read(state);
+        const { target, operator } = requirement;
+        const passed = operator === '<' ? current < target : operator === '>' ? current > target : current >= target;
+        // Round toward the same side of the boundary as the actual check.
+        const shown = (operator === '>' ? Math.ceil(current * 100) : Math.floor(current * 100)) / 100;
+        const fraction = operator === '<' ? (100 - current) / (100 - target) : current / target;
+        return { passed, progress: passed ? 1 : Math.max(0, Math.min(0.99, fraction)),
+            text: `${requirement.label}：${shown}${requirement.unit} / 要求${operator}${target}${requirement.unit}` };
+    };
+    const requirements = goal.requirements.map(read);
+    const challenges = goal.challenges.map(read);
+    const achieved = requirements.every(row => row.passed);
+    const progress = achieved ? 100 : Math.min(99, Math.floor(requirements.reduce((sum, row) => sum + row.progress, 0) / requirements.length * 100));
+    return { requirements, challenges, achieved, progress };
+}
+function renderGoalRows(rows) {
+    return rows.map(row => `<li class="${row.passed ? 'goal-met' : 'goal-pending'}">${row.passed ? '✅ 已满足' : '○ 未满足'} · ${escapeText(row.text)}</li>`).join('');
+}
+function renderGoalSettlement(detail) {
+    const missing = detail.requirements.filter(row => !row.passed);
+    return `<p class="goal-note">${detail.achieved ? `主要目标达成，阶段奖励：${escapeText(detail.rewardText)}` : `未达成原因：${missing.map(row => escapeText(row.text)).join('；')}。后续阶段仍可继续。`}</p>` +
+        `<ul class="goal-checklist">${renderGoalRows(detail.requirements)}</ul>` +
+        (detail.challenges.length ? `<p class="goal-note">选做挑战（仅记录，不影响阶段奖励）</p><ul class="goal-checklist">${renderGoalRows(detail.challenges)}</ul>` : '') +
+        (Array.isArray(detail.mementos) ? detail.mementos.filter(t => typeof t === 'string').map(t => `<p class="narrative-note">${escapeText(t)}</p>`).join('') : '');
+}
 function settleStageGoal() {
     if (gameState.goalWeek !== gameState.week || Object.hasOwn(gameState.goalResults, gameState.week)) return;
     const goal = stageGoals[gameState.week];
-    const achieved = goal.check(gameState);
+    const status = getStageGoalStatus(goal);
+    const achieved = status.achieved;
     gameState.goalResults[gameState.week] = achieved;
+    const detail = { week: gameState.week, title: goal.title, achieved,
+        requirements: status.requirements.map(({ text, passed }) => ({ text, passed })),
+        challenges: status.challenges.map(({ text, passed }) => ({ text, passed })), rewardText: previewEffect(goal.reward), mementos: [] };
+    if (gameState.week === 25 && status.challenges[1]?.passed) detail.mementos.push('蓝本便签：你把确实发生过的交流题名写在同一页，采访、小群里的问题和愿意分享的生活都有各自的位置。熟悉不等于喜欢，这些交谈本身已经留下过声音。');
+    if (gameState.week === 45 && status.challenges[0]?.passed) detail.mementos.push('蓝本便签：两位已经熟悉的人的名字留在页边。你知道可以怎样问候他们，也知道熟悉不会替任何人保证此后的关系。');
+    gameState.goalDetails[gameState.week] = detail;
     if (achieved) applyEffect(goal.reward);
-    addToLog(`${goal.title}：${achieved ? '达成，已获得奖励' : '尚未达成，后面的安排仍可继续'}。`, achieved ? 'good' : 'neutral');
+    const reason = achieved ? `主要目标达成，阶段奖励：${detail.rewardText}` :
+        `主要目标未达成；未满足：${detail.requirements.filter(row => !row.passed).map(row => row.text).join('；')}。后面的安排仍可继续`;
+    const extra = detail.challenges.length ? `\n选做挑战（仅记录）：${detail.challenges.map(row => `${row.passed ? '已满足' : '未满足'} ${row.text}`).join('；')}` : '';
+    addToLog(`${goal.title}：${reason}。${extra}`, achieved ? 'good' : 'neutral');
 }
 function updateGoalText() {
     const goal = gameState.currentGoal;
-    elements.currentGoal.textContent = goal ? `${goal.desc}；截止第${gameState.goalWeek}周结束` : '本轮阶段目标已结算';
-    elements.goalProgress.style.width = goal?.check(gameState) ? '100%' : '0%';
+    const status = goal ? getStageGoalStatus(goal) : null;
+    elements.currentGoal.textContent = goal ? `${goal.title}；截止第${gameState.goalWeek}周结束` : '本轮阶段目标已结算';
+    gameState.goalProgress = status?.progress || 0;
+    elements.goalProgress.style.width = `${gameState.goalProgress}%`;
+    elements.goalProgress.setAttribute('aria-valuenow', gameState.goalProgress);
+    document.getElementById('goal-progress-status').textContent = status ?
+        `主要目标 ${status.requirements.filter(row => row.passed).length}/${status.requirements.length} 项满足 · 综合进度 ${status.progress}%。${status.achieved ? '当前条件已满足，' : ''}截止周结束时按届时状态结算。` : '六个阶段均已结算，剩余周数仍可自由安排。';
+    document.getElementById('goal-requirements').innerHTML = status ? renderGoalRows(status.requirements) : '';
+    const extra = document.getElementById('goal-challenges');
+    extra.style.display = status?.challenges.length ? 'block' : 'none';
+    extra.innerHTML = status?.challenges.length ? `<p class="goal-note">选做挑战（仅记录，不影响阶段奖励）</p><ul class="goal-checklist">${renderGoalRows(status.challenges)}</ul>` : '';
+    const lastWeek = Object.keys(gameState.goalResults).map(Number).filter(w => w <= gameState.completedWeeks && Object.hasOwn(stageGoals, w)).sort((a, b) => b - a)[0];
+    const last = document.getElementById('goal-latest-result');
+    last.style.display = lastWeek ? 'block' : 'none';
+    if (lastWeek) {
+        const detail = gameState.goalDetails[lastWeek];
+        document.getElementById('goal-latest-summary').textContent = `${stageGoals[lastWeek].title} · ${gameState.goalResults[lastWeek] ? '已达成' : '未达成'}${detail ? '' : '（旧版记录）'}`;
+        document.getElementById('goal-latest-detail').innerHTML = detail ? renderGoalSettlement(detail) : '<p class="goal-note">旧存档没有分项结算记录，保留原达成结果；不会按新条件补算奖励。</p>';
+    }
 };
 changeWeather = function() {
     gameState.previousWeather = gameState.currentWeather?.id || null;
@@ -687,6 +777,98 @@ checkAchievements = function() {
     const sides = gameState.events.filter(id => /^H/.test(id)).length;
     for (let i = 1; i <= 3; i++) if (sides >= i) unlockAchievement('hidden-' + i);
 };
+function sceneChoice(id, state = gameState) {
+    return (state.storyChoices[id] || state.sceneChoices?.[id])?.key;
+}
+function chose(id, key, state = gameState) { return sceneChoice(id, state) === key; }
+function sceneRequirementsMet(node, state = gameState) {
+    return (node.requires || []).every(r => state.events.includes(r.id) && (!r.keys.length || r.keys.includes(sceneChoice(r.id, state))));
+}
+function peerInteractionCount(state = gameState) {
+    const scenes = ['S05', 'S16', 'S17', 'H05', 'H07', 'H08', 'H09'].filter(id =>
+        id === 'S05' ? chose(id, 'B', state) : id === 'S16' ? ['A', 'B'].includes(sceneChoice(id, state)) : !!sceneChoice(id, state)).length;
+    return scenes + (state.actionHistory || []).filter(a => a.kind === 'social' && a.detail === 'crush' || a.kind === 'studyGroup' && a.partner === 'crush').length;
+}
+function hasRomanceEvent(type, state = gameState) { return state.romanceHistory?.some(e => e.type === type) || false; }
+function recordRomanceOutcome(node, c) {
+    if (!['S24', 'H08', 'S33'].includes(node.id)) return;
+    const record = type => {
+        if (!gameState.romanceHistory.some(e => e.scene === node.id && e.type === type))
+            gameState.romanceHistory.push({ scene: node.id, type, week: gameState.week });
+    };
+    if (node.id === 'S24') gameState.romance = { A: '慢慢了解', B: '朋友', C: '暂不命名' }[c.key];
+    if (node.id === 'H08') {
+        if (c.key === 'A' && chose('S24', 'A')) {
+            if (chose('H07', 'A')) { record('rejected'); gameState.romance = '告白被拒绝'; }
+            else { record('mutual'); gameState.romance = '明确互相喜欢'; }
+        } else if (c.key === 'C') gameState.romance = '朋友';
+    }
+    if (node.id === 'S33') {
+        if (hasRomanceEvent('rejected')) gameState.romance = c.key === 'B' ? '被拒后朋友' : '告白被拒绝';
+        else if (hasRomanceEvent('mutual') && chose('H09', 'A')) { record('ended'); gameState.romance = '已结束'; }
+        else if (c.key === 'A') {
+            if (chose('H07', 'A') && chose('H08', 'A')) { record('rejected'); gameState.romance = '告白被拒绝'; }
+            else if (chose('H07', 'B') && chose('H08', 'A') && chose('H09', 'B')) { record('mutual'); gameState.romance = '明确互相喜欢'; }
+            else gameState.romance = hasRomanceEvent('mutual') ? '明确互相喜欢' : '慢慢了解';
+        } else gameState.romance = c.key === 'B' ? '朋友' : '暂不命名';
+    }
+    gameState.mutualAffirmation = gameState.romance === '明确互相喜欢' && hasRomanceEvent('mutual');
+}
+function restoreNarrativeEvidence() {
+    const object = value => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    gameState.sceneChoices = Object.fromEntries(Object.entries(object(gameState.sceneChoices)).filter(([id, r]) => {
+        const n = findNarrative(id);
+        return n?.kind === 'side' && gameState.events.includes(id) && n.choices.some(c => c.key === r?.key) && Number.isInteger(r.week) && r.week >= n.week && r.week <= n.until;
+    }));
+    gameState.missedScenes = Object.fromEntries(Object.entries(object(gameState.missedScenes)).filter(([id, week]) => {
+        const n = findNarrative(id);
+        return n?.revision && week === n.until && !gameState.events.includes(id) && sceneRequirementsMet(n);
+    }));
+    gameState.romanceHistory = Array.isArray(gameState.romanceHistory) ? gameState.romanceHistory.filter(e =>
+        e && ['H08', 'S33'].includes(e.scene) && ['mutual', 'rejected', 'ended'].includes(e.type) &&
+        gameState.events.includes(e.scene) && Number.isInteger(e.week)) : [];
+    const history = Array.isArray(gameState.wellbeingHistory) ? gameState.wellbeingHistory : [];
+    const seen = new Set();
+    gameState.wellbeingHistory = history.filter(row => row && Number.isInteger(row.week) && row.week >= 1 && row.week <= gameState.completedWeeks &&
+        !seen.has(row.week) && ['health', 'mental', 'anxiety', 'stress'].every(k => Number.isFinite(row[k]) && row[k] >= 0 && row[k] <= 100) && !!seen.add(row.week));
+    gameState.routePlans = object(gameState.routePlans);
+    for (const [route, plan] of Object.entries(gameState.routePlans)) {
+        if (!validRoutePlan(route, plan)) delete gameState.routePlans[route];
+    }
+    // Count actual completed main nodes; a missing node never becomes a cosmetic 36/36.
+    gameState.storyProgress = narrativeData.stories.filter(n => n.kind === 'main' && gameState.events.includes(n.id)).length;
+}
+function settleSceneDeadlines() {
+    for (const id of ['H11', 'H13', 'H15', 'H17', 'H19', 'H21', 'H23', 'H25', 'H27']) {
+        const node = findNarrative(id);
+        if (node.until !== gameState.week || gameState.events.includes(id) || !sceneRequirementsMet(node) || gameState.missedScenes[id]) continue;
+        gameState.missedScenes[id] = gameState.week;
+        addToLog(`“${node.title}”的期限已过。${node.missedFeedback}`, 'story');
+    }
+}
+function persistentDifficulty(state = gameState, physical = false) {
+    const after = (state.sceneChoices?.H26?.week || 35);
+    const bad = row => physical ? row.health < 45 : row.mental < 45 || row.anxiety >= 65 || row.stress >= 75;
+    return !!state.finalSnapshot && bad(state.finalSnapshot) && (state.wellbeingHistory || []).filter(row => row.week >= after && bad(row)).length >= 3;
+}
+function lineResults(state = gameState) {
+    const c = (id, key) => chose(id, key, state);
+    const missed = id => !!state.missedScenes?.[id];
+    return {
+        desk: c('H10', 'A') && (c('H11', 'B') || c('H11', 'C') || missed('H11')),
+        team: !!sceneChoice('H12', state) && (c('H13', 'A') || c('H13', 'B') || missed('H13')),
+        family: c('H14', 'A') && (!!sceneChoice('H15', state) || missed('H15')),
+        teacher: c('H16', 'B') && (c('H17', 'B') || missed('H17')) || c('H16', 'A') && (c('H17', 'A') || c('H17', 'B') || missed('H17')),
+        mathTeacher: c('H18', 'A') && (c('H19', 'A') || c('H19', 'B') || missed('H19')),
+        chineseTeacher: c('H20', 'A') && (c('H21', 'A') || c('H21', 'B') || missed('H21')),
+        englishTeacher: c('H22', 'A') && (c('H23', 'A') || c('H23', 'B') || missed('H23')),
+        oi: c('H24', 'A') && (c('H25', 'A') || c('H25', 'C') || missed('H25')),
+        body: c('H26', 'A') && persistentDifficulty(state, true),
+        mind: c('H26', 'A') && persistentDifficulty(state),
+        crushReject: hasRomanceEvent('rejected', state),
+        crushBreakup: hasRomanceEvent('ended', state)
+    };
+}
 function chooseEpilogues(state = gameState) {
     const index = id => ({ A: '01', B: '02', C: '03' }[state.storyChoices[id]?.key] || '04');
     const final = state.finalSnapshot;
@@ -695,8 +877,20 @@ function chooseEpilogues(state = gameState) {
         health = final.health < 45 ? 'ST01' : final.anxiety >= 65 || final.stress >= 75 || final.mental < 45 ? 'ST02' :
             final.health >= 75 && final.mental >= 65 && final.anxiety < 40 && final.stress < 50 ? 'ST03' : 'ST04';
     }
-    const peer = state.romance === '朋友' ? 'PEER01' : state.romance === '慢慢了解' ? 'PEER02' : state.romance === '明确互相喜欢' && state.mutualAffirmation ? 'PEER03' : 'PEER04';
-    return ['F' + index('S34'), 'DESK' + index('S28'), 'TEAM' + index('S14'), peer, health, 'OI' + index('S30')];
+    const lines = lineResults(state);
+    if (lines.body || lines.mind) health = lines.body ? 'BODY_BE' : 'MIND_BE';
+    const peer = lines.crushBreakup ? 'PEER_END' : lines.crushReject ? state.romance === '被拒后朋友' ? 'PEER_REJECT_FRIEND' : 'PEER_REJECT' :
+        state.romance === '朋友' ? 'PEER01' : state.romance === '慢慢了解' ? 'PEER02' : state.romance === '明确互相喜欢' && state.mutualAffirmation ? 'PEER03' : 'PEER04';
+    const selected = [lines.family ? 'FAMILY_BE' : 'F' + index('S34'), lines.desk ? 'DESK_BE' : 'DESK' + index('S28'),
+        lines.team ? 'TEAM_BE' : 'TEAM' + index('S14'), peer, health, lines.oi ? 'OI_BE' : 'OI' + index('S30')];
+    for (const [line, setup, result, goodKey, prefix] of [['teacher', 'H16', 'H17', 'C', 'TEACHER'], ['mathTeacher', 'H18', 'H19', 'C', 'MATH'],
+        ['chineseTeacher', 'H20', 'H21', 'C', 'CHINESE'], ['englishTeacher', 'H22', 'H23', 'C', 'ENGLISH']]) {
+        if (lines[line]) selected.push(prefix + '_BE');
+        else if (sceneChoice(setup, state) && (chose(result, goodKey, state) || line === 'teacher' && chose(result, 'A', state))) selected.push(prefix + '_OK');
+    }
+    const routeBE = routeRegret(state.finalRoute, state);
+    if (routeBE) selected.push(routeBE);
+    return selected;
 }
 function mainEndingId(route, score) {
     if (!['C01', 'C02', 'C03', 'C04'].includes(route)) throw new Error('无效去向');
@@ -718,16 +912,87 @@ function endGame() {
     triggerStoryEvent(findNarrative('S36'));
     saveGame();
 };
+const routePlanOptions = {
+    C01: { project: ['lanchuan', 'beichen'], materials: ['complete', 'general'] },
+    C02: { mode: ['dorm', 'local'] }, C03: { wish: ['exhibit', 'daily'] }, C04: { mode: ['rota', 'compare'] }
+};
+function validRoutePlan(route, plan) {
+    return !!routePlanOptions[route] && plan && typeof plan === 'object' && !Array.isArray(plan) &&
+        Object.entries(plan).every(([field, value]) => routePlanOptions[route][field]?.includes(value));
+}
+function routePlanReady(route) {
+    const plan = gameState.routePlans[route];
+    return validRoutePlan(route, plan) && Object.keys(routePlanOptions[route]).every(field => plan[field]);
+}
+function setRoutePlan(route, field, value) {
+    if (gameState.phase !== 'postExam' || gameState.finalRoute || !routePlanOptions[route]?.[field]?.includes(value)) return false;
+    const plan = { ...gameState.routePlans[route], [field]: value };
+    if (!validRoutePlan(route, plan)) return false;
+    gameState.routePlans[route] = plan;
+    saveGame(); renderPostExam(route);
+    return true;
+}
+function applicationResults(state = gameState) {
+    const plan = state.routePlans?.C01;
+    if (!plan?.project || !plan.materials || !state.finalSnapshot) return null;
+    const score = state.finalSnapshot.score;
+    const lanchuan = score >= 90, beichen = score >= 95 && plan.materials === 'complete';
+    const preferred = plan.project === 'beichen' ? '北辰大学计算系统研修项目' : '岚川大学计算与生活基础项目';
+    return { rejected: plan.project === 'beichen' ? !beichen : !lanchuan,
+        text: `你实际将两项申请一起递交，明确更希望去${preferred}。岚川项目${lanchuan ? '发来录取答复' : '没有通过，冻结的成绩未达到参考指数90'}；北辰项目${beichen ? '发来录取答复' : score < 95 ? '拒绝申请，本次成绩未达到参考指数95' : '拒绝申请，缺少已说明的完整研修说明'}。${plan.project === 'beichen' && !beichen || plan.project === 'lanchuan' && !lanchuan ? '你明确期待的项目没有通过。另一项结果和之后的安排都没有抹去这次失败。' : '你确认了更想去的项目，也保留另一封实际答复。'}` };
+}
+function routeRegret(route, state = gameState) {
+    const plan = state.routePlans?.[route];
+    if (!plan) return null;
+    if (route === 'C01' && applicationResults(state)?.rejected) return 'ROUTE_C01_BE';
+    if (route === 'C02' && plan.mode === 'dorm') return 'ROUTE_C02_BE';
+    if (route === 'C03' && plan.wish === 'exhibit' && (persistentDifficulty(state, true) || persistentDifficulty(state))) return 'ROUTE_C03_BE';
+    if (route === 'C04' && plan.mode === 'rota') return 'ROUTE_C04_BE';
+    return null;
+}
+function routePreparation(route) {
+    const plan = gameState.routePlans[route] || {};
+    const button = (field, value, label) => `<button class="restart-btn plan-choice" aria-pressed="${plan[field] === value}" onclick="setRoutePlan('${route}','${field}','${value}')">${plan[field] === value ? '✓ ' : ''}${escapeText(label)}</button>`;
+    if (route === 'C01') return `<section class="route-plan"><h3>两项实际申请</h3><p>岚川：基础课程宽、可走读，参考指数90。北辰：系统实验、小班与住宿，参考指数95且须完整研修说明。两项一并递交；先选更期待哪项，再决定材料。答复依据本次已确定成绩和这里留下的材料记录。</p>${chose('H28', 'A') ? '<p>你在筹备时圈过北辰的系统实验。现在可以重新确认偏好。</p>' : ''}${button('project', 'lanchuan', '更期待岚川的课程与走读')}${button('project', 'beichen', '更期待北辰的系统研修')}<p>研修说明和共同材料</p>${button('materials', 'complete', '核对完整研修说明后递交')}${button('materials', 'general', '按目前只有通用说明的材料递交')}</section>`;
+    if (route === 'C02') return `<section class="route-plan"><h3>想赶上哪一种开班方式</h3><p>岚桥第一期宿舍施工仍未确认。你可以继续争取这一期住宿，也可以从本地走读方案开始核实。认真询问无法保证宿舍按期开放。</p>${button('mode', 'dorm', '仍想住第一期宿舍，继续询问延期入住')}${button('mode', 'local', '先核对本地走读，不把未确认宿舍当作已有条件')}</section>`;
+    if (route === 'C03') return `<section class="route-plan"><h3>休整时具体盼望什么</h3><p>城市展览在七月第一个周末闭幕。你可以把按期出门作为愿望，也可以暂时只照顾日常。后记会结合实际持续状态，不会把选择休整本身判成失败。</p>${button('wish', 'exhibit', '希望休整后赶在闭幕前去看展览')}${button('wish', 'daily', '暂不设有期限的活动，先安排日常照护')}</section>`;
+    return `<section class="route-plan"><h3>岗位与课程能否同时落实</h3><p>设备整理岗位需要轮班，石桥晚间课程的时段固定。现在仍有冲突。可以带着两者兼顾的期待去申请调班，也可以继续比较其他岗位，暂不接受这一份。</p>${button('mode', 'rota', '向岗位方申请调班，仍希望兼顾工作与这门课')}${button('mode', 'compare', '暂不接受冲突排班，继续比较其他岗位')}</section>`;
+}
+function epilogueContent(key, state = gameState) {
+    const friendDetail = peerInteractionCount(state) >= 4 ? '一起改过的稿、听过的录音给你们留了具体话题。后来偶尔约时间分享新稿，也仍会先问对方是否有空。' : '你们共同经历还不多，毕业后偶尔互道近况，没有变成每天分享生活的亲密朋友。';
+    const text = narrativeData.endings[key].content;
+    return text.replace('{friendDetail}', friendDetail)
+        .replace('{teamOrigin}', chose('H12', 'B', state) ? '你把旧队友的遗憾说成没想开，他收回了一次邀请。' : '你曾认真听过旧队友的遗憾，也希望继续亲近，他却决定把下一段生活和旧队伍分开。')
+        .replace('{teamAttempt}', chose('H13', 'A', state) ? '你认真提出重新聊，他听完仍不想回到以前的亲密。' : '后来没有恢复原先的单独约见。')
+        .replace('{familyAttempt}', chose('H15', 'B', state) ? '班主任帮你们谈过一次，决定仍没改变。' : chose('H15', 'A', state) ? '你把准备完整讲过，最终的答复仍是否定。' : '期限过去，这项支持仍没有落实。')
+        .replace('{teacherAttempt}', chose('H16', 'A', state) ? '你按约到场，老师给过一般材料建议，但期待的系统方向专门咨询最终取消了；后面也没有补开的名额。' : chose('H17', 'B', state) ? '最后一次你只交出成绩单，没能谈清方向。' : '你没有在已经说明的期限内完成预约。')
+        .replace('{oiAttempt}', chose('H25', 'C', state) ? '你到了门口，仍无法打开旧题，提前离开。' : chose('H25', 'A', state) ? '你按通知赶到，临时提前的搬迁却已封起机房。教练也尝试申请延后，没有获准。' : '你想参加，却错过了当天的联系与到场窗口。')
+        .replace('{applicationResult}', applicationResults(state)?.text || '旧记录里没有具体申请材料，不能据此补写一次失败。');
+}
+function mainEndingContent(id) {
+    const application = gameState.finalRoute === 'C01' ? applicationResults() : null;
+    if (application) {
+        const acceptedPreferred = !application.rejected;
+        return application.text + '\n\n' + (acceptedPreferred ? '你把课程、交通和住处重新排进蓝本。录取已经确认，曾经盼望而没有发生的其他事也还在这一年的记录里。' : '你把拒信和本次成绩一起夹进蓝本。眼前要处理的安排仍然具体，想去的那一处却没有成为这一次的去向。');
+    }
+    if (routeRegret(gameState.finalRoute)) return '你确认了这个方向，也带着之前留下的具体期待继续核实。接下来的答复已经写在去向后记里，本次成绩保持原样。';
+    return narrativeData.endings[id].content;
+}
+function prepareFinalLayout() {
+    document.querySelector('.container').classList.add('post-exam');
+    updateNarrativeStatus();
+}
 function finalRecord() {
     const f = gameState.finalSnapshot;
     return `<div class="final-score">${f.score}/100</div><p>本次成绩指数 · 游戏中的成长记录</p><p>${Object.entries(f.subjects).map(([k, v]) => `${subjectNames[k]} ${v.toFixed(1)}`).join(' · ')}</p>`;
 }
 function renderPostExam(route = null) {
     if (!gameState.finalSnapshot) return;
+    prepareFinalLayout();
     if (gameState.finalRoute) { renderEnding(); return; }
     const main = document.querySelector('.main');
-    const entry = route ? narrativeData.endings[route] : null;
-    main.innerHTML = `<div class="end-screen"><h2>铃响以后</h2>${finalRecord()}${entry ? `<h3>${escapeText(entry.title)}</h3><div class="ending-text">${paragraphs(entry.content)}</div><button class="restart-btn" onclick="confirmRoute('${route}')">确认这个方向</button><button class="restart-btn" onclick="renderPostExam()">返回四项选择</button>` :
+    const entry = routePlanOptions[route] ? narrativeData.endings[route] : null;
+    main.innerHTML = `<div class="end-screen"><h2>铃响以后</h2>${finalRecord()}${entry ? `<h3>${escapeText(entry.title)}</h3><div class="ending-text">${paragraphs(entry.content)}</div>${routePreparation(route)}<div class="route-confirm"><button class="restart-btn" ${routePlanReady(route) ? '' : 'disabled'} onclick="confirmRoute('${route}')">确认这个方向</button><button class="restart-btn" onclick="renderPostExam()">返回四项选择</button></div>` :
         `<p>先查看准备事项、代价与需要核实的支持，确认前可以自由返回。四项对所有成绩开放。</p>${['C01', 'C02', 'C03', 'C04'].map(id => `<button class="restart-btn" onclick="renderPostExam('${id}')">${escapeText(narrativeData.endings[id].title)}</button>`).join('')}`}
         ${!gameState.events.includes('S36') || gameState.narrativeFeedback ? '<button class="restart-btn" onclick="pumpNarrative()">继续考后剧情</button>' : ''}
         <button class="restart-btn" onclick="savePostExam()">先保存，稍后决定</button><p id="post-save-status"></p><button class="restart-btn" onclick="restartGame()">重新开始</button></div>`;
@@ -737,17 +1002,22 @@ function savePostExam() {
     document.getElementById('post-save-status').textContent = okay ? '已保存；去向仍未确认，稍后可继续查看全部方向。' : '本设备无法保存，请保持这个页面打开。';
 }
 function confirmRoute(route) {
-    if (gameState.phase !== 'postExam' || !gameState.finalSnapshot || !gameState.events.includes('S36') || gameState.activeNarrative || gameState.narrativeFeedback) return;
+    if (!routePlanOptions[route] || gameState.phase !== 'postExam' || !gameState.finalSnapshot || !gameState.events.includes('S36') || gameState.activeNarrative || gameState.narrativeFeedback) return;
     const id = mainEndingId(route, gameState.finalSnapshot.score);
     gameState.finalRoute = route; gameState.phase = 'ending';
     unlockAchievement('ending-' + id);
     saveGame(); renderEnding();
 }
 function renderEnding() {
+    prepareFinalLayout();
     const id = mainEndingId(gameState.finalRoute, gameState.finalSnapshot.score);
     const ending = narrativeData.endings[id];
     const epilogues = chooseEpilogues();
-    document.querySelector('.main').innerHTML = `<div class="end-screen"><h2>${escapeText(ending.title)}</h2>${finalRecord()}<div class="ending-text">${paragraphs(ending.content)}${epilogues.map(key => `<details class="epilogue" open><summary>${escapeText(narrativeData.endings[key].title)}</summary>${paragraphs(narrativeData.endings[key].content)}</details>`).join('')}</div><p>这份成绩与本次选择已保存。学校和项目均为虚构。</p><button class="restart-btn" onclick="restartGame()">重新开始</button></div>`;
+    const application = gameState.finalRoute === 'C01' ? applicationResults() : null;
+    const routeBE = routeRegret(gameState.finalRoute);
+    const title = application ? application.rejected ? '两封回信，与没有成行的愿望' : gameState.routePlans.C01.project === 'beichen' ? '北辰的系统实验' : '岚川的课程表' : routeBE ? narrativeData.endings[routeBE].title : ending.title;
+    const beCount = epilogues.filter(key => narrativeData.endings[key].be).length;
+    document.querySelector('.main').innerHTML = `<div class="end-screen"><h2>${escapeText(title)}</h2>${finalRecord()}<div class="ending-text">${paragraphs(mainEndingContent(id))}${epilogues.map(key => `<details class="epilogue" open><summary>${escapeText(narrativeData.endings[key].title)}${narrativeData.endings[key].be ? ' · 遗憾' : ''}</summary>${paragraphs(epilogueContent(key))}</details>`).join('')}</div><p>${beCount ? `这一年留下${beCount}份没有实现的期待。它们各有来处，也各自留在这里。` : '这一年的选择与实际经历已留在这里。'}这份成绩与本次选择已保存。学校和项目均为虚构。</p><button class="restart-btn" onclick="restartGame()">重新开始</button></div>`;
 }
 openModal = function(id) {
     if (id === 'story-modal') { resumeNarrative(); return; }
