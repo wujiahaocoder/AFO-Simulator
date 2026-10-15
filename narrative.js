@@ -943,7 +943,7 @@ function getStageGoalStatus(goal, state = gameState) {
     return { requirements, challenges, achieved, progress };
 }
 function renderGoalRows(rows) {
-    return rows.map(row => `<li class="${row.passed ? 'goal-met' : 'goal-pending'}">${row.passed ? '✅ 已满足' : '○ 未满足'} · ${escapeText(row.text)}</li>`).join('');
+    return rows.map(row => `<li class="${row.passed ? 'goal-met' : 'goal-pending'}"><span class="goal-marker" aria-label="${row.passed ? '已满足' : '未满足'}">${row.passed ? '✓' : '○'}</span><span>${escapeText(row.text.replace(' / 要求', ' / '))}</span></li>`).join('');
 }
 function renderGoalSettlement(detail) {
     const missing = detail.requirements.filter(row => !row.passed);
