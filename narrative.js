@@ -7,6 +7,8 @@ const subjectNames = { chinese: '语文', math: '数学', english: '英语', phy
 const relationshipNames = { teacher: '班主任', mathTeacher: '数学老师', chineseTeacher: '语文老师', englishTeacher: '英语老师', classmateA: '同桌', classmateB: '旧队友', parents: '父母', crush: '校园记录同学' };
 const effectNames = { ...subjectNames, ...relationshipNames, energy: '精力', stress: '压力', health: '健康', mental: '心理', anxiety: '焦虑', money: '金钱' };
 const saveKey = 'afo-save-3.0.0';
+// UI-only patches keep the existing save format so local rollback remains readable.
+const saveVersion = '3.1.0';
 const legacy = { initGame, updateUI, study, rest, exercise, takeExam, homework, activity, economy, changeWeather, checkAchievements, openModal };
 let actionInProgress = null;
 let saveAvailable = true;
@@ -80,7 +82,7 @@ function previewEffect(effect) {
 function saveGame() {
     try {
         const state = { ...gameState, achievements: [...gameState.achievements], currentGoal: null };
-        localStorage.setItem(saveKey, JSON.stringify({ version: '3.1.0', state }));
+        localStorage.setItem(saveKey, JSON.stringify({ version: saveVersion, state }));
         saveAvailable = true;
         return true;
     } catch (_) {
@@ -986,15 +988,20 @@ function finalRecord() {
     const f = gameState.finalSnapshot;
     return `<div class="final-score">${f.score}/100</div><p>本次成绩指数 · 游戏中的成长记录</p><p>${Object.entries(f.subjects).map(([k, v]) => `${subjectNames[k]} ${v.toFixed(1)}`).join(' · ')}</p>`;
 }
+function postExamStoryComplete() {
+    return gameState.events.includes('S36') && !gameState.activeNarrative &&
+        !gameState.narrativeFeedback && gameState.narrativeQueue.length === 0;
+}
 function renderPostExam(route = null) {
     if (!gameState.finalSnapshot) return;
     prepareFinalLayout();
     if (gameState.finalRoute) { renderEnding(); return; }
     const main = document.querySelector('.main');
     const entry = routePlanOptions[route] ? narrativeData.endings[route] : null;
-    main.innerHTML = `<div class="end-screen"><h2>铃响以后</h2>${finalRecord()}${entry ? `<h3>${escapeText(entry.title)}</h3><div class="ending-text">${paragraphs(entry.content)}</div>${routePreparation(route)}<div class="route-confirm"><button class="restart-btn" ${routePlanReady(route) ? '' : 'disabled'} onclick="confirmRoute('${route}')">确认这个方向</button><button class="restart-btn" onclick="renderPostExam()">返回四项选择</button></div>` :
+    const storyComplete = postExamStoryComplete();
+    main.innerHTML = `<div class="end-screen"><h2>铃响以后</h2>${finalRecord()}${!storyComplete ? '<p class="goal-note" role="status">考后剧情尚未读完。可以先查看和填写准备事项；请继续读完剧情及选择反馈，再确认去向。</p>' : ''}${entry ? `<h3>${escapeText(entry.title)}</h3><div class="ending-text">${paragraphs(entry.content)}</div>${routePreparation(route)}<div class="route-confirm"><button class="restart-btn" ${routePlanReady(route) && storyComplete ? '' : 'disabled'} onclick="confirmRoute('${route}')">确认这个方向</button><button class="restart-btn" onclick="renderPostExam()">返回四项选择</button></div>` :
         `<p>先查看准备事项、代价与需要核实的支持，确认前可以自由返回。四项对所有成绩开放。</p>${['C01', 'C02', 'C03', 'C04'].map(id => `<button class="restart-btn" onclick="renderPostExam('${id}')">${escapeText(narrativeData.endings[id].title)}</button>`).join('')}`}
-        ${!gameState.events.includes('S36') || gameState.narrativeFeedback ? '<button class="restart-btn" onclick="pumpNarrative()">继续考后剧情</button>' : ''}
+        ${!storyComplete ? '<button class="restart-btn" onclick="pumpNarrative()">继续考后剧情</button>' : ''}
         <button class="restart-btn" onclick="savePostExam()">先保存，稍后决定</button><p id="post-save-status"></p><button class="restart-btn" onclick="restartGame()">重新开始</button></div>`;
 }
 function savePostExam() {
@@ -1002,11 +1009,17 @@ function savePostExam() {
     document.getElementById('post-save-status').textContent = okay ? '已保存；去向仍未确认，稍后可继续查看全部方向。' : '本设备无法保存，请保持这个页面打开。';
 }
 function confirmRoute(route) {
-    if (!routePlanOptions[route] || gameState.phase !== 'postExam' || !gameState.finalSnapshot || !gameState.events.includes('S36') || gameState.activeNarrative || gameState.narrativeFeedback) return;
+    if (!routePlanOptions[route] || gameState.phase !== 'postExam' || !gameState.finalSnapshot) return false;
+    if (!postExamStoryComplete()) {
+        showNotification('请先继续读完考后剧情和选择反馈，再确认去向。', 'neutral');
+        pumpNarrative();
+        return false;
+    }
     const id = mainEndingId(route, gameState.finalSnapshot.score);
     gameState.finalRoute = route; gameState.phase = 'ending';
     unlockAchievement('ending-' + id);
     saveGame(); renderEnding();
+    return true;
 }
 function renderEnding() {
     prepareFinalLayout();
