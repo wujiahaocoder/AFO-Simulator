@@ -1071,6 +1071,7 @@ initGame = function() {
         // The saved log is text, so it never creates markup from a save file.
         for (const e of gameState.logHistory.slice().reverse()) legacyLog(e.text, e.type, typeof e.time === 'string' ? e.time : '此前记录');
         if (gameState.phase !== 'playing') {
+            updateUI();
             document.querySelector('.actions').style.display = 'none';
             document.getElementById('actionCounter').style.display = 'none';
             document.getElementById('welcome-modal').style.display = 'none';
