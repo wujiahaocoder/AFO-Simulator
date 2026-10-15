@@ -17533,5 +17533,108 @@ window.AFONarrative = {
       "content": "你认真希望巷口那家旧书店留下，也整理过读者意见，等过一轮又一轮答复。\n\n{venueAttempt}\n\n考后走过那条巷子，窗边已经没有椅子，玻璃里映出的是空墙。以后或许还能买到同一本书，坐到别的地方读完；那间让你不必买书也能坐一会儿的店，已经结束营业。你带去的那些名字，没有让门再打开。"
     }
   },
-  "revision": "3.1.11"
+  "revision": "3.1.12",
+  "promises": [
+    {
+      "setup": "H10",
+      "keys": [
+        "A"
+      ],
+      "result": "H11",
+      "line": "desk",
+      "title": "修车台前两个人的合照"
+    },
+    {
+      "setup": "H12",
+      "keys": [
+        "A",
+        "B"
+      ],
+      "result": "H13",
+      "line": "team",
+      "title": "旧队友的单独往来"
+    },
+    {
+      "setup": "H14",
+      "keys": [
+        "A"
+      ],
+      "result": "H15",
+      "line": "family",
+      "title": "外地写作营的住处与支持"
+    },
+    {
+      "setup": "H16",
+      "keys": [
+        "A",
+        "B"
+      ],
+      "result": "H17",
+      "line": "teacher",
+      "title": "系统方向的项目咨询"
+    },
+    {
+      "setup": "H18",
+      "keys": [
+        "A"
+      ],
+      "result": "H19",
+      "line": "mathTeacher",
+      "title": "那一份完整推导的认可"
+    },
+    {
+      "setup": "H20",
+      "keys": [
+        "A"
+      ],
+      "result": "H21",
+      "line": "chineseTeacher",
+      "title": "想写完的毕业练笔"
+    },
+    {
+      "setup": "H22",
+      "keys": [
+        "A"
+      ],
+      "result": "H23",
+      "line": "englishTeacher",
+      "title": "想讲完整的英语录音"
+    },
+    {
+      "setup": "H24",
+      "keys": [
+        "A"
+      ],
+      "result": "H25",
+      "line": "oi",
+      "title": "旧机房的共同解题与告别"
+    },
+    {
+      "setup": "H29",
+      "keys": [
+        "A"
+      ],
+      "result": "H30",
+      "line": "recording",
+      "title": "最后一晚集训的原声"
+    },
+    {
+      "setup": "H31",
+      "keys": [
+        "A"
+      ],
+      "result": "H32",
+      "line": "circle",
+      "title": "毕业后四个人的桌边时间"
+    },
+    {
+      "setup": "H33",
+      "keys": [
+        "A"
+      ],
+      "result": "H34",
+      "line": "venue",
+      "title": "巷口旧书店的续租"
+    }
+  ]
 };
