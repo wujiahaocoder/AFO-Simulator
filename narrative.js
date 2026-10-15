@@ -862,8 +862,8 @@ function restoreNarrativeEvidence() {
     gameState.storyProgress = narrativeData.stories.filter(n => n.kind === 'main' && gameState.events.includes(n.id)).length;
 }
 function settleSceneDeadlines() {
-    for (const id of ['H11', 'H13', 'H15', 'H17', 'H19', 'H21', 'H23', 'H25', 'H27']) {
-        const node = findNarrative(id);
+    for (const node of narrativeData.stories.filter(n => n.kind === 'side' && n.revision && n.missedFeedback)) {
+        const id = node.id;
         if (node.until !== gameState.week || gameState.events.includes(id) || !sceneRequirementsMet(node) || gameState.missedScenes[id]) continue;
         gameState.missedScenes[id] = gameState.week;
         addToLog(`“${node.title}”的期限已过。${node.missedFeedback}`, 'story');
@@ -878,6 +878,7 @@ function lineResults(state = gameState) {
     const c = (id, key) => chose(id, key, state);
     const missed = id => !!state.missedScenes?.[id];
     return {
+        recording: c('H29', 'A') && (!!sceneChoice('H30', state) || missed('H30')),
         desk: c('H10', 'A') && (c('H11', 'B') || c('H11', 'C') || missed('H11')),
         team: !!sceneChoice('H12', state) && (c('H13', 'A') || c('H13', 'B') || missed('H13')),
         family: c('H14', 'A') && (!!sceneChoice('H15', state) || missed('H15')),
@@ -912,6 +913,7 @@ function chooseEpilogues(state = gameState) {
         else if (sceneChoice(setup, state) && (chose(result, goodKey, state) || line === 'teacher' && chose(result, 'A', state))) selected.push(prefix + '_OK');
     }
     const routeBE = routeRegret(state.finalRoute, state);
+    if (lines.recording) selected.push('VOICE_BE');
     if (routeBE) selected.push(routeBE);
     return selected;
 }
@@ -985,6 +987,7 @@ function epilogueContent(key, state = gameState) {
     const friendDetail = peerInteractionCount(state) >= 4 ? '一起改过的稿、听过的录音给你们留了具体话题。后来偶尔约时间分享新稿，也仍会先问对方是否有空。' : '你们共同经历还不多，毕业后偶尔互道近况，没有变成每天分享生活的亲密朋友。';
     const text = narrativeData.endings[key].content;
     return text.replace('{friendDetail}', friendDetail)
+        .replace('{recordingAttempt}', chose('H30', 'A', state) ? '你又带着原盘核对了一次，得到相同的结论。两份报告都没有可用音频，认真再试一次也没能留下那句原声。' : chose('H30', 'B', state) ? '你读完报告，停止继续恢复。那句想保留的话没有找回来，你没有拿后来的重录冒充它。' : '老师转来最终报告时，恢复窗口已经结束。你想保留的那一句没有找回来，报告只确认了损坏和没有备份。')
         .replace('{teamOrigin}', chose('H12', 'B', state) ? '你把旧队友的遗憾说成没想开，他收回了一次邀请。' : '你曾认真听过旧队友的遗憾，也希望继续亲近，他却决定把下一段生活和旧队伍分开。')
         .replace('{teamAttempt}', chose('H13', 'A', state) ? '你认真提出重新聊，他听完仍不想回到以前的亲密。' : '后来没有恢复原先的单独约见。')
         .replace('{familyAttempt}', chose('H15', 'B', state) ? '班主任帮你们谈过一次，决定仍没改变。' : chose('H15', 'A', state) ? '你把准备完整讲过，最终的答复仍是否定。' : '期限过去，这项支持仍没有落实。')
