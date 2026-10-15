@@ -261,6 +261,8 @@ function showMenu(title, text, entries) {
         elements.storyChoices.appendChild(button);
     }
     document.getElementById('story-modal').style.display = 'flex';
+    const panel = document.querySelector('#story-modal .modal-content');
+    if (panel) panel.scrollTop = 0;
 }
 function social(target) {
     if (!target) {
@@ -434,7 +436,39 @@ function resumeNarrative() {
     const sides = availableSideStories();
     showMenu('本周剧情与支线', '主线和可选支线不消耗常规行动。关闭窗口后可从这里继续；支线是否参与由你决定。',
         [...due, ...sides].map(n => ({ text: `${n.kind === 'main' ? '主线' : '支线'}：${n.title}${n.kind === 'side' ? `（至第${n.until}周）` : ''}`, action: () => triggerStoryEvent(n) })).concat(
-            [{ text: '回到本周安排', action: () => closeModal('story-modal') }]));
+            [{ text: `回看蓝本里的牵挂（${promiseRecords().length}项）`, action: showPromiseLedger },
+                { text: '回到本周安排', action: () => closeModal('story-modal') }]));
+}
+function promiseRecords(state = gameState) {
+    const lines = lineResults(state);
+    return (narrativeData.promises || []).filter(entry => state.events.includes(entry.setup) && entry.keys.includes(sceneChoice(entry.setup, state))).map(entry => {
+        const result = findNarrative(entry.result);
+        const key = sceneChoice(entry.result, state);
+        const answered = state.events.includes(entry.result) && result.choices.some(c => c.key === key);
+        const missed = state.missedScenes?.[entry.result] === result.until;
+        const week = state.sceneChoices[entry.setup].week;
+        let status, detail;
+        if (missed) { status = '期限已过'; detail = result.missedFeedback; }
+        else if (answered) {
+            status = lines[entry.line] ? '已经落空' : '已有答复';
+            detail = '那次你选择：' + narrativeChoiceText(result, result.choices.find(c => c.key === key), narrativeVariant(result, state));
+        } else if (state.week > result.until) {
+            status = '暂无答复记录'; detail = '这页没有留下最后的答复，先把这一处留空。';
+        } else {
+            status = state.week < result.week ? '等候后续' : '尚待答复';
+            detail = `后续可在第${result.week === result.until ? result.week : result.week + '—' + result.until}周查看，至第${result.until}周结束。`;
+        }
+        return { id: entry.setup, title: entry.title, week, status, detail };
+    }).sort((a, b) => a.week - b.week);
+}
+function showPromiseLedger() {
+    if (gameState.phase !== 'playing') return false;
+    if (gameState.activeNarrative || gameState.narrativeFeedback || gameState.narrativeQueue.length || gameState.weekEnding) { pumpNarrative(); return false; }
+    const records = promiseRecords();
+    const text = records.length ? '这里只记下你实际提起过的事。没有得到答复的，仍留在各自的期限里；已经落空的，也不会因为后来成绩或熟悉程度变好就自动消失。' : '蓝本里还没有记下这些具体的牵挂。没有提起过的事，不会替你补写成失约或失去。';
+    showMenu('蓝本里的牵挂', text, [{ text: '回到本周剧情与支线', action: resumeNarrative }, { text: '收好蓝本，回到本周安排', action: () => closeModal('story-modal') }]);
+    elements.storyContent.innerHTML += records.map(row => `<section class="promise-record"><h4>${escapeText(row.title)} · ${escapeText(row.status)}</h4><p class="promise-week">第${row.week}周记下</p><p>${escapeText(row.detail)}</p></section>`).join('');
+    return true;
 }
 function triggerStoryEvent(node) {
     if (gameState.events.includes(node.id)) return;
