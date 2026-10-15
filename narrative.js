@@ -480,14 +480,22 @@ function examTrend(state = gameState) {
     const a = h.at(-2), b = h.at(-1);
     return `两次真实模考记录：第${a.week}周 ${a.score}/100，第${b.week}周 ${b.score}/100。${b.score > a.score ? '这次向上挪了一些，可以先为这一小段高兴。' : '这次持平或下降，还需要分清已经掌握的部分和仍要处理的问题。'}`;
 }
+function narrativeVariant(node, state = gameState) {
+    if (!node.variants) return null;
+    const key = hasRomanceEvent('rejected', state) ? 'refused' : state.romance === '明确互相喜欢' && state.mutualAffirmation ? 'dating' : state.romance === '朋友' ? 'friends' : 'growing';
+    return node.variants[key] || null;
+}
+function narrativeChoiceText(node, c, variant = narrativeVariant(node)) {
+    return variant?.choices?.[c.key]?.text || c.text;
+}
 function renderStoryContent(node) {
-    let text = node.content;
+    let text = narrativeVariant(node)?.content || node.content;
     const choice = id => gameState.storyChoices[id]?.key;
     const source = { A: '作业单', B: '页码小框', C: '夹在最前面的课表' }[choice('S01')] || '课表';
     text = text.replace('{familyCallback}', { A: '对方带来那张三栏汇报页，纸边仍有一个分数问号。', B: '对方先问今天是不是约好的谈话时间。', C: '对方带来给班主任的提问草稿，里面有两条还没问清楚。' }[choice('S03')] || '对方只问：“现在方便聊吗？”');
     text = text.replace('{conditionCallback}', (gameState.health < 45 || gameState.energy < 25 ? '你坐下后才发现自己一直揉着眼睛，今天需要为必要的休息留位置。' : '你看见同桌收起书，自己的计划里也需要留空。') + (gameState.anxiety >= 65 || gameState.stress >= 75 ? '你把安排看了三遍，仍担心漏掉什么。' : ''));
     text = text.replace('{examCallback}', examTrend());
-    text = text.replace('{peerCallback}', peerInteractionCount() >= 2 ? '你们一起听过采访、改过稿，有些话已不必借一道题开头。' : '你们有过几次交谈，还没有许多一起度过的时间。你发觉自己在等一个顺便说话的时机。');
+    text = text.replace('{peerCallback}', peerInteractionCount() >= 2 ? '几次实际交流给你们留了能记起的话题，有些话已不必借一道题开头。' : '你们有过几次交谈，还没有许多一起度过的时间。你发觉自己在等一个顺便说话的时机。');
     text = text.replace('{teamConversation}', chose('H12', 'B') ? '你想起自己把他的感受说轻的那句话，仍有机会解释。' : '上次你认真听过他的遗憾，他却也说想把下一段生活和旧队伍分开。你们的距离不全是一场误会造成的。');
     text = text.replace('{teacherConversation}', chose('H16', 'A') ? '你按约得到过一般材料建议，期待的系统方向专门咨询却收到可能取消的通知。' : '你想谈的方向仍写在蓝本上，还没有约上这一轮面谈。');
     if (node.id === 'S07') text = text.split('按实际记录显示一段：')[0] + '\n\n' + examTrend();
@@ -520,7 +528,8 @@ function renderStoryContent(node) {
     }
     return text.trim();
 }
-function choiceFeedback(node, c) {
+function choiceFeedback(node, c, variant = null) {
+    if (variant?.choices?.[c.key]?.feedback) return variant.choices[c.key].feedback;
     if (node.id === 'H17' && c.key === 'A') return chose('H16', 'A') ? '专门咨询最终取消，班主任给过一般材料建议，也尝试联系原定的方向老师，没能补开名额。你按约准备过，期待的那轮专门指导仍没有得到。' : '你在截止前完成预约，老师读过你的一页方向问题，给了具体材料反馈。这轮机会确实发生了。';
     if (node.id === 'H08' && c.key === 'A') {
         if (hasRomanceEvent('rejected')) return '你把喜欢说清，她认真回答：“我很珍惜你，但没有同样的感情。我想继续做采访伙伴，不想建立恋爱关系。”你听见了她的拒绝；之前的帮忙没有换来同样的喜欢。';
@@ -529,17 +538,19 @@ function choiceFeedback(node, c) {
     }
     if (node.id === 'S33') {
         if (gameState.romance === '已结束') return '她说：“我们确实喜欢过，但我不想继续一段总在为陪伴时间道歉的关系。”你们回顾已经试过的安排，明确结束恋爱。这段喜欢成立过，结束也已经发生。';
-        if (hasRomanceEvent('rejected')) return gameState.romance === '被拒后朋友' ? '她没有改变之前的回答。你们另外确认愿意按朋友的范围联系，被拒的事实没有被这次友谊覆盖。' : '她明确说没有同样的喜欢，不愿建立恋爱关系。你接受这个回答，之后减少单独联系；不会靠再选一次走近把拒绝改掉。';
-        if (gameState.romance === '明确互相喜欢') return '她提起一起改稿、说清分歧的那几次相处，亲口说仍然喜欢你，你也明确回应。你们确认愿意继续这段关系，各自的采访和生活安排仍需要商量。';
-        if (gameState.romance === '慢慢了解') return '你表达仍愿意走近。她说还没有足够的共同经历来确认同样的喜欢，愿意继续慢慢了解。这次没有把两个走近选项算作恋爱成功。';
-        return c.key === 'B' ? '你们重新谈清朋友的范围，双方都答应按愿意分享的事情联系。没有一场被拒绝的告白被补写进来。' : '你们暂时不命名关系。她说明自己会继续采访与生活，也没有承诺等待一个未来答案。';
+        if (hasRomanceEvent('rejected')) return gameState.romance === '被拒后朋友' ? '她没有改变之前的回答。你们另外确认愿意按朋友的范围联系，被拒的事实没有被这次友谊覆盖。' : '她明确说没有同样的喜欢，不愿建立恋爱关系。你听完，接受了这个回答，之后减少单独联系。';
+        if (gameState.romance === '明确互相喜欢') return gameState.romanceHistory.some(e => e.type === 'mutual' && e.scene === 'H08') ?
+            '她提起一起改稿、说清分歧的那几次相处，亲口说仍然喜欢你，你也明确回应。你们愿意继续这段关系，各自的采访和生活安排仍需要商量。' :
+            '她提起一起改稿、聊起各自生活的那几次相处，说：“现在我知道，我喜欢你。”你明确回应同样的喜欢。这是你们第一次把彼此的回答说清，之后的安排仍需要一起商量。';
+        if (gameState.romance === '慢慢了解') return '你表达仍愿意走近。她说还没有足够的共同经历来确认同样的喜欢，愿意继续慢慢了解。你们说好有想分享的事情再联系，今天先各自回家。';
+        return c.key === 'B' ? '你们重新谈清朋友的范围，双方都答应按愿意分享的事情联系。她讲起下一次采访，问你附近那家小店有没有重新开门。' : '你们暂时不命名关系。她说明自己会继续采访与生活，也没有承诺等待一个未来答案。';
     }
     if (node.id === 'S36') return { A: '成绩已经留在蓝本里。你先了解升学方向，也可以返回比较其他安排。', B: '升学、复读、休整、工作与继续学习同时开放，确认前可以自由返回。', C: '今天先吃一顿不必卡着下课铃的饭。去向仍未确认，回来后可继续查看全部方向。' }[c.key];
     return c.feedback.replace(/S\d{2}/g, '之前的那次选择');
 }
 function showNarrative(node) {
     const entries = node.choices.map(c => ({
-        text: `${c.text}\n${previewEffect(c.effect)}${c.target ? c.target === 'lastStudy' ? `；本周最近一次主动学习科目 +${c.targetGain}` : `；另选科目，总能力 +${c.targetGain ?? 1.2}` : ''}`,
+        text: `${narrativeChoiceText(node, c)}\n${previewEffect(c.effect)}${c.target ? c.target === 'lastStudy' ? `；本周最近一次主动学习科目 +${c.targetGain}` : `；另选科目，总能力 +${c.targetGain ?? 1.2}` : ''}`,
         action: () => {
             if (c.target) {
                 const resolved = resolveChoices(node).filter(x => x.key === c.key);
@@ -565,6 +576,8 @@ function commitNarrativeChoice(node, c) {
     if (gameState.finalSnapshot && node.id !== 'S36') return false;
     if ((c.effect.money || 0) < -gameState.money) return false;
     if (node.kind === 'memory' && (gameState.actionsThisWeek >= 3 || gameState.energy < 10)) return false;
+    const variant = narrativeVariant(node);
+    const selectedText = narrativeChoiceText(node, c, variant);
     if (node.commonEffect) applyEffect(node.commonEffect);
     if (node.cost) applyEffect(node.cost);
     applyEffect(c.effect);
@@ -597,8 +610,8 @@ function commitNarrativeChoice(node, c) {
     recordRomanceOutcome(node, c);
     if (node.id === 'S18') gameState.practiceGoal = { week: gameState.week, subjects: c.targets?.length ? c.targets : Object.keys(subjectNames) };
     gameState.activeNarrative = null;
-    gameState.narrativeFeedback = { title: node.title, text: choiceFeedback(node, c), postChoice: node.id === 'S36' ? c.key : null };
-    addToLog(`${node.title}：${c.text}${c.targets?.length ? '（' + c.targets.map(k => subjectNames[k]).join('、') + '）' : ''}`, 'story');
+    gameState.narrativeFeedback = { title: node.title, text: choiceFeedback(node, c, variant), postChoice: node.id === 'S36' ? c.key : null };
+    addToLog(`${node.title}：${selectedText}${c.targets?.length ? '（' + c.targets.map(k => subjectNames[k]).join('、') + '）' : ''}`, 'story');
     if (gameState.phase === 'playing') { checkAchievements(); updateUI(); }
     updateNarrativeStatus();
     saveGame();
