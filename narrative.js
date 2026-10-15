@@ -880,6 +880,7 @@ function lineResults(state = gameState) {
     return {
         recording: c('H29', 'A') && (!!sceneChoice('H30', state) || missed('H30')),
         circle: c('H31', 'A') && (!!sceneChoice('H32', state) || missed('H32')),
+        venue: c('H33', 'A') && (!!sceneChoice('H34', state) || missed('H34')),
         desk: c('H10', 'A') && (c('H11', 'B') || c('H11', 'C') || missed('H11')),
         team: !!sceneChoice('H12', state) && (c('H13', 'A') || c('H13', 'B') || missed('H13')),
         family: c('H14', 'A') && (!!sceneChoice('H15', state) || missed('H15')),
@@ -916,6 +917,7 @@ function chooseEpilogues(state = gameState) {
     const routeBE = routeRegret(state.finalRoute, state);
     if (lines.recording) selected.push('VOICE_BE');
     if (lines.circle) selected.push('CIRCLE_BE');
+    if (lines.venue) selected.push('VENUE_BE');
     if (routeBE) selected.push(routeBE);
     return selected;
 }
@@ -989,6 +991,7 @@ function epilogueContent(key, state = gameState) {
     const friendDetail = peerInteractionCount(state) >= 4 ? '一起改过的稿、听过的录音给你们留了具体话题。后来偶尔约时间分享新稿，也仍会先问对方是否有空。' : '你们共同经历还不多，毕业后偶尔互道近况，没有变成每天分享生活的亲密朋友。';
     const text = narrativeData.endings[key].content;
     return text.replace('{friendDetail}', friendDetail)
+        .replace('{venueAttempt}', chose('H34', 'A', state) ? '最后一次你核对答复，扶着梯子看店主把店名卸下来。意见被收下，续租仍未获准，他也决定不再经营。' : chose('H34', 'B', state) ? '你帮店主封好最后一箱书，看着他签下交还钥匙的单子。关店没有被写成暂时分别，也没有留下重开的日期。' : '店主发来交还钥匙的消息。书已搬空，店名已经取下；你整理过的读者意见没有换来续租，他也不另开店。')
         .replace('{circleAttempt}', chose('H32', 'A', state) ? '你问过更短、更少、只连声音的办法，也逐一听过最后的答复。大家不再维持这份共同安排，空出的月份没有补上。' : chose('H32', 'B', state) ? '你们把不再继续这份共同安排说清，划掉了未来的月份。你收好日历，留下的只有试坐那一晚。' : '最后一轮核对结束，三个人都确认不再维持这份四人安排。你没有再得到一个能聚齐的日期。')
         .replace('{recordingAttempt}', chose('H30', 'A', state) ? '你又带着原盘核对了一次，得到相同的结论。两份报告都没有可用音频，认真再试一次也没能留下那句原声。' : chose('H30', 'B', state) ? '你读完报告，停止继续恢复。那句想保留的话没有找回来，你没有拿后来的重录冒充它。' : '老师转来最终报告时，恢复窗口已经结束。你想保留的那一句没有找回来，报告只确认了损坏和没有备份。')
         .replace('{teamOrigin}', chose('H12', 'B', state) ? '你把旧队友的遗憾说成没想开，他收回了一次邀请。' : '你曾认真听过旧队友的遗憾，也希望继续亲近，他却决定把下一段生活和旧队伍分开。')
