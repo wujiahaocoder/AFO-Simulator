@@ -654,7 +654,10 @@ function commitNarrativeChoice(node, c) {
     recordRomanceOutcome(node, c);
     if (node.id === 'S18') gameState.practiceGoal = { week: gameState.week, subjects: c.targets?.length ? c.targets : Object.keys(subjectNames) };
     gameState.activeNarrative = null;
-    gameState.narrativeFeedback = { title: node.title, text: choiceFeedback(node, c, variant), postChoice: node.id === 'S36' ? c.key : null };
+    const feedbackText = choiceFeedback(node, c, variant);
+    const finishShortEvent = node.kind === 'random' && node.choices.length === 1 && !feedbackText.trim();
+    gameState.narrativeFeedback = finishShortEvent ? null : { title: node.title, text: feedbackText, postChoice: node.id === 'S36' ? c.key : null };
+    if (finishShortEvent) closeModal('story-modal');
     addToLog(`${node.title}：${selectedText}${c.targets?.length ? '（' + c.targets.map(k => subjectNames[k]).join('、') + '）' : ''}`, 'story');
     if (gameState.phase === 'playing') { checkAchievements(); updateUI(); }
     updateNarrativeStatus();
