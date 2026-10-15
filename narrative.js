@@ -482,6 +482,10 @@ function examTrend(state = gameState) {
 }
 function narrativeVariant(node, state = gameState) {
     if (!node.variants) return null;
+    if (node.id === 'S30') {
+        const archive = chose('H25', 'A', state) ? 'closed' : chose('H25', 'C', state) ? 'withdrawn' : chose('H25', 'B', state) ? 'moved' : chose('H24', 'A', state) ? 'scheduled' : null;
+        return node.variants[archive] || null;
+    }
     const key = hasRomanceEvent('rejected', state) ? 'refused' : state.romance === '明确互相喜欢' && state.mutualAffirmation ? 'dating' : state.romance === '朋友' ? 'friends' : 'growing';
     return node.variants[key] || null;
 }
@@ -983,6 +987,7 @@ function epilogueContent(key, state = gameState) {
         .replace('{familyAttempt}', chose('H15', 'B', state) ? '班主任帮你们谈过一次，决定仍没改变。' : chose('H15', 'A', state) ? '你把准备完整讲过，最终的答复仍是否定。' : '期限过去，这项支持仍没有落实。')
         .replace('{teacherAttempt}', chose('H16', 'A', state) ? '你按约到场，老师给过一般材料建议，但期待的系统方向专门咨询最终取消了；后面也没有补开的名额。' : chose('H17', 'B', state) ? '最后一次你只交出成绩单，没能谈清方向。' : '你没有在已经说明的期限内完成预约。')
         .replace('{oiAttempt}', chose('H25', 'C', state) ? '你到了门口，仍无法打开旧题，提前离开。' : chose('H25', 'A', state) ? '你按通知赶到，临时提前的搬迁却已封起机房。教练也尝试申请延后，没有获准。' : '你想参加，却错过了当天的联系与到场窗口。')
+        .replace('{oiArchive}', chose('S30', 'A', state) ? '后来你把旧稿带回家，纸箱里还夹着那张日期已经过去的展示通知。' : chose('S30', 'B', state) ? '你把大部分旧稿归好，只留一页在蓝本里。' : chose('S30', 'C', state) ? '你把纸箱交给老师保管，记下以后领取的办法。那张展示通知上的日期已经过去。' : '那张写过日期的展示通知仍留在蓝本里。')
         .replace('{applicationResult}', applicationResults(state)?.text || '旧记录里没有具体申请材料，不能据此补写一次失败。');
 }
 function mainEndingContent(id) {
