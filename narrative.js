@@ -486,6 +486,10 @@ function narrativeVariant(node, state = gameState) {
         const archive = chose('H25', 'A', state) ? 'closed' : chose('H25', 'C', state) ? 'withdrawn' : chose('H25', 'B', state) ? 'moved' : chose('H24', 'A', state) ? 'scheduled' : null;
         return node.variants[archive] || null;
     }
+    if (['M02', 'M04'].includes(node.id)) {
+        const contact = lineResults(state).team ? 'distant' : chose('H13', 'C', state) ? 'occasional' : null;
+        return node.variants[contact] || null;
+    }
     const key = hasRomanceEvent('rejected', state) ? 'refused' : state.romance === '明确互相喜欢' && state.mutualAffirmation ? 'dating' : state.romance === '朋友' ? 'friends' : 'growing';
     return node.variants[key] || null;
 }
@@ -515,7 +519,6 @@ function renderStoryContent(node) {
     if (node.id === 'S29') text = text.split('按实际材料呈现：')[0] + '\n\n' + examTrend();
     if (node.id === 'S34') text = text.split('S03、S21')[0] + '\n\n' + (gameState.relationships.parents < 50 ? '你们说话仍容易绕回旧争论，于是先只谈一项。' : '你们已经知道哪些话题需要先问是否方便。') + '哪些费用能够承担，仍要逐项核实。';
     if (node.id === 'S35') text = text.split('读取真实状态：')[0] + '\n\n' + (gameState.health < 45 ? '必要的身体照护先放在前面，其他事情可以分开处理。' : gameState.anxiety >= 65 || gameState.stress >= 75 ? '手机每一次亮屏都让你想伸手。今晚只先处理能确认的一小段。' : '你有余力整理桌面，把必要的东西留在手边。') + `\n\n蓝本里仍留着第一天的${source}。`;
-    if (node.id === 'M04') text = text.split('你和他们现在')[0] + '\n\n你可以问候，也可以今天先看完。没有联系记录时，不替任何人宣布关系破裂。';
     const refs = { S03: '之前家里谈话', S07: '之前留下的学习页', S08: '通知栏试做', S10: '那次互助', S12: '之前饭桌谈话', S16: '小群约定', S18: '之前的小目标', S19: '限时练习', S22: '练习核对', S24: '之前在校门口的', S25: '修改过的练笔', S26: '课堂尝试', S29: '复做页' };
     text = text.replace(/S\d{2}/g, id => refs[id] || '之前的那次选择');
     if (['S02', 'S06', 'S09', 'S13', 'S16', 'S18', 'S19', 'S21', 'S23', 'S26', 'S31', 'S32', 'S33', 'S36'].includes(node.id)) {
