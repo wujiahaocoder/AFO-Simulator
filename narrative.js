@@ -4,12 +4,12 @@
 "use strict";
 const narrativeData = window.AFONarrative;
 const subjectNames = { chinese: '语文', math: '数学', english: '英语', physics: '物理', chemistry: '化学', biology: '生物' };
-const relationshipNames = { teacher: '班主任', mathTeacher: '数学老师', chineseTeacher: '语文老师', englishTeacher: '英语老师', classmateA: '同桌', classmateB: '旧队友', parents: '父母', crush: '校园记录同学' };
+const relationshipNames = { teacher: '班主任', mathTeacher: '数学老师', chineseTeacher: '语文老师', englishTeacher: '英语老师', classmateA: '同桌', classmateB: '旧队友', parents: '父母', crush: '林知夏' };
 const effectNames = { ...subjectNames, ...relationshipNames, energy: '精力', stress: '压力', health: '健康', mental: '心理', anxiety: '焦虑', money: '金钱' };
 const saveKey = 'afo-save-3.0.0';
-// UI-only patches keep the existing save format so local rollback remains readable.
+// New fields are additive; existing 3.x saves keep the same local-storage key.
 const saveVersion = '3.1.0';
-const legacy = { initGame, updateUI, study, rest, exercise, takeExam, homework, activity, economy, changeWeather, checkAchievements, openModal };
+const legacy = { initGame, updateUI, study, rest, exercise, takeExam, activity, economy, changeWeather, checkAchievements, openModal, closeModal };
 let actionInProgress = null;
 let saveAvailable = true;
 
@@ -24,7 +24,8 @@ Object.assign(gameState, {
     romance: '暂不命名', mutualAffirmation: false, previousWeather: null,
     oldProgramAccess: false, practiceGoal: null, logHistory: [], negativeRandomThisWeek: false,
     reviewedExams: [], reviewPlan: null, studyGroupWeek: null, totalReviews: 0, totalStudyGroups: 0,
-    sceneChoices: {}, missedScenes: {}, romanceHistory: [], wellbeingHistory: [], routePlans: {}
+    sceneChoices: {}, missedScenes: {}, romanceHistory: [], wellbeingHistory: [], routePlans: {},
+    homeworkSettledWeek: null, homeworkBacklog: [], homeworkHistory: [], goalClaims: {}
 });
 const initialState = JSON.parse(JSON.stringify(gameState));
 
@@ -84,9 +85,11 @@ function saveGame() {
         const state = { ...gameState, achievements: [...gameState.achievements], currentGoal: null };
         localStorage.setItem(saveKey, JSON.stringify({ version: saveVersion, state }));
         saveAvailable = true;
+        updateNarrativeStatus();
         return true;
     } catch (_) {
         saveAvailable = false;
+        updateNarrativeStatus();
         return false;
     }
 }
@@ -111,6 +114,18 @@ function restoreGame() {
         const restoredAchievements = new Set(s.achievements);
         Object.assign(gameState, fresh, s, { achievements: restoredAchievements });
         restoreNarrativeEvidence();
+        gameState.homeworkBacklog = Array.isArray(s.homeworkBacklog) ? s.homeworkBacklog.filter(row =>
+            row && Number.isInteger(row.week) && row.week > 0 && row.week <= s.week && Object.hasOwn(subjectNames, row.subject)) : [];
+        gameState.homeworkHistory = Array.isArray(s.homeworkHistory) ? s.homeworkHistory.filter(row =>
+            row && Number.isInteger(row.week) && Array.isArray(row.completed) && Array.isArray(row.missing) &&
+            [...row.completed, ...row.missing].every(k => Object.hasOwn(subjectNames, k))) : [];
+        gameState.homeworkSettledWeek = s.homeworkSettledWeek === s.week ? s.week : null;
+        gameState.goalClaims = {};
+        for (const [week, claim] of Object.entries(s.goalClaims || {})) {
+            if (Object.hasOwn(stageGoals, week) && claim && Number.isInteger(claim.week) && claim.week > 0 && claim.week <= Number(week) &&
+                typeof claim.actualReward === 'string' && Array.isArray(claim.requirements) &&
+                claim.requirements.every(row => row && typeof row.text === 'string' && row.passed === true)) gameState.goalClaims[week] = claim;
+        }
         gameState.reviewedExams = Array.isArray(gameState.reviewedExams) ? gameState.reviewedExams : [];
         if (gameState.reviewPlan && (!Array.isArray(gameState.reviewPlan.subjects) ||
             !gameState.reviewPlan.subjects.every(k => Object.hasOwn(subjectNames, k)) ||
@@ -147,21 +162,24 @@ addToLog = function(text, type = 'neutral') {
     legacyLog(text, type, time);
 };
 updateUI = function() {
+    claimStageGoal();
     legacy.updateUI();
     const total = document.getElementById('achievement-total');
     if (total) total.textContent = Object.keys(achievements).length;
     updateNarrativeStatus();
     const plan = document.getElementById('review-plan-status');
-    if (plan) plan.textContent = activeReviewPlan() ? `复盘提示：${gameState.reviewPlan.subjects.map(k => subjectNames[k]).join('、')}，还可用于${gameState.reviewPlan.remaining}次主动学习，至第${gameState.reviewPlan.expiresWeek}周结束。` : '模考后三周内可复盘一次，结合后续学习巩固薄弱科目。';
+    if (plan) plan.textContent = activeReviewPlan() ? `复盘提示 · ${gameState.reviewPlan.subjects.map(k => subjectNames[k]).join('、')} · 还可巩固 ${gameState.reviewPlan.remaining} 次` : '';
+    document.getElementById('average-value').textContent = `均分 ${stageAverage(gameState).toFixed(1)}`;
+    document.getElementById('homework-backlog').textContent = gameState.homeworkBacklog.length;
 };
 function updateNarrativeStatus() {
     const status = document.getElementById('game-status');
     if (status) status.textContent = gameState.phase === 'ending' ? '这一年的记录已封存。' :
-        gameState.phase === 'postExam' ? '考试已结束，考后去向待确认。' : `这一年，第${gameState.week}周。`;
+        gameState.phase === 'postExam' ? '考试已结束，考后去向待确认。' : gameState.weekEnding ? '周末 · 作业与故事' : '安排好本周，故事会在周末继续。';
     const info = document.getElementById('narrative-status');
-    if (info) info.textContent = `主线 ${gameState.storyProgress}/36 · 当前学习效率 ${calculateStudyEfficiency().toFixed(2)} · ${saveAvailable ? '进度自动保存在本设备' : '本设备无法保存，关闭页面前请留意'}`;
-    const resume = document.getElementById('narrative-btn');
-    if (resume) resume.textContent = gameState.activeNarrative || gameState.narrativeFeedback || gameState.narrativeQueue.length ? '继续未完成的剧情' : `本周剧情与支线（${availableSideStories().length}段可选）`;
+    if (info) info.textContent = `故事 ${gameState.storyProgress}/36 · 学习效率 ${calculateStudyEfficiency().toFixed(2)} · ${saveAvailable ? '已自动保存' : '本设备无法保存，请保持页面打开'}`;
+    const resume = document.getElementById('narrative-label');
+    if (resume) resume.textContent = gameState.weekEnding || gameState.activeNarrative || gameState.narrativeFeedback || gameState.narrativeQueue.length ? '继续阅读' : '蓝本';
 }
 function checkActionLimit() {
     if (gameState.gameOver || gameState.phase !== 'playing') return false;
@@ -186,23 +204,17 @@ function recordAction() {
 function performAction(kind, detail, action) {
     if (!checkActionLimit()) return;
     const count = gameState.actionsThisWeek;
-    const beforeHomework = { ...gameState.homework };
     const beforeMoney = gameState.money;
     actionInProgress = { kind, detail };
     try { action(); } finally { actionInProgress = null; }
     if (gameState.actionsThisWeek === count) return;
-    if (kind === 'homework') {
-        const completed = Object.keys(subjectNames).filter(k => !beforeHomework[k] && gameState.homework[k]);
-        const last = gameState.actionHistory.at(-1);
-        if (last) last.subjects = completed;
-        gameState.totalHomework += completed.length;
-    }
+    legacy.closeModal('story-modal');
     if (gameState.money > beforeMoney) gameState.totalIncome += gameState.money - beforeMoney;
     if (kind === 'rest' && detail === 'counseling') gameState.actionHistory.at(-1).support = true;
     clampState();
     updateUI();
     saveGame();
-    if (gameState.deferredRandom && !dueMainStories().length) triggerRandomEvent();
+    // Random scenes, like story scenes, wait for the weekend.
 }
 study = function(subject) {
     const costs = { chinese: 25, math: 35, english: 25, physics: 35, chemistry: 20, biology: 20 };
@@ -227,10 +239,7 @@ rest = function(type) {
     performAction('rest', type, () => legacy.rest(type));
 };
 exercise = function() { performAction('exercise', null, legacy.exercise); };
-homework = function(action) {
-    if (!['complete-all', 'complete-one', 'skip'].includes(action)) return;
-    performAction('homework', action, () => legacy.homework(action));
-};
+function homework(action) { settleWeekendHomework(action); }
 activity = function(type) {
     const costs = { club: 15, volunteer: 25, lecture: 10, competition: 35, 'oi-meetup': 20 };
     if (!Object.hasOwn(costs, type)) return;
@@ -250,8 +259,26 @@ takeExam = function() {
     if (!checkActionLimit()) return;
     const count = gameState.examCount;
     performAction('exam', null, legacy.takeExam);
-    if (gameState.examCount !== count) saveGame();
+    if (gameState.examCount !== count) {
+        reviewExam(gameState.examHistory.length - 1);
+        const exam = gameState.examHistory.at(-1);
+        showMenu('模考与复盘', `成绩指数 ${exam.score}/100。\n\n${Object.entries(exam.subjects).map(([k,v]) => `${subjectNames[k]} ${v}`).join(' · ')}\n\n已核对最低两科，各 +3；压力 -5、焦虑 -6。后续两次相关科目的独立学习 +20%。考试与复盘共用这次行动，消耗40精力。`,
+            [{ text: '收好试卷', action: () => closeModal('story-modal') }]);
+        saveGame();
+    }
 };
+function showStudyMenu() {
+    if (!checkActionLimit()) return;
+    const costs = { chinese: 25, math: 35, english: 25, physics: 35, chemistry: 20, biology: 20 };
+    showMenu('学习', '独立练习或找人核对问题，都占一次行动。',
+        Object.keys(subjectNames).map(k => ({ text: `${subjectNames[k]} · ${costs[k]}精力`, action: () => study(k) })).concat(
+            [{ text: '与人共学 · 选择伙伴（20精力）', action: () => studyTogether() }]));
+}
+function showExamMenu() {
+    if (!checkActionLimit()) return;
+    showMenu('模考', `已参加 ${gameState.examCount}/5 次。考试与复盘一起完成：一次行动、40精力，健康至少60。复盘会留下两门薄弱科目的学习提示。`,
+        [{ text: '开始模考并复盘', disabled: gameState.examCount >= 5 || gameState.energy < 40 || gameState.health < 60, action: takeExam }, { text: '返回', action: () => closeModal('story-modal') }]);
+}
 function showMenu(title, text, entries) {
     elements.storyTitle.textContent = title;
     elements.storyContent.innerHTML = paragraphs(text);
@@ -260,6 +287,7 @@ function showMenu(title, text, entries) {
         const button = document.createElement('button');
         button.className = 'story-choice-btn';
         button.textContent = entry.text;
+        button.disabled = !!entry.disabled;
         button.onclick = entry.action;
         elements.storyChoices.appendChild(button);
     }
@@ -296,28 +324,18 @@ function availableReviews() {
         Object.keys(subjectNames).every(k => Number.isFinite(exam.subjects?.[k])));
 }
 function reviewExam(index) {
-    if (!checkActionLimit()) return;
     const reviews = availableReviews();
-    if (index === undefined) {
-        showMenu('模考复盘', '每场模考后三周内一次，消耗一次行动、20精力。根据当场实际表现选择两科，各 +3，压力 -5、焦虑 -6。接下来三周内，两次相关科目的主动学习增益 +20%；提示不叠加。',
-            reviews.map(({ exam, index: i }) => ({ text: `第${exam.week}周模考：${exam.score}/100`, action: () => reviewExam(i) })).concat(
-                [{ text: '返回本周安排', action: () => closeModal('story-modal') }]));
-        return;
-    }
+    if (index === undefined) return showExamMenu();
     const match = reviews.find(r => r.index === index);
-    if (!match) { showNotification('这场模考已复盘或已超过三周窗口。', 'neutral'); return; }
-    if (gameState.energy < 20) { showNotification('复盘需要20精力。', 'neutral'); return; }
+    if (!match || gameState.finalSnapshot) return;
     const subjects = Object.keys(subjectNames).sort((a, b) => match.exam.subjects[a] - match.exam.subjects[b]).slice(0, 2);
-    performAction('review', String(index), () => {
-        applyEffect({ energy: -20, stress: -5, anxiety: -6, ...Object.fromEntries(subjects.map(k => [k, 3])) });
-        gameState.reviewedExams.push(index);
-        gameState.reviewPlan = { subjects, remaining: 2, expiresWeek: Math.min(52, gameState.week + 3) };
-        gameState.totalReviews++;
-        addToLog(`复盘第${match.exam.week}周的真实模考记录：核对${subjects.map(k => subjectNames[k]).join('、')}；低分不直接等于逐题答错，今天从基础材料复做。`, 'good');
-        closeModal('story-modal'); recordAction();
-        gameState.actionHistory.at(-1).subjects = subjects;
-        advanceTime();
-    });
+    applyEffect({ stress: -5, anxiety: -6, ...Object.fromEntries(subjects.map(k => [k, 3])) });
+    gameState.reviewedExams.push(index);
+    gameState.reviewPlan = { subjects, remaining: 2, expiresWeek: Math.min(52, gameState.week + 3) };
+    gameState.totalReviews++;
+    gameState.actionHistory.push({ week: gameState.week, kind: 'review', detail: String(index), subjects, integrated: true });
+    addToLog(`模考后核对${subjects.map(k => subjectNames[k]).join('、')}，各 +3；已留下后续练习提示。`, 'good');
+    updateUI(); saveGame();
 }
 function groupSubjects(target) {
     if (['classmateA', 'classmateB', 'crush'].includes(target)) return Object.keys(subjectNames);
@@ -331,9 +349,10 @@ function studyTogether(target, subject) {
     if (!checkActionLimit()) return;
     if (gameState.studyGroupWeek === gameState.week) { showNotification('本周已经共同学习过一次，把其他时间留给各自的安排。', 'neutral'); return; }
     if (!target) {
-        showMenu('一起核对一处课内问题', `每周一次，消耗一次行动、20精力，需要健康至少50、对应关系至少60。按当前学习效率和能力增长，压力 -4、焦虑 -${studyBalance.groupAnxietyReduction}，熟悉程度 +2；不保证对方已经知道全部答案。`,
-            availableStudyPartners().map(k => ({ text: relationshipNames[k], action: () => studyTogether(k) })).concat(
-                [{ text: '返回本周安排', action: () => closeModal('story-modal') }]));
+        const partners = Object.keys(relationshipNames).filter(k => groupSubjects(k).length);
+        showMenu('与谁共学？', '每周一次：一次行动、20精力，健康至少50，熟悉程度至少60。同学可讨论六科，老师只辅导任教学科。',
+            partners.map(k => ({ text: `${relationshipNames[k]} · 熟悉 ${Math.round(gameState.relationships[k])}/60 · ${groupSubjects(k).length === 6 ? '六科' : groupSubjects(k).map(x => subjectNames[x]).join('、')}${gameState.relationships[k] < 60 ? '（暂未解锁）' : ''}`, disabled: gameState.relationships[k] < 60, action: () => studyTogether(k) })).concat(
+                [{ text: '返回学习', action: showStudyMenu }]));
         return;
     }
     if (!availableStudyPartners().includes(target)) return;
@@ -406,6 +425,7 @@ function availableRandomEvents(state = gameState) {
 }
 function triggerRandomEvent() {
     if (gameState.finalSnapshot || gameState.randomCountThisWeek >= 1 || gameState.weekRandomAttempted) return;
+    if (!gameState.weekEnding) { gameState.deferredRandom = true; return; }
     if (actionInProgress || gameState.activeNarrative || gameState.narrativeFeedback || dueMainStories().length) {
         gameState.deferredRandom = true;
         return;
@@ -432,15 +452,14 @@ function availableSideStories() {
     return narrativeData.stories.filter(n => n.kind === 'side' && n.week <= gameState.week && gameState.week <= n.until && !gameState.events.includes(n.id) &&
         (n.revision ? sceneRequirementsMet(n) : n.id === 'H06' ? Object.values(gameState.subjects).some(v => v < 40) : gameState.events.includes(entry[n.id])));
 }
+function availableWeeklyStories() {
+    return [...dueMainStories(), ...availableSideStories()];
+}
 function resumeNarrative() {
     if (gameState.phase !== 'playing') { renderPostExam(); pumpNarrative(); return; }
     if (gameState.narrativeFeedback || gameState.activeNarrative || gameState.narrativeQueue.length) { pumpNarrative(); return; }
-    const due = dueMainStories();
-    const sides = availableSideStories();
-    showMenu('本周剧情与支线', '主线和可选支线不消耗常规行动。关闭窗口后可从这里继续；支线是否参与由你决定。',
-        [...due, ...sides].map(n => ({ text: `${n.kind === 'main' ? '主线' : '支线'}：${n.title}${n.kind === 'side' ? `（至第${n.until}周）` : ''}`, action: () => triggerStoryEvent(n) })).concat(
-            [{ text: `回看蓝本里的牵挂（${promiseRecords().length}项）`, action: showPromiseLedger },
-                { text: '回到本周安排', action: () => closeModal('story-modal') }]));
+    if (gameState.weekEnding) { continueWeekEnd(); return; }
+    showPromiseLedger();
 }
 function promiseRecords(state = gameState) {
     const lines = lineResults(state);
@@ -459,7 +478,7 @@ function promiseRecords(state = gameState) {
             status = '暂无答复记录'; detail = '这页没有留下最后的答复，先把这一处留空。';
         } else {
             status = state.week < result.week ? '等候后续' : '尚待答复';
-            detail = `后续可在第${result.week === result.until ? result.week : result.week + '—' + result.until}周查看，至第${result.until}周结束。`;
+            detail = '有后续时会在周末继续，先把这一页留好。';
         }
         return { id: entry.setup, title: entry.title, week, status, detail };
     }).sort((a, b) => a.week - b.week);
@@ -469,8 +488,8 @@ function showPromiseLedger() {
     if (gameState.activeNarrative || gameState.narrativeFeedback || gameState.narrativeQueue.length || gameState.weekEnding) { pumpNarrative(); return false; }
     const records = promiseRecords();
     const text = records.length ? '这里只记下你实际提起过的事。没有得到答复的，仍留在各自的期限里；已经落空的，也不会因为后来成绩或熟悉程度变好就自动消失。' : '蓝本里还没有记下这些具体的牵挂。没有提起过的事，不会替你补写成失约或失去。';
-    showMenu('蓝本里的牵挂', text, [{ text: '回到本周剧情与支线', action: resumeNarrative }, { text: '收好蓝本，回到本周安排', action: () => closeModal('story-modal') }]);
-    elements.storyContent.innerHTML += records.map(row => `<section class="promise-record"><h4>${escapeText(row.title)} · ${escapeText(row.status)}</h4><p class="promise-week">第${row.week}周记下</p><p>${escapeText(row.detail)}</p></section>`).join('');
+    showMenu('蓝本里的牵挂', text, [{ text: '收好蓝本', action: () => closeModal('story-modal') }]);
+    elements.storyContent.innerHTML += records.map(row => `<section class="promise-record"><h4>${escapeText(row.title)} · ${escapeText(row.status)}</h4><p>${escapeText(row.detail)}</p></section>`).join('');
     return true;
 }
 function triggerStoryEvent(node) {
@@ -479,7 +498,7 @@ function triggerStoryEvent(node) {
     if (!gameState.narrativeQueue.includes(node.id) && gameState.activeNarrative !== node.id) gameState.narrativeQueue.push(node.id);
     pumpNarrative();
 };
-function checkHiddenEvents() { /* Optional scenes are entered explicitly through the narrative menu. */ };
+function checkHiddenEvents() { /* Eligible side scenes are scheduled at the weekend. */ };
 function resolveChoices(node, state = gameState) {
     const all = Object.keys(subjectNames);
     const resolved = [];
@@ -592,7 +611,95 @@ function choiceFeedback(node, c, variant = null) {
     if (node.id === 'S36') return { A: '成绩已经留在蓝本里。你先了解升学方向，也可以返回比较其他安排。', B: '升学、复读、休整、工作与继续学习同时开放，确认前可以自由返回。', C: '今天先吃一顿不必卡着下课铃的饭。去向仍未确认，回来后可继续查看全部方向。' }[c.key];
     return c.feedback.replace(/S\d{2}/g, '之前的那次选择');
 }
+// Select an actual authored branch from current abilities, state and recorded actions.
+// No hidden random draw or relationship score alone creates a romance choice.
+function automaticMainChoice(node, state = gameState) {
+    const low = state.energy < 35 || state.health < 55;
+    const burden = state.anxiety >= 45 || state.stress >= 55;
+    const socialStudy = state.actionHistory.some(a => a.week >= state.week - 3 && ['social', 'studyGroup'].includes(a.kind));
+    const recentStudy = state.actionHistory.some(a => a.week >= state.week - 3 && a.kind === 'study');
+    const average = Object.values(state.subjects).reduce((a,b) => a+b, 0) / 6;
+    const r = state.relationships;
+    const preferred = {
+        S01: burden ? 'C' : r.classmateA >= r.teacher ? 'A' : 'B',
+        S02: socialStudy && r.classmateA >= 60 ? 'B' : r.mathTeacher >= 60 ? 'A' : 'C',
+        S03: burden ? 'B' : r.parents >= 50 ? 'A' : 'C',
+        S04: burden ? 'B' : r.classmateB >= 55 ? 'A' : 'C',
+        S05: r.crush >= 40 && socialStudy ? 'B' : state.subjects.chinese < 20 ? 'A' : 'C',
+        S06: socialStudy ? 'B' : sceneChoice('S02', state) === 'A' ? 'A' : 'C',
+        S07: average < 40 ? 'A' : state.examHistory.length ? 'B' : 'C',
+        S08: low || burden ? 'C' : socialStudy ? 'B' : 'A',
+        S09: state.subjects.physics < state.subjects.math ? 'A' : state.subjects.english < 30 ? 'C' : 'B',
+        S10: socialStudy && r.classmateA >= 55 ? 'A' : r.teacher >= 60 ? 'B' : 'C',
+        S11: burden ? 'B' : state.subjects.english < 30 ? 'C' : 'A',
+        S12: burden ? 'B' : r.parents >= 60 ? 'C' : 'A',
+        S13: state.memoryCount > 0 ? 'B' : r.classmateB >= 55 ? 'A' : 'C',
+        S14: burden ? 'B' : r.classmateB >= 55 ? 'A' : 'C',
+        S15: Math.abs(state.subjects.chemistry - state.subjects.biology) < 8 ? 'C' : state.subjects.chemistry < state.subjects.biology ? 'A' : 'B',
+        S16: low || burden ? 'C' : socialStudy ? 'B' : 'A',
+        S17: r.crush >= 60 && socialStudy ? 'A' : r.crush >= 35 ? 'B' : 'C',
+        S18: recentStudy ? 'A' : state.examHistory.length ? 'B' : 'C',
+        S19: burden ? 'C' : socialStudy ? 'B' : 'A',
+        S20: low ? 'C' : burden ? 'A' : 'B',
+        S21: state.money < 200 ? 'B' : r.parents < 45 ? 'C' : 'A',
+        S22: recentStudy ? 'A' : burden ? 'C' : 'B',
+        S23: r.classmateB < 45 ? 'C' : recentStudy ? 'A' : 'B',
+        // Friendship and explicitly recorded interest persist; familiarity is never consent.
+        S24: r.crush >= 65 && state.actionHistory.filter(a => a.kind === 'social' && a.detail === 'crush' || a.kind === 'studyGroup' && a.partner === 'crush').length >= 2 ? 'A' : r.crush >= 35 ? 'B' : 'C',
+        S25: state.subjects.english < state.subjects.chinese ? 'B' : state.subjects.chinese < 50 ? 'A' : 'C',
+        S26: socialStudy && r.classmateB >= 60 ? 'B' : state.subjects.physics < 55 ? 'A' : 'C',
+        S27: low ? 'A' : burden ? 'B' : 'C',
+        S28: r.classmateB < 45 ? 'C' : burden ? 'B' : 'A',
+        S29: average < 60 ? 'A' : burden ? 'C' : 'B',
+        S30: state.memoryCount > 0 || state.oldProgramAccess ? 'A' : burden ? 'C' : 'B',
+        S31: state.money < 200 ? 'C' : average >= 60 ? 'A' : 'B',
+        S32: Math.min(state.subjects.chinese, state.subjects.english) < 50 ? 'A' : socialStudy ? 'C' : 'B',
+        S33: hasRomanceEvent('mutual', state) || hasRomanceEvent('rejected', state) || state.romance === '慢慢了解' ? 'A' : state.romance === '朋友' ? 'B' : 'C',
+        S34: r.parents >= 60 ? 'A' : r.parents >= 40 ? 'B' : 'C',
+        S35: low ? 'A' : burden ? 'C' : 'B', S36: 'B'
+    }[node.id];
+    const options = resolveChoices(node, state).filter(c => (c.effect.money || 0) >= -state.money);
+    const candidates = options.filter(c => c.key === preferred);
+    const pool = candidates.length ? candidates : options;
+    return pool.slice().sort((a,b) => {
+        const need = c => (c.targets || []).reduce((sum,k) => sum + 100 - state.subjects[k], 0);
+        return need(b) - need(a);
+    })[0];
+}
+function routedSideStories() {
+    return availableSideStories().filter(node => {
+        // Follow-ups keep their actual prerequisite choices. New introductions also use the panel.
+        if (node.requires?.some(r => r.id.startsWith('H'))) return true;
+        const r = gameState.relationships;
+        const gates = {
+            H01: r.classmateB >= 55 || gameState.memoryCount > 0,
+            H02: r.parents < 60 || gameState.stress >= 40,
+            H03: r.classmateB >= 55, H04: r.teacher >= 55,
+            H05: r.crush >= 35, H07: r.crush >= 40,
+            H12: r.classmateB >= 50, H14: r.parents >= 50,
+            H16: r.teacher >= 55, H18: gameState.totalStudyHours >= 8,
+            H20: gameState.subjects.chinese >= 25, H22: gameState.subjects.english >= 20,
+            H24: gameState.memoryCount > 0 || r.classmateB >= 60,
+            H26: gameState.health >= 50, H28: stageAverage(gameState) >= 50,
+            H29: r.classmateB >= 55, H31: r.classmateA >= 55,
+            H33: r.classmateB >= 50, H35: gameState.subjects.math >= 15,
+            H37: r.classmateA >= 55, H39: r.crush >= 35,
+            H41: r.parents >= 40, H43: r.classmateA >= 50,
+            H45: gameState.stress >= 25 || gameState.totalStudyHours >= 5
+        };
+        return gates[node.id] !== false;
+    });
+}
+function storyWithoutSchedule(text) {
+    return text.replace(/第\d+(?:[—－-]\d+)?周(?:结束)?/g, '此前').replace(/（至此前）/g, '');
+}
 function showNarrative(node) {
+    if (node.kind === 'main') {
+        const c = automaticMainChoice(node);
+        if (!c) throw new Error('没有可进入的主线分支：' + node.id);
+        commitNarrativeChoice(node, c, true);
+        return;
+    }
     const entries = node.choices.map(c => ({
         text: `${narrativeChoiceText(node, c)}\n${previewEffect(c.effect)}${c.target ? c.target === 'lastStudy' ? `；本周最近一次主动学习科目 +${c.targetGain}` : `；另选科目，总能力 +${c.targetGain ?? 1.2}` : ''}`,
         action: () => {
@@ -605,7 +712,7 @@ function showNarrative(node) {
         }
     }));
     if (node.kind === 'memory') entries.push({ text: '今天先不回忆（不扣行动和精力）', action: () => { gameState.activeNarrative = null; closeModal('story-modal'); saveGame(); pumpNarrative(); } });
-    showMenu(`${node.kind === 'memory' ? '回忆：' : node.kind === 'side' ? '支线：' : ''}${node.title}`, renderStoryContent(node), entries);
+    showMenu(node.title, storyWithoutSchedule(renderStoryContent(node)), entries);
     if (node.commonEffect || node.cost) {
         elements.storyContent.innerHTML += `<p class="narrative-note">${node.commonEffect ? '本学段课堂练习与整理：六科各 +0.2；' : ''}${node.cost ? '确认后：一次行动，精力 -10，焦虑 -2；' : '本段不消耗常规行动；'}选择效果见下方。</p>`;
     }
@@ -615,12 +722,13 @@ function showNarrative(node) {
         if (c && (c.effect.money || 0) < -gameState.money) { button.disabled = true; button.textContent += '（余额不足）'; }
     });
 }
-function commitNarrativeChoice(node, c) {
+function commitNarrativeChoice(node, c, automatic = false) {
     if (gameState.activeNarrative !== node.id || gameState.events.includes(node.id) || gameState.randomSeen.includes(node.id)) return false;
     if (gameState.finalSnapshot && node.id !== 'S36') return false;
     if ((c.effect.money || 0) < -gameState.money) return false;
     if (node.kind === 'memory' && (gameState.actionsThisWeek >= 3 || gameState.energy < 10)) return false;
     const variant = narrativeVariant(node);
+    const sceneText = automatic ? storyWithoutSchedule(renderStoryContent(node)) : null;
     const selectedText = narrativeChoiceText(node, c, variant);
     if (node.commonEffect) applyEffect(node.commonEffect);
     if (node.cost) applyEffect(node.cost);
@@ -656,7 +764,9 @@ function commitNarrativeChoice(node, c) {
     gameState.activeNarrative = null;
     const feedbackText = choiceFeedback(node, c, variant);
     const finishShortEvent = node.kind === 'random' && node.choices.length === 1 && !feedbackText.trim();
-    gameState.narrativeFeedback = finishShortEvent ? null : { title: node.title, text: feedbackText, postChoice: node.id === 'S36' ? c.key : null };
+    gameState.narrativeFeedback = finishShortEvent ? null : { title: node.title,
+        text: automatic ? `${sceneText}\n\n${selectedText}\n\n${storyWithoutSchedule(feedbackText)}` : storyWithoutSchedule(feedbackText),
+        postChoice: node.id === 'S36' ? c.key : null };
     if (finishShortEvent) closeModal('story-modal');
     addToLog(`${node.title}：${selectedText}${c.targets?.length ? '（' + c.targets.map(k => subjectNames[k]).join('、') + '）' : ''}`, 'story');
     if (gameState.phase === 'playing') { checkAchievements(); updateUI(); }
@@ -689,7 +799,7 @@ function pumpNarrative() {
         return;
     }
     if (gameState.weekEnding) continueWeekEnd();
-    else if (gameState.phase === 'playing' && gameState.deferredRandom && !dueMainStories().length) triggerRandomEvent();
+    // During the week, pending events stay deferred until endWeek.
 }
 function endWeek() {
     if (gameState.phase !== 'playing') return;
@@ -697,10 +807,78 @@ function endWeek() {
     if (gameState.actionsThisWeek < 3 && !confirm(`本周还有${3 - gameState.actionsThisWeek}次行动机会，确定结束本周吗？`)) return;
     closeModal('story-modal');
     gameState.weekEnding = true;
+    saveGame();
     continueWeekEnd();
+};
+function showWeekendHomework() {
+    if (!gameState.weekEnding || gameState.homeworkSettledWeek === gameState.week) return;
+    const missing = Object.keys(subjectNames).filter(k => !gameState.homework[k]);
+    if (!missing.length) { settleWeekendHomework('rest'); return; }
+    const price = missing.length * 5;
+    elements.homeworkList.textContent = `${missing.map(k => subjectNames[k]).join('、')}待完成。现有精力 ${Math.floor(gameState.energy)}，欠交 ${gameState.homeworkBacklog.length} 科次。未完成部分会自动登记，留出的时间可恢复精力、减轻压力。`;
+    const entries = [
+        { text: `完成本周${missing.length}科 · ${price}精力`, disabled: gameState.energy < price, action: () => homework('complete-all') },
+        { text: `先做最弱${Math.min(2, missing.length)}科 · ${Math.min(2, missing.length) * 5}精力`, disabled: gameState.energy < Math.min(2, missing.length) * 5, action: () => homework('complete-one') }
+    ];
+    const repay = Math.min(2, gameState.homeworkBacklog.length);
+    if (repay) entries.push({ text: `完成本周并补交${repay}科次 · ${price + repay * 5}精力`, disabled: gameState.energy < price + repay * 5, action: () => homework('complete-and-repay') });
+    entries.push({ text: '先留出休息时间', action: () => homework('rest') });
+    const choices = document.getElementById('weekend-choices');
+    choices.innerHTML = '';
+    for (const entry of entries) {
+        const button = document.createElement('button');
+        button.className = 'study-btn'; button.textContent = entry.text;
+        button.disabled = !!entry.disabled; button.onclick = entry.action;
+        choices.appendChild(button);
+    }
+    document.getElementById('homework-modal').style.display = 'flex';
+    saveGame();
+}
+function settleWeekendHomework(action = 'rest') {
+    if (!gameState.weekEnding || gameState.phase !== 'playing' || gameState.homeworkSettledWeek === gameState.week ||
+        !['complete-all', 'complete-one', 'complete-and-repay', 'rest', 'skip'].includes(action)) return false;
+    const missing = Object.keys(subjectNames).filter(k => !gameState.homework[k]);
+    const complete = action === 'complete-one' ? missing.slice().sort((a,b) => gameState.subjects[a] - gameState.subjects[b]).slice(0,2) :
+        ['complete-all', 'complete-and-repay'].includes(action) ? missing : [];
+    const repay = action === 'complete-and-repay' ? gameState.homeworkBacklog.slice(0,2) : [];
+    const energy = (complete.length + repay.length) * 5;
+    if (gameState.energy < energy) { showNotification(`需要${energy}精力。`, 'neutral'); return false; }
+    // Mark first so closing, double clicks and restoring cannot settle twice.
+    gameState.homeworkSettledWeek = gameState.week;
+    applyEffect({ energy: -energy });
+    for (const subject of complete) { gameState.homework[subject] = true; applyEffect({ [subject]: 0.5 }); }
+    gameState.totalHomework += complete.length + repay.length;
+    if (complete.length) applyEffect({ teacher: complete.length / 2, mathTeacher: complete.includes('math') ? 2 : 0,
+        chineseTeacher: complete.includes('chinese') ? 2 : 0, englishTeacher: complete.includes('english') ? 2 : 0, anxiety: -complete.length / 3 });
+    gameState.homeworkBacklog.splice(0, repay.length);
+    for (const row of repay) applyEffect({ [row.subject]: 0.3, teacher: 1 });
+    const uncompleted = missing.filter(k => !gameState.homework[k]);
+    const fraction = uncompleted.length / 6;
+    if (uncompleted.length) {
+        for (const subject of uncompleted) gameState.homeworkBacklog.push({ week: gameState.week, subject });
+        applyEffect({ teacher: -5 * fraction, mathTeacher: uncompleted.includes('math') ? -3 : 0,
+            chineseTeacher: uncompleted.includes('chinese') ? -3 : 0, englishTeacher: uncompleted.includes('english') ? -3 : 0,
+            energy: 8 * fraction, stress: -3 * fraction, anxiety: 2 * fraction });
+    }
+    const record = { week: gameState.week, kind: 'homework', detail: action, subjects: complete, completed: complete,
+        missing: uncompleted, repaid: repay, weekend: true };
+    gameState.homeworkHistory.push(record); gameState.actionHistory.push(record);
+    addToLog(`周末作业：完成${complete.length}科${repay.length ? `、补交${repay.length}科次` : ''}${uncompleted.length ? `，${uncompleted.length}科自动记为欠交；休息精力 +${(8*fraction).toFixed(1)}、压力 -${(3*fraction).toFixed(1)}，班主任熟悉 -${(5*fraction).toFixed(1)}、对应任课老师 -3、焦虑 +${(2*fraction).toFixed(1)}` : '，已全部交齐'}。`, uncompleted.length ? 'neutral' : 'good');
+    legacy.closeModal('homework-modal');
+    checkAchievements(); updateUI(); saveGame();
+    continueWeekEnd();
+    return true;
+}
+closeModal = function(id) {
+    if (id === 'homework-modal' && gameState.weekEnding && gameState.homeworkSettledWeek !== gameState.week) {
+        settleWeekendHomework('rest'); return;
+    }
+    const modal = document.getElementById(id);
+    if (modal) modal.style.display = 'none';
 };
 function continueWeekEnd() {
     if (gameState.activeNarrative || gameState.narrativeFeedback || gameState.narrativeQueue.length) { pumpNarrative(); return; }
+    if (gameState.homeworkSettledWeek !== gameState.week) { showWeekendHomework(); return; }
     // All final-week random effects settle before S35 freezes the score.
     if (gameState.week === 52 && !gameState.weekRandomAttempted) {
         const shouldDraw = gameState.deferredRandom || Math.random() < 0.6;
@@ -708,7 +886,9 @@ function continueWeekEnd() {
         if (shouldDraw) { gameState.weekRandomAttempted = false; drawRandomEvent(); if (gameState.activeNarrative) return; }
     }
     const due = dueMainStories();
-    if (due.length) { gameState.narrativeQueue.push(...due.map(n => n.id)); pumpNarrative(); return; }
+    if (due.length) { gameState.narrativeQueue.push(due[0].id); pumpNarrative(); return; }
+    const sides = routedSideStories();
+    if (sides.length) { gameState.narrativeQueue.push(sides[0].id); pumpNarrative(); return; }
     if (!gameState.weekRandomAttempted) {
         const shouldDraw = gameState.deferredRandom || Math.random() < 0.6;
         gameState.weekRandomAttempted = true;
@@ -736,7 +916,7 @@ function continueWeekEnd() {
     gameState.negativeRandomThisWeek = false;
     gameState.season = Math.min(3, Math.floor((gameState.week - 1) / 13));
     checkHolidays(); checkStageGoals(); generateSchedule(); changeWeather();
-    addToLog(`第${gameState.week}周开始，距离考试还有${gameState.daysLeft}个抽象学年日。`, 'neutral');
+    addToLog(`新的一周，距考试还有${gameState.daysLeft}天。`, 'neutral');
     updateUI(); saveGame();
 }
 function checkStageGoals() {
@@ -772,19 +952,36 @@ function renderGoalSettlement(detail) {
         (detail.challenges.length ? `<p class="goal-note">选做挑战（仅记录，不影响阶段奖励）</p><ul class="goal-checklist">${renderGoalRows(detail.challenges)}</ul>` : '') +
         (Array.isArray(detail.mementos) ? detail.mementos.filter(t => typeof t === 'string').map(t => `<p class="narrative-note">${escapeText(t)}</p>`).join('') : '');
 }
+function claimStageGoal() {
+    if (gameState.phase !== 'playing' || !gameState.goalWeek || gameState.finalSnapshot) return;
+    const week = gameState.goalWeek, goal = stageGoals[week];
+    if (Object.hasOwn(gameState.goalResults, week) || gameState.goalClaims[week]) return;
+    const status = getStageGoalStatus(goal);
+    if (!status.achieved) return;
+    const read = key => Object.hasOwn(relationshipNames,key) ? gameState.relationships[key] : gameState[key];
+    const before = Object.fromEntries(Object.keys(goal.reward).map(k => [k, read(k)]));
+    applyEffect(goal.reward);
+    const actual = Object.fromEntries(Object.keys(goal.reward).map(k => [k, Math.round((read(k)-before[k])*100)/100]));
+    if (Object.values(actual).every(v => v === 0)) { applyEffect({ money: 20 }); actual.money = 20; }
+    gameState.goalClaims[week] = { week: gameState.week, requirements: status.requirements.map(({text,passed}) => ({text,passed})), actualReward: previewEffect(actual) };
+    addToLog(`${goal.title}已达成，奖励已领取：${previewEffect(actual)}。`, 'good');
+    showNotification(`目标达成 · ${previewEffect(actual)}`, 'good');
+    saveGame();
+}
 function settleStageGoal() {
     if (gameState.goalWeek !== gameState.week || Object.hasOwn(gameState.goalResults, gameState.week)) return;
     const goal = stageGoals[gameState.week];
     const status = getStageGoalStatus(goal);
-    const achieved = status.achieved;
+    claimStageGoal();
+    const claim = gameState.goalClaims[gameState.week];
+    const achieved = !!claim;
     gameState.goalResults[gameState.week] = achieved;
     const detail = { week: gameState.week, title: goal.title, achieved,
-        requirements: status.requirements.map(({ text, passed }) => ({ text, passed })),
-        challenges: status.challenges.map(({ text, passed }) => ({ text, passed })), rewardText: previewEffect(goal.reward), mementos: [] };
+        requirements: claim ? claim.requirements : status.requirements.map(({ text, passed }) => ({ text, passed })),
+        challenges: status.challenges.map(({ text, passed }) => ({ text, passed })), rewardText: claim?.actualReward || previewEffect(goal.reward), mementos: [] };
     if (gameState.week === 25 && status.challenges[1]?.passed) detail.mementos.push('蓝本便签：你把确实发生过的交流题名写在同一页，采访、小群里的问题和愿意分享的生活都有各自的位置。熟悉不等于喜欢，这些交谈本身已经留下过声音。');
     if (gameState.week === 45 && status.challenges[0]?.passed) detail.mementos.push('蓝本便签：两位已经熟悉的人的名字留在页边。你知道可以怎样问候他们，也知道熟悉不会替任何人保证此后的关系。');
     gameState.goalDetails[gameState.week] = detail;
-    if (achieved) applyEffect(goal.reward);
     const reason = achieved ? `主要目标达成，阶段奖励：${detail.rewardText}` :
         `主要目标未达成；未满足：${detail.requirements.filter(row => !row.passed).map(row => row.text).join('；')}。后面的安排仍可继续`;
     const extra = detail.challenges.length ? `\n选做挑战（仅记录）：${detail.challenges.map(row => `${row.passed ? '已满足' : '未满足'} ${row.text}`).join('；')}` : '';
@@ -793,16 +990,19 @@ function settleStageGoal() {
 function updateGoalText() {
     const goal = gameState.currentGoal;
     const status = goal ? getStageGoalStatus(goal) : null;
-    elements.currentGoal.textContent = goal ? `${goal.title}；截止第${gameState.goalWeek}周结束` : '本轮阶段目标已结算';
-    gameState.goalProgress = status?.progress || 0;
+    const claim = gameState.goalClaims[gameState.goalWeek];
+    elements.currentGoal.textContent = goal ? goal.title : '本轮阶段目标已结算';
+    document.getElementById('goal-reward').textContent = goal ? claim ? `✓ 奖励已领取：${claim.actualReward}` : `达标即领：${previewEffect(goal.reward)}` : '六个阶段已结算';
+    document.getElementById('goal-reward').title = '原奖励全部因满值无法生效时，转为20元资料补贴。';
+    gameState.goalProgress = claim ? 100 : status?.progress || 0;
     elements.goalProgress.style.width = `${gameState.goalProgress}%`;
     elements.goalProgress.setAttribute('aria-valuenow', gameState.goalProgress);
     document.getElementById('goal-progress-status').textContent = status ?
-        `主要目标 ${status.requirements.filter(row => row.passed).length}/${status.requirements.length} 项满足 · 综合进度 ${status.progress}%。${status.achieved ? '当前条件已满足，' : ''}截止周结束时按届时状态结算。` : '六个阶段均已结算，剩余周数仍可自由安排。';
-    document.getElementById('goal-requirements').innerHTML = status ? renderGoalRows(status.requirements) : '';
+        claim ? '目标已达成，奖励已发放；选做挑战在截止周记录。' : `${status.requirements.filter(row => row.passed).length}/${status.requirements.length} 项满足 · 截止周前达标即可领取。` : '剩余周数可自由安排。';
+    document.getElementById('goal-requirements').innerHTML = claim ? renderGoalRows(claim.requirements) : status ? renderGoalRows(status.requirements) : '';
     const extra = document.getElementById('goal-challenges');
     extra.style.display = status?.challenges.length ? 'block' : 'none';
-    extra.innerHTML = status?.challenges.length ? `<p class="goal-note">选做挑战（仅记录，不影响阶段奖励）</p><ul class="goal-checklist">${renderGoalRows(status.challenges)}</ul>` : '';
+    extra.innerHTML = status?.challenges.length ? `<details><summary>选做挑战</summary><ul class="goal-checklist">${renderGoalRows(status.challenges)}</ul></details>` : '';
     const lastWeek = Object.keys(gameState.goalResults).map(Number).filter(w => w <= gameState.completedWeeks && Object.hasOwn(stageGoals, w)).sort((a, b) => b - a)[0];
     const last = document.getElementById('goal-latest-result');
     last.style.display = lastWeek ? 'block' : 'none';
@@ -1076,11 +1276,7 @@ function renderPostExam(route = null) {
     main.innerHTML = `<div class="end-screen"><h2>铃响以后</h2>${finalRecord()}${!storyComplete ? '<p class="goal-note" role="status">考后剧情尚未读完。可以先查看和填写准备事项；请继续读完剧情及选择反馈，再确认去向。</p>' : ''}${entry ? `<h3>${escapeText(entry.title)}</h3><div class="ending-text route-description">${routeDescription(entry)}</div>${routePreparation(route)}<div class="route-confirm"><button class="restart-btn" ${routePlanReady(route) && storyComplete ? '' : 'disabled'} onclick="confirmRoute('${route}')">确认这个方向</button><button class="restart-btn" onclick="renderPostExam()">返回四项选择</button></div>` :
         `<p>先查看准备事项、代价与需要核实的支持，确认前可以自由返回。四项对所有成绩开放。</p>${['C01', 'C02', 'C03', 'C04'].map(id => `<button class="restart-btn" onclick="renderPostExam('${id}')">${escapeText(narrativeData.endings[id].title)}</button>`).join('')}`}
         ${!storyComplete ? '<button class="restart-btn" onclick="pumpNarrative()">继续考后剧情</button>' : ''}
-        <button class="restart-btn" onclick="savePostExam()">先保存，稍后决定</button><p id="post-save-status"></p><button class="restart-btn" onclick="restartGame()">重新开始</button></div>`;
-}
-function savePostExam() {
-    const okay = saveGame();
-    document.getElementById('post-save-status').textContent = okay ? '已保存；去向仍未确认，稍后可继续查看全部方向。' : '本设备无法保存，请保持这个页面打开。';
+        <p class="narrative-note">进度自动保存，可以稍后继续决定。</p></div>`;
 }
 function confirmRoute(route) {
     if (!routePlanOptions[route] || gameState.phase !== 'postExam' || !gameState.finalSnapshot) return false;
@@ -1104,7 +1300,7 @@ function renderEnding() {
     const routeBE = routeRegret(gameState.finalRoute);
     const title = application ? application.rejected ? '两封回信，与没有成行的愿望' : gameState.routePlans.C01.project === 'beichen' ? '北辰的系统实验' : '岚川的课程表' : routeBE ? narrativeData.endings[routeBE].title : ending.title;
     const beCount = epilogues.filter(key => narrativeData.endings[key].be).length;
-    document.querySelector('.main').innerHTML = `<div class="end-screen"><h2>${escapeText(title)}</h2>${finalRecord()}<div class="ending-text">${paragraphs(mainEndingContent(id))}${epilogues.map(key => `<details class="epilogue" open><summary>${escapeText(narrativeData.endings[key].title)}${narrativeData.endings[key].be ? ' · 遗憾' : ''}</summary>${paragraphs(epilogueContent(key))}</details>`).join('')}</div><p>${beCount ? `这一年留下${beCount}份没有实现的期待。它们各有来处，也各自留在这里。` : '这一年的选择与实际经历已留在这里。'}这份成绩与本次选择已保存。学校和项目均为虚构。</p><button class="restart-btn" onclick="restartGame()">重新开始</button></div>`;
+    document.querySelector('.main').innerHTML = `<div class="end-screen"><h2>${escapeText(title)}</h2>${finalRecord()}<div class="ending-text">${paragraphs(mainEndingContent(id))}${epilogues.map(key => `<details class="epilogue" open><summary>${escapeText(narrativeData.endings[key].title)}${narrativeData.endings[key].be ? ' · 遗憾' : ''}</summary>${paragraphs(epilogueContent(key))}</details>`).join('')}</div><p>${beCount ? `这一年留下${beCount}份没有实现的期待。它们各有来处，也各自留在这里。` : '这一年的选择与实际经历已留在这里。'}这份成绩与本次选择已保存。学校和项目均为虚构。</p></div>`;
 }
 openModal = function(id) {
     if (id === 'story-modal') { resumeNarrative(); return; }

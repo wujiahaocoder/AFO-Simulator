@@ -1424,24 +1424,21 @@
         .plan-choice[aria-pressed="true"] { outline: 3px solid var(--warning); }
         .route-confirm { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
     </style>
+    <link rel="stylesheet" href="dashboard.css">
 </head>
 
 <body>
-    <!-- 操作计数器 -->
-    <div class="action-counter" id="actionCounter">
-        本周操作: 0/3
-    </div>
-
     <!-- 快捷键提示 -->
     <div class="hotkey-hint" id="hotkeyHint">
-        快捷键: 1学习 2休息 3锻炼 4社交 5回忆 6模考 7作业 8活动 9经济 0结束
+        1学习 · 2休息 · 3锻炼 · 4社交 · 5回忆 · 6模考 · 7活动 · 8经济 · 9蓝本 · 0周末
     </div>
 
     <div class="container">
         <!-- 头部 -->
         <header>
+            <div class="header-tools"><span class="action-counter" id="actionCounter">本周行动 0/3</span><button class="utility-btn" onclick="restartGame()">重新开始</button></div>
             <h1>AFO：结束？开始？</h1>
-            <div class="subtitle">"从代码到考卷,这是一场关于成长与救赎的史诗旅程"</div>
+            <div class="subtitle">退役之后，重新安排这一年。</div>
             <div class="license-info">
                 <span>
                     <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans" target="_blank"
@@ -1452,14 +1449,15 @@
                 </span>
                 <span>作者: wujiahaocoder</span>
                 <a href="https://github.com/wujiahaocoder/AFO-Simulator" target="_blank">GitHub</a>
-                <span>v3.1.14</span>
+                <span>v3.2.0</span>
             </div>
+            <div class="week-summary"><span class="time-badge">第 <span id="week">1</span> 周</span><span>距考试 <span id="days-left">364</span> 天</span><span id="season">🌸 春季</span><span class="calendar-detail"><span id="day">周一</span> · <span id="period">早晨</span> · 假期 <span id="vacation-days">0</span> 天</span></div>
             <div id="game-status" style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">准备开始你的文化课之旅...</div>
         </header>
 
         <!-- 统计面板 -->
         <div class="stats">
-            <div class="stat-section-title">📊 核心状态</div>
+            <section class="stat-group"><div class="stat-section-title">当前状态</div>
             <div class="stat-card">
                 <h3>精力值 <span class="stat-value" id="energy-value">80/100</span></h3>
                 <div class="progress-bar">
@@ -1498,7 +1496,7 @@
                 </div>
             </div>
 
-            <div class="stat-section-title">📚 学科能力</div>
+            </section><section class="stat-group"><div class="stat-section-title">学科能力 <span id="average-value"></span></div>
             <div class="stat-card">
                 <h3>语文 <span class="stat-value" id="chinese-value">10/100</span></h3>
                 <div class="progress-bar">
@@ -1536,8 +1534,8 @@
                 </div>
             </div>
 
-            <div class="stat-section-title">👥 熟悉程度</div>
-            <p class="narrative-note">表示平时的熟悉程度；人物起点不同。喜欢、约定和支持以实际对话为准。</p>
+            </section><section class="stat-group relationships"><div class="stat-section-title">熟悉程度</div>
+            <p class="narrative-note">熟悉程度不代表对方的承诺。</p>
             <div class="stat-card">
                 <h3>班主任 <span class="stat-value" id="teacher-value">50</span></h3>
                 <div class="relationship-bar">
@@ -1581,27 +1579,17 @@
                 </div>
             </div>
             <div class="stat-card">
-                <h3>校园记录同学 <span class="stat-value" id="crush-value">0</span></h3>
+                <h3>林知夏 <span class="stat-value" id="crush-value">0</span></h3>
                 <div class="relationship-bar">
                     <div class="relationship-fill" id="crush-bar" style="width: 0%"></div>
                 </div>
             </div>
+            </section>
         </div>
 
         <!-- 主区域 -->
         <div class="main">
-            <div class="time-info">
-                <div class="time-display">
-                    <span class="time-badge">第 <span id="week">1</span> 周</span>
-                    <span class="time-badge" id="day">周一</span>
-                    <span class="time-badge" id="period">早晨</span>
-                </div>
-                <div class="season-indicator" id="season">🌸 春季</div>
-            </div>
-            <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 5px;">
-                距离高考: <span id="days-left">364</span> 天 |
-                剩余假期: <span id="vacation-days">0</span> 天
-            </div>
+            <h3 class="panel-heading">最近记录</h3>
             <div class="event-log" id="event-log">
                 <!-- 动态生成 -->
             </div>
@@ -1609,18 +1597,20 @@
 
         <!-- 课程表 -->
         <div class="schedule">
-            <h3>📅 本周课程表</h3>
+            <details><summary>本周课表</summary>
             <div id="schedule-list">
                 <!-- 动态生成 -->
             </div>
+            </details>
             <div style="margin-top: 10px; font-size: 0.8rem; opacity: 0.7;">
-                作业: <span id="homework-count">0</span> 未完成 |
+                作业 <span id="homework-count">0</span> 科待安排 · <span id="homework-backlog">0</span> 科次欠交 |
                 本周活动: <span id="week-activities">0</span>
             </div>
         </div>
 
         <!-- 事件区域 -->
         <div class="events">
+            <details class="status-details"><summary>状态解读</summary>
             <div class="event-card">
                 <h3>🎯 当前状态</h3>
                 <p id="current-status">一切正常,准备开始学习。</p>
@@ -1642,9 +1632,11 @@
                 <h3>😰 焦虑状态</h3>
                 <p id="anxiety-status">心态平和,暂无焦虑。</p>
             </div>
-            <div class="event-card">
-                <h3>🎯 当前阶段目标</h3>
+            </details>
+            <div class="event-card goal-card">
+                <h3>阶段目标</h3>
                 <p id="current-goal">暂无目标</p>
+                <p id="goal-reward" class="goal-note"></p>
                 <p id="goal-progress-status" class="goal-note" aria-live="polite"></p>
                 <div class="progress-bar">
                     <div class="progress-fill" id="goal-progress" role="progressbar" aria-label="阶段主要目标进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width: 0%; background: var(--warning)"></div>
@@ -1664,25 +1656,20 @@
 
         <!-- 操作区域 -->
         <div class="actions">
-            <button class="action-btn primary" id="study-btn">📚 学习 <span class="hotkey">1</span></button>
-            <button class="action-btn" id="rest-btn">💤 休息 <span class="hotkey">2</span></button>
-            <button class="action-btn" id="exercise-btn">🏃 锻炼 <span class="hotkey">3</span></button>
-            <button class="action-btn" id="social-btn">👥 社交 <span class="hotkey">4</span></button>
-            <button class="action-btn purple" id="memory-btn">💭 回忆 <span class="hotkey">5</span></button>
-            <button class="action-btn warning" id="exam-btn">📝 模考 <span class="hotkey">6</span></button>
-            <button class="action-btn" onclick="reviewExam()">模考复盘</button>
-            <button class="action-btn" onclick="studyTogether()">共同学习</button>
-            <button class="action-btn cyan" id="homework-btn">✏️ 作业 <span class="hotkey">7</span></button>
-            <button class="action-btn" id="activity-btn">🎉 活动 <span class="hotkey">8</span></button>
-            <button class="action-btn" id="economy-btn">💰 经济 <span class="hotkey">9</span></button>
-            <button class="action-btn" id="narrative-btn" onclick="resumeNarrative()">本周剧情与支线</button>
-            <button class="action-btn" onclick="showNotification(saveGame() ? '进度已保存' : '本设备无法保存，请保持页面打开', 'neutral')">保存进度</button>
-            <button class="action-btn" onclick="restartGame()">重新开始</button>
-            <button class="action-btn danger" id="end-btn">🌙 结束本周 <span class="hotkey">0</span></button>
+            <div class="actions-heading"><h2>本周安排</h2><span>每周 3 次 · 作业周末另算</span></div>
+            <button class="action-btn primary" id="study-btn" aria-keyshortcuts="1"><span>学习</span><kbd>1</kbd><small>独立练习 / 与人共学</small></button>
+            <button class="action-btn" id="rest-btn" aria-keyshortcuts="2"><span>休息</span><kbd>2</kbd><small>补精力、调整状态</small></button>
+            <button class="action-btn" id="exercise-btn" aria-keyshortcuts="3"><span>锻炼</span><kbd>3</kbd><small>保持健康</small></button>
+            <button class="action-btn" id="social-btn" aria-keyshortcuts="4"><span>社交</span><kbd>4</kbd><small>选择交流对象</small></button>
+            <button class="action-btn purple" id="memory-btn" aria-keyshortcuts="5"><span>回忆</span><kbd>5</kbd><small>翻看旧竞赛片段</small></button>
+            <button class="action-btn warning" id="exam-btn" aria-keyshortcuts="6"><span>模考</span><kbd>6</kbd><small>考试与复盘一起完成</small></button>
+            <button class="action-btn" id="activity-btn" aria-keyshortcuts="7"><span>活动</span><kbd>7</kbd><small>校园里的其他安排</small></button>
+            <button class="action-btn" id="economy-btn" aria-keyshortcuts="8"><span>经济</span><kbd>8</kbd><small>收入与学习开支</small></button>
+            <button class="action-btn" id="narrative-btn" onclick="resumeNarrative()" aria-keyshortcuts="9"><span id="narrative-label">蓝本</span><kbd>9</kbd><small>回看牵挂 / 继续阅读</small></button>
+            <button class="action-btn danger" id="end-btn" aria-keyshortcuts="0"><span>结束本周</span><kbd>0</kbd><small>安排作业、阅读故事</small></button>
+            <p id="narrative-status" class="dashboard-note"></p>
+            <p id="review-plan-status" class="dashboard-note"></p>
         </div>
-
-        <p id="narrative-status" style="grid-column:1/-1;font-size:0.85rem;opacity:0.8;"></p>
-        <p id="review-plan-status" style="grid-column:1/-1;font-size:0.85rem;opacity:0.8;"></p>
 
         <!-- 成就区域（已隐藏） -->
         <div class="achievements" style="display: none;">
@@ -1694,7 +1681,7 @@
 
         <!-- 页脚 -->
         <div class="footer">
-            <span>💡 提示：按住Shift显示快捷键提示</span>
+            <span>数字键安排本周 · Esc 收起窗口 · 自动保存</span>
             <span>
                 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.zh-Hans" target="_blank"
                    style="color: rgb(196, 196, 196)">
@@ -1718,76 +1705,14 @@
                 <h2>🎉 欢迎来到 AFO：结束？开始？</h2>
             </div>
             <div class="modal-body welcome-content">
-                <h3>游戏介绍</h3>
-                <p>这是一个AFO后进行文化学习的模拟游戏。你将扮演一位退役OI选手,在52周的时间内,通过策略性的选择,平衡学习、休息、社交、经济等多维度状态,最终在高考中取得理想成绩。</p>
-                <div style="margin-top: 20px; font-size: 0.85rem; opacity: 0.7; text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px;">
-                    <p><strong>更新日志 </strong>2026.10.15 v3.1.14</p>
-                    <p>新增家庭沟通、空教室交接与个人计划三组支线，再增24条带具体选择和结果的随机事件；小安排会按实际参与继续。</p>
-                    <p>没有额外结果文字的单按钮短事件，读完后直接继续安排；保留所有有内容的反馈与存档恢复。</p>
-                    <p>新增草稿解释、借伞图维护与广播试听三组日常支线，后续场景会接住此前真正参与的过程；另增24条按实际行为触发的随机事件。</p>
-                    <p>健康对学习效率改为连续变化，跨过40或65时不再突然跳变；原有行动费用、学习门槛与考试规则保持。</p>
-                    <p>椅子与合照的回忆会回应旧队友的实际联系范围，群里问候不会自动修复已经疏远的私下往来。</p>
-                    <p>旧机房封门、转移展示与取回资料按实际经历衔接；后记记下旧稿的去处，未完成的展示与告别仍保留。</p>
-                    <p>剧情入口会及时提示未读正文、选科与反馈；读完或取消回忆后恢复本周支线入口。</p>
-                    <p>考后与终局读档时，下方状态、学科能力和熟悉程度面板同步恢复为这一局的实际记录。</p>
-                    <p>四种考后方向的准备事项以清单呈现，去除写作标记；申请说明对应实际偏好、材料与成绩条件。</p>
-                    <p>工作与学习筹备会先明确调班未获准时的取舍，确认后记与你选择的安排一致。</p>
-                    <p><strong>人物衔接：</strong>明确拒绝后的对话与选项尊重已有答复，朋友与仍在了解的相处范围分别呈现；日志记录实际选择的文字。</p>
-                    <p><strong>考后确认：</strong>剧情或反馈未读完时明确提示待办，读完后再开放去向确认；关闭弹窗不会丢失准备事项。</p>
-                    <p><strong>遗憾与去向：</strong>新增有前置约定、困难与结果的人物支线；认真努力也可能落空。两项具体申请、四种去向筹备与独立后记，记录这一年确实没能实现的事。</p>
-                    <p><strong>剧情更新：</strong>蓝色活页本主线、可选支线、随机事件、考后去向与独立后记；新增自动保存，修复剧情与时间结算。</p>
-                    <p><strong>玩法调优：</strong>心理收益在85封顶，减轻焦虑与低精力的学习惩罚；新增模考复盘与每周共同学习。</p>
-                    <p><strong>阶段目标：</strong>按实际成长节奏调整门槛；作业、关系与模考作为选做挑战，新增分项进度和结算原因。</p>
-                    
-                </div>
-
-                <p>本作采用抽象52周学年。为照顾不同选科组合的玩家，对“四选二”进行了简化，统一经营游戏中的六科能力。</p>
-                <p>学校与项目均为虚构；成绩指数不对应真实分数线。</p>
+                <h3>重新回到课堂</h3>
+                <p>用 52 周准备文化课。每周安排 3 次行动，兼顾学习、状态和身边的人。</p>
+                <p>共学在“学习”里选择伙伴；模考会同时复盘。周末统一安排作业，不占行动次数，未完成部分自动计入欠交。</p>
+                <p>结束本周后，故事会依照你的状态和经历继续。主线只需阅读，支线仍可作出回应。进度自动保存。</p>
+                <p class="narrative-note">v3.2.0 · 新版紧凑面板与周末流程。成绩为六科等权指数，学校与项目均为虚构。</p>
             </div>
             <div class="welcome-buttons">
                 <button class="welcome-btn primary" onclick="closeModal('welcome-modal')">开始游戏</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 学习模态框 -->
-    <div class="modal" id="study-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>📚 选择学习科目</h2>
-                <button class="close-btn" onclick="closeModal('study-modal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p>选择要重点学习的科目。不同科目消耗精力不同,提升效果也不同。竞赛背景让你在数学和物理上有额外加成。</p>
-                <div class="study-options">
-                    <button class="study-btn" onclick="study('chinese')">
-                        语文
-                        <small>消耗中等精力</small>
-                    </button>
-                    <button class="study-btn" onclick="study('math')">
-                        数学
-                        <small>消耗大量精力</small>
-                    </button>
-                    <button class="study-btn" onclick="study('english')">
-                        英语
-                        <small>消耗中等精力</small>
-                    </button>
-                    <button class="study-btn" onclick="study('physics')">
-                        物理
-                        <small>消耗大量精力</small>
-                    </button>
-                    <button class="study-btn" onclick="study('chemistry')">
-                        化学
-                        <small>消耗较少精力</small>
-                    </button>
-                    <button class="study-btn" onclick="study('biology')">
-                        生物
-                        <small>消耗较少精力</small>
-                    </button>
-                </div>
-                <div style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8;">
-                    💡 提示：数学和物理有竞赛基础,提升更快但消耗更大。心理状态会影响学习效率！高焦虑会降低效率。
-                </div>
             </div>
         </div>
     </div>
@@ -1900,35 +1825,11 @@
         </div>
     </div>
 
-    <!-- 作业模态框 -->
-    <div class="modal" id="homework-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>✏️ 作业管理</h2>
-                <button class="close-btn" onclick="closeModal('homework-modal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p>完成作业可以巩固知识,但也会消耗精力。拖欠作业会影响老师关系。</p>
-                <div id="homework-list" style="margin-bottom: 15px;">
-                    <!-- 动态生成 -->
-                </div>
-                <div class="study-options">
-                    <button class="study-btn" onclick="homework('complete-all')">
-                        完成所有作业
-                        <small>消耗30精力 | 全科+0.5 | 老师关系+3</small>
-                    </button>
-                    <button class="study-btn" onclick="homework('complete-one')">
-                        完成一项作业
-                        <small>消耗10精力 | 随机科目+0.3 | 老师关系+1</small>
-                    </button>
-                    <button class="study-btn danger" onclick="homework('skip')">
-                        拖欠作业
-                        <small>无消耗 | 老师关系-5 | 压力+5</small>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- 周末作业：关闭也会自动登记剩余欠交。 -->
+    <div class="modal" id="homework-modal"><div class="modal-content">
+        <div class="modal-header"><h2>周末作业</h2><button class="close-btn" onclick="closeModal('homework-modal')" aria-label="先休息，登记未完成作业">&times;</button></div>
+        <div class="modal-body"><p>作业在周末统一安排，不占行动次数。</p><div id="homework-list"></div><div id="weekend-choices" class="study-options"></div></div>
+    </div></div>
 
     <!-- 故事/回忆模态框 -->
     <div class="modal" id="story-modal">
@@ -2141,7 +2042,7 @@
                 stageRequirement('全科平均', 50, stageAverage, '分')
             ], { energy: 15, mental: 10 }, [
                 stageRequirement('达到70分的科目', 1, s => Object.values(s.subjects).filter(v => v >= 70).length, '科'),
-                stageRequirement('与校园记录同学有内容的交流', 2, s => peerInteractionCount(s), '次')
+                stageRequirement('与林知夏有内容的交流', 2, s => peerInteractionCount(s), '次')
             ]),
             35: makeStageGoal('决战期目标（第35周）', [
                 stageRequirement('全科平均', 60, stageAverage, '分'),
@@ -2189,7 +2090,7 @@
             'teacher-90': { name: '班主任宠儿', desc: '班主任关系90', hidden: false },
             'math-teacher-90': { name: '数学老师喜爱', desc: '数学老师关系90', hidden: false },
             'parents-90': { name: '家庭和睦', desc: '父母关系90', hidden: false },
-            'crush-60': { name: '熟悉的同学', desc: '校园记录同学关系达到60；感情状态以实际对话共识为准', hidden: false },
+            'crush-60': { name: '熟悉的同学', desc: '林知夏关系达到60；感情状态以实际对话共识为准', hidden: false },
             'classmate-90': { name: '同学领袖', desc: '同学关系90', hidden: false },
 
             // 活动成就
@@ -2485,7 +2386,7 @@
             const max = gameState.maxActionsPerWeek;
             const remaining = max - used;
 
-            counter.textContent = `本周操作: ${used}/${max} | 剩余: ${remaining}`;
+            counter.textContent = `本周行动 ${used}/${max} · 剩余 ${remaining}`;
 
             // 根据剩余操作数改变颜色
             counter.className = 'action-counter';
@@ -2545,7 +2446,7 @@
             else if (p < 30) text += " 与父母的沟通较少。";
             else text += " 与父母保持日常沟通。";
 
-            text += ` 与校园记录同学的共识：${gameState.romance || '暂不命名'}；${typeof peerInteractionCount === 'function' ? `有记录的共同交流${peerInteractionCount()}次；` : ''}熟悉程度不代替对方的回答。`;
+            text += ` 与林知夏的共识：${gameState.romance || '暂不命名'}；${typeof peerInteractionCount === 'function' ? `有记录的共同交流${peerInteractionCount()}次；` : ''}熟悉程度不代替对方的回答。`;
 
             elements.relationshipStatus.textContent = text;
         }
@@ -2971,83 +2872,6 @@
             updateUI();
         }
 
-        // 作业功能
-        function homework(action) {
-            if (!checkActionLimit()) return;
-
-            const homeworkList = Object.entries(gameState.homework).filter(([sub, done]) => !done);
-
-            if (action === 'complete-all') {
-                if (homeworkList.length === 0) {
-                    showNotification("本周作业已完成！", "neutral");
-                    return;
-                }
-                if (gameState.energy < 30) {
-                    showNotification("精力不足,无法完成所有作业！", "bad");
-                    return;
-                }
-
-                gameState.energy -= 30;
-                gameState.relationships.teacher += 3;
-                gameState.relationships.mathTeacher += 2;
-                gameState.relationships.chineseTeacher += 2;
-                gameState.relationships.englishTeacher += 2;
-                gameState.anxiety = Math.max(0, gameState.anxiety - 2); // 完成作业减少焦虑
-
-                // 全科提升
-                for (let sub in gameState.subjects) {
-                    gameState.subjects[sub] = Math.min(100, gameState.subjects[sub] + 0.5);
-                }
-
-                // 完成所有作业
-                for (let sub in gameState.homework) {
-                    gameState.homework[sub] = true;
-                }
-
-                addToLog("完成了所有作业,老师很满意", "good");
-                showNotification("作业完成！全科+0.5,焦虑-2", "good");
-            } else if (action === 'complete-one') {
-                if (homeworkList.length === 0) {
-                    showNotification("本周作业已完成！", "neutral");
-                    return;
-                }
-                if (gameState.energy < 10) {
-                    showNotification("精力不足,无法完成作业！", "bad");
-                    return;
-                }
-
-                const [subject, _] = homeworkList[Math.floor(Math.random() * homeworkList.length)];
-                gameState.energy -= 10;
-                gameState.subjects[subject] = Math.min(100, gameState.subjects[subject] + 0.3);
-                gameState.relationships.teacher += 1;
-                gameState.homework[subject] = true;
-
-                const name = { chinese: '语文', math: '数学', english: '英语', physics: '物理', chemistry: '化学', biology: '生物' }[subject];
-                addToLog(`完成了${name}作业`, "good");
-                showNotification(`${name}作业完成！+0.3点`, "good");
-            } else if (action === 'skip') {
-                if (homeworkList.length === 0) {
-                    showNotification("本周作业已完成！", "neutral");
-                    return;
-                }
-
-                gameState.relationships.teacher -= 5;
-                gameState.relationships.mathTeacher -= 3;
-                gameState.relationships.chineseTeacher -= 3;
-                gameState.relationships.englishTeacher -= 3;
-                gameState.stress += 5;
-                gameState.anxiety += 5; // 拖欠作业增加焦虑
-
-                addToLog("拖欠作业,老师很失望", "bad");
-                showNotification("拖欠作业！老师关系-5,焦虑+5", "bad");
-            }
-
-            closeModal('homework-modal');
-            recordAction();
-            advanceTime();
-            updateUI();
-        }
-
         // 活动功能
         function activity(type) {
             if (!checkActionLimit()) return;
@@ -3437,59 +3261,34 @@
             }, 1000);
         }
 
-        document.getElementById('study-btn').addEventListener('click', () => handleButtonClick(() => openModal('study-modal')));
+        document.getElementById('study-btn').addEventListener('click', () => handleButtonClick(showStudyMenu));
         document.getElementById('rest-btn').addEventListener('click', () => handleButtonClick(() => openModal('rest-modal')));
         document.getElementById('exercise-btn').addEventListener('click', () => handleButtonClick(exercise));
         document.getElementById('social-btn').addEventListener('click', () => handleButtonClick(social));
         document.getElementById('memory-btn').addEventListener('click', () => handleButtonClick(memory));
-        document.getElementById('exam-btn').addEventListener('click', () => handleButtonClick(takeExam));
-        document.getElementById('homework-btn').addEventListener('click', () => handleButtonClick(() => openModal('homework-modal')));
+        document.getElementById('exam-btn').addEventListener('click', () => handleButtonClick(showExamMenu));
         document.getElementById('activity-btn').addEventListener('click', () => handleButtonClick(() => openModal('activity-modal')));
         document.getElementById('economy-btn').addEventListener('click', () => handleButtonClick(() => openModal('economy-modal')));
         document.getElementById('end-btn').addEventListener('click', () => handleButtonClick(endWeek));
 
-        // 点击模态框外部关闭
-        window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                e.target.style.display = 'none';
-            }
+        // All dismiss routes share settlement rules, including backdrop and Escape.
+        window.addEventListener('click', e => {
+            if (e.target.classList.contains('modal')) closeModal(e.target.id);
         });
-
-        // 键盘快捷键
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); return; }
-            if (gameState.gameOver) return;
-            if (gameState.activeNarrative || gameState.narrativeFeedback) return;
-
-            // Shift键显示提示
-            if (e.key === 'Shift') {
-                elements.hotkeyHint.classList.add('show');
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                const visible = Array.from(document.querySelectorAll('.modal')).filter(m => m.style.display === 'flex');
+                visible.forEach(m => closeModal(m.id));
                 return;
             }
-
-            // 快捷键（添加防抖）
-            if (buttonCooldown) return;
-            buttonCooldown = true;
-
-            switch (e.key) {
-                case '1': openModal('study-modal'); break;
-                case '2': openModal('rest-modal'); break;
-                case '3': exercise(); break;
-                case '4': social(); break;
-                case '5': memory(); break;
-                case '6': takeExam(); break;
-                case '7': openModal('homework-modal'); break;
-                case '8': openModal('activity-modal'); break;
-                case '9': openModal('economy-modal'); break;
-                case '0': endWeek(); break;
-                case 'Escape':
-                    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-                    break;
-            }
-
-            setTimeout(() => {
-                buttonCooldown = false;
-            }, 1000);
+            if (e.key === 'Shift') { elements.hotkeyHint.classList.add('show'); return; }
+            if (e.repeat || e.ctrlKey || e.altKey || e.metaKey || e.target?.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+            if (Array.from(document.querySelectorAll('.modal')).some(m => m.style.display === 'flex')) return;
+            if (gameState.gameOver) return;
+            const actions = { '1': showStudyMenu, '2': () => openModal('rest-modal'), '3': exercise,
+                '4': social, '5': memory, '6': showExamMenu, '7': () => openModal('activity-modal'),
+                '8': () => openModal('economy-modal'), '9': resumeNarrative, '0': endWeek };
+            if (actions[e.key]) { e.preventDefault(); handleButtonClick(actions[e.key]); }
         });
 
         // Shift键释放隐藏提示
