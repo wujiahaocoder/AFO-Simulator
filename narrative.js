@@ -155,6 +155,9 @@ updateUI = function() {
     if (plan) plan.textContent = activeReviewPlan() ? `复盘提示：${gameState.reviewPlan.subjects.map(k => subjectNames[k]).join('、')}，还可用于${gameState.reviewPlan.remaining}次主动学习，至第${gameState.reviewPlan.expiresWeek}周结束。` : '模考后三周内可复盘一次，结合后续学习巩固薄弱科目。';
 };
 function updateNarrativeStatus() {
+    const status = document.getElementById('game-status');
+    if (status) status.textContent = gameState.phase === 'ending' ? '这一年的记录已封存。' :
+        gameState.phase === 'postExam' ? '考试已结束，考后去向待确认。' : `这一年，第${gameState.week}周。`;
     const info = document.getElementById('narrative-status');
     if (info) info.textContent = `主线 ${gameState.storyProgress}/36 · 当前学习效率 ${calculateStudyEfficiency().toFixed(2)} · ${saveAvailable ? '进度自动保存在本设备' : '本设备无法保存，关闭页面前请留意'}`;
     const resume = document.getElementById('narrative-btn');

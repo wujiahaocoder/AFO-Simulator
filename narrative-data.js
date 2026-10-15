@@ -2878,6 +2878,180 @@ window.AFONarrative = {
         }
       ],
       "missedFeedback": "店主发来交还钥匙的消息：续租没有获准，书已搬空，也不另开店。你整理过的读者意见没有改变这个结果，原址的店名已经取下。"
+    },
+    {
+      "id": "H35",
+      "kind": "side",
+      "week": 6,
+      "until": 12,
+      "title": "草稿纸上的省略号",
+      "content": "数学老师把你的一页草稿推回来，没有圈最后的答案，只圈了中间一个省略号。你说那一步以前在机房里常用，话到嘴边，却发现自己一直借着“大家都知道”跳过去。\n\n同桌也想知道这里怎么接上。他把自己的错误写法留在旁边，说今天不比谁先讲出来。你们约定下次带着这两张纸再看一次。",
+      "revision": true,
+      "requires": [
+        {
+          "id": "S05",
+          "keys": []
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "先用三个具体的数，把省掉的一步逐个写出。",
+          "feedback": "三个数里有一个不符合你刚才的说法。你没有把它擦掉，沿着它补出遗漏的条件。同桌把那行条件抄在自己的错误旁边。",
+          "effect": {}
+        },
+        {
+          "key": "B",
+          "text": "先听同桌复述，标出两个人从哪一句开始理解不同。",
+          "feedback": "他以为你在交换顺序，你其实在划分情况。你们在那一句下面各画了一条线，先把分歧留住，没有把点头当成听懂。",
+          "effect": {}
+        }
+      ]
+    },
+    {
+      "id": "H36",
+      "kind": "side",
+      "week": 16,
+      "until": 21,
+      "title": "换一张纸再讲一遍",
+      "content": "同桌带来了那两张有折痕的草稿。上回标出的条件还在，老师这次换了一个题面，问你们能不能不沿用旧的句子解释。\n\n他先说到一半，你也在同一个地方停住。会做原题和能说清理由，原来是两件挨得很近、仍需要分别练习的事。",
+      "revision": true,
+      "requires": [
+        {
+          "id": "H35",
+          "keys": []
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "从那条条件重新说明，再请同桌找一个不成立的例子。",
+          "feedback": "他找到一个边界情形，你把它写在说明末尾。老师只核对了这一步，没有把它算成整章都掌握；你们把两张旧纸和新纸夹在一起。",
+          "effect": {}
+        },
+        {
+          "key": "B",
+          "text": "各自重写一小段，交换后只指出仍看不懂的地方。",
+          "feedback": "你们留下了两个问号，也各讲清了一处。今天没有轮到整道题，蓝本里却能分开看见已经说明和仍待补上的部分。",
+          "effect": {}
+        }
+      ]
+    },
+    {
+      "id": "H37",
+      "kind": "side",
+      "week": 12,
+      "until": 18,
+      "title": "走廊口的借伞图",
+      "content": "值日同学在走廊口画借伞点的位置，图上写着“门边”，你站在两个门中间不知道该往哪边走。同桌拿来一张废纸，问要不要试着把这张图画给第一次来的人看。\n\n你们今天只是核对位置，不替值日同学决定借还规则，也没有借出一把尚未登记的伞。",
+      "revision": true,
+      "requires": [
+        {
+          "id": "S09",
+          "keys": []
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "从楼梯口实际走一遍，把容易认错的转角标出来。",
+          "feedback": "你们走到一处才发现图上的左右反了。值日同学改掉箭头，补上旧钟的位置，请你们下次路过时再看看还有没有人停错门。",
+          "effect": {}
+        },
+        {
+          "key": "B",
+          "text": "请一个没看过图的人指出疑问，只记下他说不清的位置。",
+          "feedback": "对方把两扇门都圈了起来。你们把“门边”改成旧钟下面的值日柜，保留值日同学写的借还说明，约好晚些时候核对新版。",
+          "effect": {}
+        }
+      ]
+    },
+    {
+      "id": "H38",
+      "kind": "side",
+      "week": 27,
+      "until": 32,
+      "title": "被雨水晕开的箭头",
+      "content": "借伞图贴了一阵，透明套的一角进了水。你和同桌回来核对，看见有人已经在旁边补了一根很粗的箭头；值日同学说，新同学这次找到了柜子，却没看清归还时间。\n\n那张图没有一次就画完，别人后来添上的一笔，也不是对你们上次工作的否定。",
+      "revision": true,
+      "requires": [
+        {
+          "id": "H37",
+          "keys": []
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "和现在的值日同学一起重排位置，把归还时间放到图旁。",
+          "feedback": "新版留出了写日期的空栏。你们把画图的人和维护的人都记在背面，旧纸晒干后夹回蓝本，没有宣称今后再没人会走错。",
+          "effect": {}
+        },
+        {
+          "key": "B",
+          "text": "只更换破掉的透明套，把未解决的问题交给下一班值日同学。",
+          "feedback": "你在交接纸写清“归还时间还不够醒目”。下一班同学收下纸，决定自己再试一种写法。这次帮忙在交接处结束。",
+          "effect": {}
+        }
+      ]
+    },
+    {
+      "id": "H39",
+      "kind": "side",
+      "week": 20,
+      "until": 25,
+      "title": "午间广播的两秒空白",
+      "content": "校园记录同学整理一段午间广播，开头有两秒空白。她先问你愿不愿意只听这一段技术问题，又说明采访原声不在本次分享范围里。\n\n你认得剪辑软件的一些按钮，也不确定自己的办法会不会让句尾变短。她另存了一份副本，让今天的尝试有地方撤回。",
+      "revision": true,
+      "requires": [
+        {
+          "id": "S16",
+          "keys": []
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "在副本上标记两秒的位置，请她核对删去后是否影响语意。",
+          "feedback": "删完后句子接得太急，她把其中半秒放回来。你把改过的位置写在文件说明里，她说之后播出前还会重新听一遍。",
+          "effect": {}
+        },
+        {
+          "key": "B",
+          "text": "先比较保留与缩短两种试听，把选择留给她。",
+          "feedback": "你们并排听完两个版本。她暂时留下较长的停顿，你只记下试听结论，没有拿走原声，也没有替她决定最终播出稿。",
+          "effect": {}
+        }
+      ]
+    },
+    {
+      "id": "H40",
+      "kind": "side",
+      "week": 40,
+      "until": 44,
+      "title": "最后一次试听的座位",
+      "content": "她带来准备播出的片段，让你在原来的座位再听一遍。两秒空白那一处已经改过，后面却多了一个过低的句尾。她没有把上次的帮忙写成你必须继续负责的工作。\n\n你们只讨论她这次授权分享的片段。广播什么时候播出，仍按她和值日组核定的安排。",
+      "revision": true,
+      "requires": [
+        {
+          "id": "H39",
+          "keys": []
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "只指出句尾听不清的位置，再听她调整后的版本。",
+          "feedback": "她把音量改到能分辨词尾，保留了说话时的呼吸。你们核对完这一小段，各自收起耳机；她在记录上注明今天实际完成的试听。",
+          "effect": {}
+        },
+        {
+          "key": "B",
+          "text": "说明今天没有余力再剪辑，把听到的问题交还给她。",
+          "feedback": "她收下时间标记，另找值日组核对。你们仍聊完了午饭前的一件小事，今天的边界没有被解释成拒绝这段关系。",
+          "effect": {}
+        }
+      ]
     }
   ],
   "random": [
@@ -17146,6 +17320,686 @@ window.AFONarrative = {
         }
       ],
       "disabledReason": ""
+    },
+    {
+      "id": "RAND-L61",
+      "kind": "random",
+      "category": "L",
+      "title": "把条件留在等号前",
+      "content": "你把成立条件抄在等号前面，算到最后才发现它排除了一个原先保留的根。答案少了一个，理由却终于接上。",
+      "conditionText": "本周学习数学",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "study:math"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "math": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-L62",
+      "kind": "random",
+      "category": "L",
+      "title": "一句译文里的时间",
+      "content": "同一句话换了时间状语，你沿用的译法便不再合适。你划出动词旁的两个词，把译文改成今天能解释的意思。",
+      "conditionText": "本周学习英语",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "study:english"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "english": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-L63",
+      "kind": "random",
+      "category": "L",
+      "title": "题目没有问到的那半页",
+      "content": "你写了半页背景才回到题目真正问的一句。重新圈出提问后，你只留与它有关系的证据，旁边那段好看的句子移到了别页。",
+      "conditionText": "本周学习语文",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "study:chinese"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "chinese": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-L64",
+      "kind": "random",
+      "category": "L",
+      "title": "先确认是哪一杯",
+      "content": "实验图里两只烧杯相似，你先按标签区分溶液，再沿着操作顺序读一次。之前混在一起的观察结果有了各自的位置。",
+      "conditionText": "本周学习化学",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "study:chemistry"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "chemistry": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-R61",
+      "kind": "random",
+      "category": "R",
+      "title": "说到这里先停一下",
+      "content": "对方看了一眼时间，说接下来有自己的事。你们把没说完的地方记住，今天的谈话在这里结束，没有再追着要一个完整结论。",
+      "conditionText": "本周社交",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "social"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-R62",
+      "kind": "random",
+      "category": "R",
+      "title": "借来的橡皮少了一角",
+      "content": "你归还橡皮时说清少掉的那一角，对方摆摆手，先让你把桌上的橡皮屑扫好。小事没有被一句“没关系”包办完。",
+      "conditionText": "本周作业",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "homework"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "anxiety": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-R63",
+      "kind": "random",
+      "category": "R",
+      "title": "同一页的两种记号",
+      "content": "旁边的同学把星号留给没懂的地方，你一直用它标重点。交换笔记前，你们先写了一行图例，少误读了彼此几个晚上。",
+      "conditionText": "本周学习",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "study"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-R64",
+      "kind": "random",
+      "category": "R",
+      "title": "把消息留到下课",
+      "content": "你们还各有一节课要上，话题停在一个具体问题上。下课再说是今天方便的安排，不是已经答应了以后的每次回应。",
+      "conditionText": "本周社交",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "social"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "mental": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-B61",
+      "kind": "random",
+      "category": "B",
+      "title": "操场外圈慢半步",
+      "content": "跑到第二个弯时，你发现自己一直跟着旁边人的速度。你放慢半步，把今天能完成的一圈跑完，回来先喝水。",
+      "conditionText": "本周锻炼",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "exercise"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "health": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-B62",
+      "kind": "random",
+      "category": "B",
+      "title": "午睡醒来的窗缝",
+      "content": "你醒来时窗边的光换了位置。先坐稳再收起外套，今天没把醒来的第一分钟也塞进任务里。",
+      "conditionText": "本周休息方式为午睡",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "rest:nap"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "energy": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-B63",
+      "kind": "random",
+      "category": "B",
+      "title": "水杯放近一点",
+      "content": "你几次起身才想起水杯还在远处。最后把它放到手边的空位，翻书时能看见杯沿，少了一件需要反复惦记的小事。",
+      "conditionText": "本周学习",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "study"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "anxiety": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-B64",
+      "kind": "random",
+      "category": "B",
+      "title": "这一首听到结尾",
+      "content": "歌曲还没放完，你的手已经伸向下一项安排。你把手收回去，等最后一声结束，再看看现在还有多少精力。",
+      "conditionText": "本周休息",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "rest"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-M61",
+      "kind": "random",
+      "category": "M",
+      "title": "注释里还有一个错字",
+      "content": "旧程序的注释里有个错字，你以前看过许多遍都没注意。现在先改好副本里的那一个字，原文件仍留着当时的模样。",
+      "conditionText": "实际可查看旧程序",
+      "rules": [
+        {
+          "type": "oldProgram"
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "mental": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-M62",
+      "kind": "random",
+      "category": "M",
+      "title": "当时也问过基础问题",
+      "content": "翻到旧记录，你看见自己曾把一个基础问题问了三遍。那时并不总能立刻懂，今天的停顿也有它实际的来处。",
+      "conditionText": "本周主动回忆",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "memory"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "anxiety": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-M63",
+      "kind": "random",
+      "category": "M",
+      "title": "群消息里的饭盒",
+      "content": "谈话间你想起集训时有人拿错饭盒，真正吃过什么已经记不清。你只讲自己仍记得的那一小段，没替别人补上反应。",
+      "conditionText": "本周社交",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "social"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "mental": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-M64",
+      "kind": "random",
+      "category": "M",
+      "title": "没有题号的一角",
+      "content": "草稿背面留着过去画的一张小脸，没有题号。你今天在它旁边写日期，旧纸多了一次用途，仍不需要证明那一晚值得。",
+      "conditionText": "本周学习",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "study"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-E61",
+      "kind": "random",
+      "category": "E",
+      "title": "收据上的页数",
+      "content": "收据列着资料的页数，你拿实际买到的那份逐项核对。内容没有因此多出来，今天只是把支出和手里的东西对上。",
+      "conditionText": "本周有真实购买记录",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "economy:buy-books",
+            "economy:buy-course"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "anxiety": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-E62",
+      "kind": "random",
+      "category": "E",
+      "title": "家教之后先记一笔",
+      "content": "家教结束，你把今天已经收到的钱记进本子，再单独写下下次可能有的安排。尚未发生的那一栏没有先算进余额。",
+      "conditionText": "本周已完成家教",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "economy:part-time"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-E63",
+      "kind": "random",
+      "category": "E",
+      "title": "把比较页合上",
+      "content": "比较页的介绍越来越长，你先记下真正需要的章节。今天看过页面这件事不算购买，能否承担留到真要付钱时再判断。",
+      "conditionText": "本周查看资料购买",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "view:materials"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "anxiety": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-E64",
+      "kind": "random",
+      "category": "E",
+      "title": "旧本子的剩余页",
+      "content": "最后几页还够写今天的题，你把旧本子的空白集中到一起。没有一笔凭空出现的收入，只是这一次暂时用得上手边的纸。",
+      "conditionText": "本周作业",
+      "rules": [
+        {
+          "type": "action",
+          "values": [
+            "homework"
+          ],
+          "min": 1,
+          "weeks": 1
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-X61",
+      "kind": "random",
+      "category": "X",
+      "title": "楼梯平台的半张海报",
+      "content": "海报下半张卷了起来，只看得见活动名字。值日同学重新贴好，露出已经写明的日期；你看清以后继续上楼，没有被替你记为报名。",
+      "conditionText": "第6—24周",
+      "rules": [
+        {
+          "type": "week",
+          "min": 6,
+          "max": 24
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "mental": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-X62",
+      "kind": "random",
+      "category": "X",
+      "title": "落在窗台的粉笔灰",
+      "content": "擦窗台时，你看见灰里一道很窄的手印。有人刚在这里扶过窗框。你把抹布换一面，连同那一道一起擦净。",
+      "conditionText": "第12—30周",
+      "rules": [
+        {
+          "type": "week",
+          "min": 12,
+          "max": 30
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "stress": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-X63",
+      "kind": "random",
+      "category": "X",
+      "title": "铃声之前的脚步",
+      "content": "走廊里有人赶着回教室，你向边上让了一步。铃声响起时，人群已经过去，门边还留着一点从外面带来的风。",
+      "conditionText": "第25—42周",
+      "rules": [
+        {
+          "type": "week",
+          "min": 25,
+          "max": 42
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "anxiety": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": "RAND-X64",
+      "kind": "random",
+      "category": "X",
+      "title": "旧钟慢了两分钟",
+      "content": "你和墙上的旧钟对过时间，发现它又慢了两分钟。值日同学把问题写在维修栏，你今天按已经确认的时间收好东西。",
+      "conditionText": "第35—50周",
+      "rules": [
+        {
+          "type": "week",
+          "min": 35,
+          "max": 50
+        }
+      ],
+      "disabledReason": "",
+      "choices": [
+        {
+          "key": "A",
+          "text": "继续",
+          "feedback": "",
+          "effect": {
+            "stress": -1
+          }
+        }
+      ]
     }
   ],
   "endings": {
@@ -17533,7 +18387,7 @@ window.AFONarrative = {
       "content": "你认真希望巷口那家旧书店留下，也整理过读者意见，等过一轮又一轮答复。\n\n{venueAttempt}\n\n考后走过那条巷子，窗边已经没有椅子，玻璃里映出的是空墙。以后或许还能买到同一本书，坐到别的地方读完；那间让你不必买书也能坐一会儿的店，已经结束营业。你带去的那些名字，没有让门再打开。"
     }
   },
-  "revision": "3.1.12",
+  "revision": "3.1.13",
   "promises": [
     {
       "setup": "H10",
