@@ -151,14 +151,14 @@ updateUI = function() {
     const total = document.getElementById('achievement-total');
     if (total) total.textContent = Object.keys(achievements).length;
     updateNarrativeStatus();
-    const resume = document.getElementById('narrative-btn');
-    if (resume) resume.textContent = gameState.activeNarrative || gameState.narrativeFeedback ? '继续未完成的剧情' : `本周剧情与支线（${availableSideStories().length}段可选）`;
     const plan = document.getElementById('review-plan-status');
     if (plan) plan.textContent = activeReviewPlan() ? `复盘提示：${gameState.reviewPlan.subjects.map(k => subjectNames[k]).join('、')}，还可用于${gameState.reviewPlan.remaining}次主动学习，至第${gameState.reviewPlan.expiresWeek}周结束。` : '模考后三周内可复盘一次，结合后续学习巩固薄弱科目。';
 };
 function updateNarrativeStatus() {
     const info = document.getElementById('narrative-status');
     if (info) info.textContent = `主线 ${gameState.storyProgress}/36 · 当前学习效率 ${calculateStudyEfficiency().toFixed(2)} · ${saveAvailable ? '进度自动保存在本设备' : '本设备无法保存，关闭页面前请留意'}`;
+    const resume = document.getElementById('narrative-btn');
+    if (resume) resume.textContent = gameState.activeNarrative || gameState.narrativeFeedback || gameState.narrativeQueue.length ? '继续未完成的剧情' : `本周剧情与支线（${availableSideStories().length}段可选）`;
 }
 function checkActionLimit() {
     if (gameState.gameOver || gameState.phase !== 'playing') return false;
@@ -628,6 +628,7 @@ function continueNarrative() {
     pumpNarrative();
 }
 function pumpNarrative() {
+    updateNarrativeStatus();
     if (gameState.narrativeFeedback) {
         showMenu(gameState.narrativeFeedback.title, gameState.narrativeFeedback.text || '这一小段已记录。', [{ text: '继续', action: continueNarrative }]);
         return;
