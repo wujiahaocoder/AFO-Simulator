@@ -1005,6 +1005,9 @@ function postExamStoryComplete() {
     return gameState.events.includes('S36') && !gameState.activeNarrative &&
         !gameState.narrativeFeedback && gameState.narrativeQueue.length === 0;
 }
+function routeDescription(entry) {
+    return `${paragraphs(entry.content)}<h4>需要准备的事</h4><ul>${entry.preparation.map(item => `<li>${escapeText(item)}</li>`).join('')}</ul><h4>需要考虑的代价</h4>${paragraphs(entry.cost)}<h4>确认前再看一遍</h4>${paragraphs(entry.confirmation)}`;
+}
 function renderPostExam(route = null) {
     if (!gameState.finalSnapshot) return;
     prepareFinalLayout();
@@ -1012,7 +1015,7 @@ function renderPostExam(route = null) {
     const main = document.querySelector('.main');
     const entry = routePlanOptions[route] ? narrativeData.endings[route] : null;
     const storyComplete = postExamStoryComplete();
-    main.innerHTML = `<div class="end-screen"><h2>铃响以后</h2>${finalRecord()}${!storyComplete ? '<p class="goal-note" role="status">考后剧情尚未读完。可以先查看和填写准备事项；请继续读完剧情及选择反馈，再确认去向。</p>' : ''}${entry ? `<h3>${escapeText(entry.title)}</h3><div class="ending-text">${paragraphs(entry.content)}</div>${routePreparation(route)}<div class="route-confirm"><button class="restart-btn" ${routePlanReady(route) && storyComplete ? '' : 'disabled'} onclick="confirmRoute('${route}')">确认这个方向</button><button class="restart-btn" onclick="renderPostExam()">返回四项选择</button></div>` :
+    main.innerHTML = `<div class="end-screen"><h2>铃响以后</h2>${finalRecord()}${!storyComplete ? '<p class="goal-note" role="status">考后剧情尚未读完。可以先查看和填写准备事项；请继续读完剧情及选择反馈，再确认去向。</p>' : ''}${entry ? `<h3>${escapeText(entry.title)}</h3><div class="ending-text route-description">${routeDescription(entry)}</div>${routePreparation(route)}<div class="route-confirm"><button class="restart-btn" ${routePlanReady(route) && storyComplete ? '' : 'disabled'} onclick="confirmRoute('${route}')">确认这个方向</button><button class="restart-btn" onclick="renderPostExam()">返回四项选择</button></div>` :
         `<p>先查看准备事项、代价与需要核实的支持，确认前可以自由返回。四项对所有成绩开放。</p>${['C01', 'C02', 'C03', 'C04'].map(id => `<button class="restart-btn" onclick="renderPostExam('${id}')">${escapeText(narrativeData.endings[id].title)}</button>`).join('')}`}
         ${!storyComplete ? '<button class="restart-btn" onclick="pumpNarrative()">继续考后剧情</button>' : ''}
         <button class="restart-btn" onclick="savePostExam()">先保存，稍后决定</button><p id="post-save-status"></p><button class="restart-btn" onclick="restartGame()">重新开始</button></div>`;
