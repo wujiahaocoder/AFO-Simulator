@@ -101,7 +101,7 @@
             </aside>
         </div>
 
-        <footer class="footer"><div class="footer-status"><span class="save-dot"></span><p id="narrative-status"></p></div><div class="footer-links"><button class="text-btn" onclick="document.getElementById('status-modal').style.display='flex'">状态说明</button><button class="text-btn" onclick="showAchievementDetail()">成就</button><a href="https://github.com/wujiahaocoder/AFO-Simulator" target="_blank" rel="noopener">GitHub ↗</a><span>v3.3.1</span></div><span id="game-status" class="sr-only">准备开始</span></footer>
+        <footer class="footer"><div class="footer-status"><span class="save-dot"></span><p id="narrative-status"></p></div><div class="footer-links"><button class="text-btn" onclick="document.getElementById('status-modal').style.display='flex'">状态说明</button><button class="text-btn" onclick="showAchievementDetail()">成就</button><a href="https://github.com/wujiahaocoder/AFO-Simulator" target="_blank" rel="noopener">GitHub ↗</a><span>v3.3.2</span></div><span id="game-status" class="sr-only">准备开始</span></footer>
         <div class="achievements sr-only" aria-hidden="true"><span id="achievement-count">0</span><span id="achievement-total">0</span><div id="achievement-list"></div></div>
     </div>
 
@@ -122,7 +122,8 @@
                 <p>用 52 周准备文化课。每周安排 3 次行动，兼顾学习、状态和身边的人。</p>
                 <p>共学在“学习”里选择伙伴；模考会同时复盘。周末统一安排作业，不占行动次数，未完成部分自动计入欠交。</p>
                 <p>结束本周后，故事会依照你的状态和经历继续。主线只需阅读，支线仍可作出回应。进度自动保存。</p>
-                <p class="narrative-note">v3.3.1 · 成绩为六科等权指数，学校与项目均为虚构。</p>
+                <p>一次行动代表周内一段安排。假期按当周即时调适结算，每周仍安排3次行动。</p>
+                <p class="narrative-note">v3.3.2 · 成绩为六科等权指数，学校与项目均为虚构。</p>
             </div>
             <div class="welcome-buttons">
                 <button class="welcome-btn primary" onclick="closeModal('welcome-modal')">开始游戏</button>
@@ -138,11 +139,11 @@
                 <button class="close-btn" onclick="closeModal('rest-modal')">&times;</button>
             </div>
             <div class="modal-body">
-                <p>选择适当的休息方式。过度劳累会影响健康,合理休息才能保持最佳状态。</p>
+                <p>选择适当的休息方式。下列为基础效果，达到上下限时实际变化会减少。</p>
                 <div class="study-options">
                     <button class="study-btn" onclick="rest('sleep')">
                         深度睡眠
-                        <small>恢复30精力 | 降低10压力</small>
+                        <small>精力+30 | 压力-10 | 焦虑-1 | 健康+2</small>
                     </button>
                     <button class="study-btn" onclick="rest('nap')">
                         午睡
@@ -150,7 +151,7 @@
                     </button>
                     <button class="study-btn" onclick="rest('relax')">
                         放松娱乐
-                        <small>恢复10精力 | 焦虑-5</small>
+                        <small>精力+10 | 压力-15 | 焦虑-5</small>
                     </button>
                     <button class="study-btn" onclick="rest('music')">
                         听音乐
@@ -158,7 +159,7 @@
                     </button>
                     <button class="study-btn special" onclick="rest('counseling')">
                         心理咨询
-                        <small>消耗100元 | 恢复20心理 | 焦虑-25</small>
+                        <small>消耗100元 | 心理+20 | 压力-15 | 焦虑-25</small>
                     </button>
                 </div>
             </div>
@@ -516,16 +517,16 @@
             'perfect-week': { name: '平稳的两周', desc: '累计两周无负面随机事件，压力≤50且焦虑≤60', hidden: false },
             'stress-management': { name: '压力管理', desc: '压力低于10持续10周', hidden: false },
             'early-bird': { name: '早起鸟', desc: '精力保持90+持续5周', hidden: false },
-            'night-owl': { name: '夜猫子', desc: '精力低于10', hidden: false },
+            'night-owl': { name: '该歇一歇了', desc: '精力低于10', hidden: false },
             'money-maker': { name: '赚钱能手', desc: '累计收入达到1000元', hidden: false },
 
             // 故事成就
-            'story-5': { name: '故事开始', desc: '完成5个故事事件', hidden: false },
-            'story-10': { name: '故事大师', desc: '完成10个故事事件', hidden: false },
+            'story-5': { name: '故事开始', desc: '读完5段主线', hidden: false },
+            'story-10': { name: '故事大师', desc: '读完10段主线', hidden: false },
             'story-36': { name: '史诗旅程', desc: '完成36段主线', hidden: false },
-            'hidden-1': { name: '隐藏剧情1', desc: '触发隐藏剧情', hidden: true },
-            'hidden-2': { name: '隐藏剧情2', desc: '触发隐藏剧情', hidden: true },
-            'hidden-3': { name: '隐藏剧情3', desc: '触发隐藏剧情', hidden: true },
+            'hidden-1': { name: '第一份支线记录', desc: '回应了1段支线', hidden: true },
+            'hidden-2': { name: '再多一段往来', desc: '回应了2段支线', hidden: true },
+            'hidden-3': { name: '三份具体的回应', desc: '回应了3段支线', hidden: true },
 
             // 结局成就：按玩家确认的去向解锁。
             'ending-E01': { name: '升学后记：95分及以上', desc: '已确认升学方向并阅读后记；具体项目答复另按申请记录呈现', hidden: false },
@@ -1033,7 +1034,8 @@
             gameState.subjects[subject] = Math.min(100, currentLevel + gain);
 
             // 添加日志
-            addToLog(`学习了${cfg.name},能力提升了${gain.toFixed(1)}点`, "good");
+            const actualGain = gameState.subjects[subject] - currentLevel;
+            addToLog(`学习了${cfg.name},能力提升了${actualGain.toFixed(1)}点；本次状态效率${efficiency.toFixed(2)}，${subject === 'math' || subject === 'physics' ? '含竞赛背景影响，' : ''}增长还受当前水平与随机波动影响。`, "good");
 
             // 焦虑高提示
             if (gameState.anxiety > 60 && efficiency < 0.8) {
@@ -1061,6 +1063,7 @@
         // 休息功能
         function rest(type) {
             if (!checkActionLimit()) return;
+            const before = metricSnapshot();
 
             let energyGain = 0;
             let stressReduction = 0;
@@ -1119,8 +1122,9 @@
             gameState.money -= moneyCost;
             gameState.totalRestHours++;
 
-            addToLog(text, "good");
-            showNotification(`${text},精力+${energyGain},焦虑-${anxietyReduction}`, "good");
+            const actualText = actualChangeText(before);
+            addToLog(`${text}；本次实际变化：${actualText}。`, "good");
+            showNotification(`${text}；${actualText}`, "good");
 
             closeModal('rest-modal');
             recordAction();
@@ -1211,7 +1215,7 @@
                 // 关系影响（老师关系好可能有额外加分）
                 if (gameState.relationships.teacher > 70 && Math.random() < 0.2) {
                     score += 5;
-                    addToLog("老师鼓励下,考试超常发挥", "good");
+                    addToLog(`${{chinese:'语文',math:'数学',english:'英语',physics:'物理',chemistry:'化学',biology:'生物'}[subject]}得到老师鼓励，单科临场指数额外+5（仍受100上限约束）`, "good");
                 }
 
                 score = Math.max(0, Math.min(100, score));
