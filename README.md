@@ -1,6 +1,6 @@
 # AFO：结束？开始？
 
-![Version](https://img.shields.io/badge/Version-3.3.0-blue)
+![Version](https://img.shields.io/badge/Version-3.3.1-blue)
 ![License](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-lightgrey)
 
 一款可以离线游玩的学习模拟游戏。退役 OI 选手重新回到文化课课堂，用 52 周安排学习、休息、关系与生活。
@@ -82,7 +82,7 @@ Esc 收起窗口；有窗口打开或在输入框内时，数字键不会触发�
 
 沿用既有存档格式，兼容已有3.x存档；已结算的阶段不补发奖励，缺少的新记录不会补造。旧存档中尚未结束的主线将进入当前状态对应的分支。
 
-## 当前版本：3.3.0
+## 当前版本：3.3.1
 
 - 新增显式启动的本机后端调试服务，可按周次、场景ID和状态复现问题，导出状态与日志。
 - 普通玩家页面没有调试入口；调试存档独立保存。启动方式、HTTP接口及复现示例见[调试说明](DEBUG.md)。
