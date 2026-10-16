@@ -102,6 +102,7 @@
         if (command.seed !== undefined && (!Number.isInteger(command.seed) || command.seed < 0 || command.seed > 0xffffffff)) throw new Error('seed must be uint32');
         randomState = command.seed ?? 1;
         assign(state); generateSchedule(); render();
+        if (elements.randomEvent?.isConnected) elements.randomEvent.textContent = '暂无事件';
     }
     function freezeForDebug() {
         gameState.finalSnapshot ||= { score: Math.round(stageAverage(gameState)), subjects: { ...gameState.subjects },
@@ -156,7 +157,7 @@
         return result;
     }
     function snapshot() {
-        return { state: copy(gameState), randomState, storageKey: saveKey,
+        return { state: copy(gameState), randomState, storageKey: saveKey, sceneNote: elements.randomEvent?.textContent || '暂无事件',
             visible: [...document.querySelectorAll('.modal')].filter(e => getComputedStyle(e).display !== 'none')
                 .map(e => ({ id: e.id, text: e.innerText })),
             log: copy(gameState.logHistory), mainText: document.querySelector('.main').innerText };
@@ -187,7 +188,9 @@
                     const state = copy(initialState); state.achievements = new Set();
                     merge(state, command.snapshot.state); validate(state);
                     if (!Number.isInteger(command.snapshot.randomState)) throw new Error('Snapshot needs randomState');
-                    assign(state); randomState = command.snapshot.randomState >>> 0; render({ resume: true }); break;
+                    assign(state); randomState = command.snapshot.randomState >>> 0; render({ resume: true });
+                    if (elements.randomEvent?.isConnected) elements.randomEvent.textContent = typeof command.snapshot.sceneNote === 'string' ? command.snapshot.sceneNote : '暂无事件';
+                    break;
                 }
                 case 'respond': {
                     if (command.key) {
@@ -229,6 +232,7 @@
         } catch (error) {
             assign(before.state); randomState = oldRandom;
             try { render({ resume: true }); } catch (_) { /* Keep the original diagnostic error. */ }
+            if (elements.randomEvent?.isConnected) elements.randomEvent.textContent = before.sceneNote;
             throw error;
         }
     }

@@ -9,7 +9,7 @@ const effectNames = { ...subjectNames, ...relationshipNames, energy: '精力', s
 const saveKey = window.AFODebugBoot?.enabled === true ? 'afo-debug-save-3.0.0' : 'afo-save-3.0.0';
 // New fields are additive; existing 3.x saves keep the same local-storage key.
 const saveVersion = '3.1.0';
-const legacy = { initGame, updateUI, study, rest, exercise, takeExam, activity, economy, changeWeather, checkAchievements, openModal, closeModal };
+const legacy = { initGame, updateUI, study, rest, exercise, takeExam, activity, economy, changeWeather, checkAchievements, checkHolidays, openModal, closeModal };
 let actionInProgress = null;
 let saveAvailable = true;
 
@@ -78,7 +78,20 @@ function previewEffect(effect) {
             for (const [subject, amount] of Object.entries(value)) parts.push(`${subject === 'all' ? '六科各' : subjectNames[subject]} ${amount >= 0 ? '+' : ''}${amount}`);
         } else parts.push(`${effectNames[key]} ${value >= 0 ? '+' : ''}${value}${key === 'money' ? '元' : ''}`);
     }
-    return parts.join('，') || '仅保留这次选择与记录';
+    return parts.join('，') || '无直接数值变化';
+}
+function metricSnapshot(state = gameState) {
+    return Object.fromEntries(Object.keys(effectNames).map(key => [key,
+        Object.hasOwn(subjectNames, key) ? state.subjects[key] : Object.hasOwn(relationshipNames, key) ? state.relationships[key] : state[key]]));
+}
+function actualMetricChange(before, state = gameState) {
+    const after = metricSnapshot(state);
+    return Object.fromEntries(Object.keys(before).filter(key => Math.abs(after[key] - before[key]) > 1e-9)
+        .map(key => [key, Number((after[key] - before[key]).toFixed(2))]));
+}
+function actualChangeText(before, state = gameState) {
+    const change = actualMetricChange(before, state);
+    return Object.keys(change).length ? previewEffect(change) : '数值未变化（已达上下限）';
 }
 function saveGame() {
     try {
@@ -169,15 +182,17 @@ updateUI = function() {
     updateNarrativeStatus();
     const plan = document.getElementById('review-plan-status');
     if (plan) plan.textContent = activeReviewPlan() ? `复盘提示 · ${gameState.reviewPlan.subjects.map(k => subjectNames[k]).join('、')} · 还可巩固 ${gameState.reviewPlan.remaining} 次` : '';
-    document.getElementById('average-value').textContent = `均分 ${stageAverage(gameState).toFixed(1)}`;
+    document.getElementById('average-value').textContent = `均分 ${(Math.floor(stageAverage(gameState) * 100) / 100).toFixed(2)}`;
     document.getElementById('homework-backlog').textContent = gameState.homeworkBacklog.length;
+    const remaining = Object.values(gameState.homework).filter(done => !done).length;
+    document.querySelector('.weekend-note').textContent = remaining ? `本周作业需${remaining * 5}精力，不占行动` : '本周作业已安排，不占行动';
 };
 function updateNarrativeStatus() {
     const status = document.getElementById('game-status');
     if (status) status.textContent = gameState.phase === 'ending' ? '这一年的记录已封存。' :
         gameState.phase === 'postExam' ? '考试已结束，考后去向待确认。' : gameState.weekEnding ? '周末 · 作业与故事' : '安排好本周，故事会在周末继续。';
     const info = document.getElementById('narrative-status');
-    if (info) info.textContent = `故事 ${gameState.storyProgress}/36 · 学习效率 ${calculateStudyEfficiency().toFixed(2)} · ${saveAvailable ? '已自动保存' : '本设备无法保存，请保持页面打开'}`;
+    if (info) info.textContent = `主线 ${gameState.storyProgress}/36 · 学习效率 ${calculateStudyEfficiency().toFixed(2)} · ${saveAvailable ? '已自动保存' : '本设备无法保存，请保持页面打开'}`;
     const resume = document.getElementById('narrative-label');
     if (resume) resume.textContent = gameState.weekEnding || gameState.activeNarrative || gameState.narrativeFeedback || gameState.narrativeQueue.length ? '继续阅读' : '蓝本';
 }
@@ -258,11 +273,12 @@ function advanceTime() {
 takeExam = function() {
     if (!checkActionLimit()) return;
     const count = gameState.examCount;
+    const before = metricSnapshot();
     performAction('exam', null, legacy.takeExam);
     if (gameState.examCount !== count) {
         reviewExam(gameState.examHistory.length - 1);
         const exam = gameState.examHistory.at(-1);
-        showMenu('模考与复盘', `成绩指数 ${exam.score}/100。\n\n${Object.entries(exam.subjects).map(([k,v]) => `${subjectNames[k]} ${v}`).join(' · ')}\n\n已核对最低两科，各 +3；压力 -5、焦虑 -6。后续两次相关科目的独立学习 +20%。考试与复盘共用这次行动，消耗40精力。`,
+        showMenu('模考与复盘', `成绩指数 ${exam.score}/100。\n\n${Object.entries(exam.subjects).map(([k,v]) => `${subjectNames[k]} ${v}`).join(' · ')}\n\n整次行动净变化：${actualChangeText(before)}。\n\n复盘已核对${gameState.reviewPlan.subjects.map(k => subjectNames[k]).join('、')}，各最多 +3；复盘部分压力最多 -5、焦虑最多 -6。以上整次净变化还包括考试消耗与成绩反馈。后续两次相关科目的独立学习 +20%。考试与复盘共用一次行动、40精力。`,
             [{ text: '收好试卷', action: () => closeModal('story-modal') }]);
         saveGame();
     }
@@ -299,21 +315,31 @@ function social(target) {
     if (!target) {
         if (!checkActionLimit()) return;
         showMenu('这次想和谁交流？', '消耗一次行动、15精力；健康至少50。关系改善只属于本次选择的对象。',
-            Object.entries(relationshipNames).map(([key, name]) => ({ text: name, action: () => social(key) })));
+            Object.entries(relationshipNames).map(([key, name]) => ({ text: `${name} · 熟悉${Math.floor(gameState.relationships[key])}`, action: () => social(key) })));
         return;
     }
     if (!Object.hasOwn(relationshipNames, target) || !checkActionLimit()) return;
     if (gameState.energy < 15 || gameState.health < 50) { showNotification('社交需要15精力，健康至少50。', 'neutral'); return; }
     performAction('social', target, () => {
+        const before = metricSnapshot();
         const bonus = [5, 8, 3, 4][Math.floor(Math.random() * 4)];
         const stress = [-5, -3, 5, -8][Math.floor(Math.random() * 4)];
         applyEffect({ energy: -15, stress: -10 + stress, anxiety: -5, [target]: 5 + bonus });
         gameState.totalSocialHours++;
-        addToLog(`与${relationshipNames[target]}聊了这次愿意分享的事情，关系 +${5 + bonus}。`, 'good');
+        addToLog(`与${relationshipNames[target]}交流：${socialContext(target)} 实际变化：${actualChangeText(before)}。`, 'good');
         closeModal('story-modal');
         recordAction(); advanceTime();
     });
 };
+function socialContext(target) {
+    const again = gameState.actionHistory.filter(a => a.kind === 'social' && a.detail === target).length % 2;
+    if (target === 'parents') return gameState.events.includes('S12') ? '你提起饭桌上那次谈话，先问今天方便分享哪件小事；这次闲谈不替代尚未落实的约定。' : again ? '你们各自说起今天的一件小事，暂时把成绩单留在旁边。' : '你聊起今天的饭菜，也听家里分享近况。';
+    if (target === 'crush') return gameState.events.includes('S24') ? '你先问她今天愿意分享什么，聊起采访之外的近况；这次交流没有替双方改变已经说清的关系范围。' : again ? '你们分享今天路上看到的小事，没有把一次闲谈写成未来承诺。' : '你问起她最近留意的校园声音，也说起自己听见的一小段。';
+    if (target === 'classmateB') return sceneChoice('H13') ? '你问候他自己选的新安排，分享今天的一件小事，没有要求恢复从前的联系频率。' : '你们聊起训练以外的生活，也各自说了一件本周的新鲜事。';
+    if (target === 'classmateA') return chose('H11', 'A') ? '你提到修车台留下的合照，又问起今天课间的小事；下次安排仍要另外说清。' : again ? '你们各自讲了一件课间的小事，听完再回到今天的安排。' : '你们聊起午饭和课间见闻，先问彼此今天哪段时间方便。';
+    const topic = { teacher: '这周的安排', mathTeacher: '数学课', chineseTeacher: '最近读过的句子', englishTeacher: '英语课上的表达' }[target];
+    return `你从${topic}聊起，先问老师什么时候方便继续；问候不等于完成尚待核对的学习任务。`;
+}
 function activeReviewPlan() {
     return gameState.reviewPlan && gameState.reviewPlan.remaining > 0 && gameState.week <= gameState.reviewPlan.expiresWeek;
 }
@@ -473,12 +499,13 @@ function promiseRecords(state = gameState) {
         if (missed) { status = '期限已过'; detail = result.missedFeedback; }
         else if (answered) {
             status = lines[entry.line] ? '已经落空' : '已有答复';
-            detail = '那次你选择：' + narrativeChoiceText(result, result.choices.find(c => c.key === key), narrativeVariant(result, state));
+            detail = state.sceneChoices[entry.result]?.feedback || '旧记录只保留当时的回应：' + narrativeChoiceText(result, result.choices.find(c => c.key === key), narrativeVariant(result, state));
         } else if (state.week > result.until) {
             status = '暂无答复记录'; detail = '这页没有留下最后的答复，先把这一处留空。';
         } else {
             status = state.week < result.week ? '等候后续' : '尚待答复';
-            detail = '有后续时会在周末继续，先把这一页留好。';
+            const knownDate = { H10: '已约定第42周星期六下午三点到修车台合照。', H16: '已提到最晚第44周约谈。', H33: '店主说最晚第49周给出最后答复。' }[entry.setup];
+            detail = knownDate ? knownDate + '这页保留约定，实际答复仍需等后续。' : '约定还在等答复；有新的消息时会在周末继续。';
         }
         return { id: entry.setup, title: entry.title, week, status, detail };
     }).sort((a, b) => a.week - b.week);
@@ -487,7 +514,7 @@ function showPromiseLedger() {
     if (gameState.phase !== 'playing') return false;
     if (gameState.activeNarrative || gameState.narrativeFeedback || gameState.narrativeQueue.length || gameState.weekEnding) { pumpNarrative(); return false; }
     const records = promiseRecords();
-    const text = records.length ? '这里只记下你实际提起过的事。没有得到答复的，仍留在各自的期限里；已经落空的，也不会因为后来成绩或熟悉程度变好就自动消失。' : '蓝本里还没有记下这些具体的牵挂。没有提起过的事，不会替你补写成失约或失去。';
+    const text = (records.length ? '这里只记下你实际提起过的事与已经得到的答复。已经落空的，不会因为后来成绩或熟悉程度变好就自动消失。' : '蓝本里还没有记下具体的牵挂。剧情中实际提起并接下的事会记在这里；没有提起过的，不会替你补写成失约或失去。') + '\n\n查看蓝本不消耗行动。';
     showMenu('蓝本里的牵挂', text, [{ text: '收好蓝本', action: () => closeModal('story-modal') }]);
     elements.storyContent.innerHTML += records.map(row => `<section class="promise-record"><h4>${escapeText(row.title)} · ${escapeText(row.status)}</h4><p>${escapeText(row.detail)}</p></section>`).join('');
     return true;
@@ -516,6 +543,10 @@ function resolveChoices(node, state = gameState) {
             const last = state.actionHistory.filter(a => a.week === state.week && a.kind === 'study').at(-1);
             allowed = last && Object.hasOwn(subjectNames, last.detail) ? [last.detail] : [];
         }
+        if (node.id === 'S22' && c.key === 'A') {
+            const original = practiceGoalSubjects(state);
+            if (original.length) allowed = original;
+        }
         const targets = [];
         if (c.target !== 'pair') for (const k of allowed) targets.push([k]);
         if (c.target === 'pair' || c.target === 'oneOrPairBelow40') {
@@ -535,6 +566,15 @@ function examTrend(state = gameState) {
     if (h.length === 1) return `蓝本里只有一条模考记录：第${h[0].week}周，${h[0].score}/100。一条数字暂时只是起点。`;
     const a = h.at(-2), b = h.at(-1);
     return `两次真实模考记录：第${a.week}周 ${a.score}/100，第${b.week}周 ${b.score}/100。${b.score > a.score ? '这次向上挪了一些，可以先为这一小段高兴。' : '这次持平或下降，还需要分清已经掌握的部分和仍要处理的问题。'}`;
+}
+function practiceGoalSubjects(state = gameState) {
+    const recorded = state.practiceGoal?.subjects || state.storyChoices.S18?.targets || [];
+    if (!Array.isArray(recorded)) return [];
+    return [...new Set(recorded.filter(k => Object.hasOwn(subjectNames, k)))];
+}
+function practiceAttempts(state = gameState) {
+    const subjects = practiceGoalSubjects(state), week = state.practiceGoal?.week || state.storyChoices.S18?.week;
+    return subjects.length && week ? state.actionHistory.filter(a => a.week >= week && a.week < state.week && a.kind === 'study' && subjects.includes(a.detail)).length : 0;
 }
 function narrativeVariant(node, state = gameState) {
     if (!node.variants) return null;
@@ -566,16 +606,16 @@ function renderStoryContent(node) {
     if (node.id === 'S12') text = text.replace(/若 S03[\s\S]*?当时的气话。/, ({ A: '对方问起约好的简短汇报，你指着纸上仍待核实的问号。', B: '对方问是不是到了约定谈话的时间。', C: '对方问起准备交给班主任的提问草稿，仍需核实的事留在纸上。' }[choice('S03')] || '对方只问：“现在方便聊吗？”'));
     if (node.id === 'S22') {
         text = text.split('先读目标的真实记录')[0];
-        const goal = gameState.practiceGoal;
-        const attempts = goal ? gameState.actionHistory.filter(a => a.week >= goal.week && a.week < gameState.week && a.kind === 'study' && goal.subjects.includes(a.detail)).length : 0;
-        text += '\n\n' + (attempts ? `你在实际记录里找到${attempts}次对应科目的学习尝试。它能说明投入发生过，是否独立掌握仍需在练习里核实。` : '这一栏还没有可核对的后续学习记录。今天可以先问材料是否齐全，再把问题缩小一点。') + '\n\n' + examTrend();
+        const subjects = practiceGoalSubjects(), attempts = practiceAttempts();
+        text += '\n\n' + (subjects.length ? `原目标科目是${subjects.map(k => subjectNames[k]).join('、')}。` : '原记录没有留下具体目标科目，今天先确定一个可核对的入口。') +
+            (attempts ? `实际记录里有${attempts}次这些科目的学习尝试。它能说明投入发生过，是否独立掌握仍需在练习里核实。` : '这一栏还没有可核对的后续学习记录，先检查材料，再缩小问题。') + '\n\n' + examTrend();
     }
     if (node.id === 'S23') text = text.replace(/如果 S09 未发生[\s\S]*?。/, choice('S09') ? '' : '他补了一句：“现在的声音比刚修时有底气一点。”');
     if (node.id === 'S25') text = text.replace(/你们翻回 S05 的材料。[\s\S]*?用今天这份练笔。/, `你们翻回${choice('S05') === 'A' ? '食堂托盘与汤渍的观察' : choice('S05') === 'C' ? '叶片朝向的观察' : '今天这份练笔'}，从真实留下的句子继续看。`);
     if (node.id === 'S29') text = text.split('按实际材料呈现：')[0] + '\n\n' + examTrend();
     if (node.id === 'S34') text = text.split('S03、S21')[0] + '\n\n' + (gameState.relationships.parents < 50 ? '你们说话仍容易绕回旧争论，于是先只谈一项。' : '你们已经知道哪些话题需要先问是否方便。') + '哪些费用能够承担，仍要逐项核实。';
     if (node.id === 'S35') text = text.split('读取真实状态：')[0] + '\n\n' + (gameState.health < 45 ? '必要的身体照护先放在前面，其他事情可以分开处理。' : gameState.anxiety >= 65 || gameState.stress >= 75 ? '手机每一次亮屏都让你想伸手。今晚只先处理能确认的一小段。' : '你有余力整理桌面，把必要的东西留在手边。') + `\n\n蓝本里仍留着第一天的${source}。`;
-    const refs = { S03: '之前家里谈话', S07: '之前留下的学习页', S08: '通知栏试做', S10: '那次互助', S12: '之前饭桌谈话', S16: '小群约定', S18: '之前的小目标', S19: '限时练习', S22: '练习核对', S24: '之前在校门口的', S25: '修改过的练笔', S26: '课堂尝试', S29: '复做页' };
+    const refs = { S03: '之前家里谈话', S07: '之前留下的学习页', S08: '通知栏试做', S10: '那次互助', S12: '之前饭桌谈话', S16: '小群约定', S18: '之前记录', S19: '限时练习', S22: '练习核对', S24: '之前在校门口的', S25: '修改过的练笔', S26: '课堂尝试', S29: '复做页' };
     text = text.replace(/S\d{2}/g, id => refs[id] || '之前的那次选择');
     if (['S02', 'S06', 'S09', 'S13', 'S16', 'S18', 'S19', 'S21', 'S23', 'S26', 'S31', 'S32', 'S33', 'S36'].includes(node.id)) {
         const callbacks = {
@@ -583,7 +623,6 @@ function renderStoryContent(node) {
             S06: { A: '你翻回上次留下的一题样本。', B: '那张互圈纸还夹在课表边。', C: '你拿出了写着对象、条件、单位、结论的检查卡。' }[choice('S02')],
             S09: '这次可以聊修车、做饭和各自的安排，朋友的生活不只有功课。',
             S13: '你知道可以主动联系原教练，也可以今天先停在这里。',
-            S18: examTrend(),
             S31: '蓝本里可以找到之前留下的范围和安排；没有核实的项目仍留白。',
             S36: `收拾时，你又看见第一天的${source}。`
         };
@@ -593,6 +632,7 @@ function renderStoryContent(node) {
 }
 function choiceFeedback(node, c, variant = null) {
     if (variant?.choices?.[c.key]?.feedback) return variant.choices[c.key].feedback;
+    if (node.id === 'S22' && c.key === 'A') return `你保留原来的页码，把这次能检验的${(c.targets || practiceGoalSubjects()).map(k => subjectNames[k]).join('、')}问题写清。${practiceAttempts() ? '已有的学习记录留在旁边，今天再独立试一处。' : '尚无可核对的后续练习，今天从最小入口开始。'}是否掌握仍按这次实际练习核实，不必换一本新本子来给自己另一个开头。`;
     if (node.id === 'H17' && c.key === 'A') return chose('H16', 'A') ? '专门咨询最终取消，班主任给过一般材料建议，也尝试联系原定的方向老师，没能补开名额。你按约准备过，期待的那轮专门指导仍没有得到。' : '你在截止前完成预约，老师读过你的一页方向问题，给了具体材料反馈。这轮机会确实发生了。';
     if (node.id === 'H08' && c.key === 'A') {
         if (hasRomanceEvent('rejected')) return '你把喜欢说清，她认真回答：“我很珍惜你，但没有同样的感情。我想继续做采访伙伴，不想建立恋爱关系。”你听见了她的拒绝；之前的帮忙没有换来同样的喜欢。';
@@ -690,8 +730,11 @@ function routedSideStories() {
         return gates[node.id] !== false;
     });
 }
-function storyWithoutSchedule(text) {
-    return text.replace(/第\d+(?:[—－-]\d+)?周(?:结束)?/g, '此前').replace(/（至此前）/g, '');
+function mainResponseSentence(node, c, variant) {
+    const raw = narrativeChoiceText(node, c, variant);
+    const targets = c.targets?.map(k => subjectNames[k]).join('、');
+    const response = /^你/.test(raw) ? raw : `你${raw.replace(/^选择/, '选择了').replace(/^选(?=[一两])/, '选了')}`;
+    return response + (targets ? `\n\n这次处理的科目是${targets}。` : '');
 }
 function showNarrative(node) {
     if (node.kind === 'main') {
@@ -712,7 +755,7 @@ function showNarrative(node) {
         }
     }));
     if (node.kind === 'memory') entries.push({ text: '今天先不回忆（不扣行动和精力）', action: () => { gameState.activeNarrative = null; closeModal('story-modal'); saveGame(); pumpNarrative(); } });
-    showMenu(node.title, storyWithoutSchedule(renderStoryContent(node)), entries);
+    showMenu(node.title, renderStoryContent(node), entries);
     if (node.commonEffect || node.cost) {
         elements.storyContent.innerHTML += `<p class="narrative-note">${node.commonEffect ? '本学段课堂练习与整理：六科各 +0.2；' : ''}${node.cost ? '确认后：一次行动，精力 -10，焦虑 -2；' : '本段不消耗常规行动；'}选择效果见下方。</p>`;
     }
@@ -728,7 +771,7 @@ function commitNarrativeChoice(node, c, automatic = false) {
     if ((c.effect.money || 0) < -gameState.money) return false;
     if (node.kind === 'memory' && (gameState.actionsThisWeek >= 3 || gameState.energy < 10)) return false;
     const variant = narrativeVariant(node);
-    const sceneText = automatic ? storyWithoutSchedule(renderStoryContent(node)) : null;
+    const sceneText = automatic ? renderStoryContent(node) : null;
     const selectedText = narrativeChoiceText(node, c, variant);
     if (node.commonEffect) applyEffect(node.commonEffect);
     if (node.cost) applyEffect(node.cost);
@@ -763,9 +806,10 @@ function commitNarrativeChoice(node, c, automatic = false) {
     if (node.id === 'S18') gameState.practiceGoal = { week: gameState.week, subjects: c.targets?.length ? c.targets : Object.keys(subjectNames) };
     gameState.activeNarrative = null;
     const feedbackText = choiceFeedback(node, c, variant);
-    const finishShortEvent = node.kind === 'random' && node.choices.length === 1 && !feedbackText.trim();
+    if (node.kind === 'side') record.feedback = feedbackText;
+    const finishShortEvent = node.kind === 'random' && !feedbackText.trim();
     gameState.narrativeFeedback = finishShortEvent ? null : { title: node.title,
-        text: automatic ? `${sceneText}\n\n${selectedText}\n\n${storyWithoutSchedule(feedbackText)}` : storyWithoutSchedule(feedbackText),
+        text: automatic ? `${sceneText}\n\n${mainResponseSentence(node, c, variant)}\n\n${feedbackText}` : feedbackText,
         postChoice: node.id === 'S36' ? c.key : null };
     if (finishShortEvent) closeModal('story-modal');
     addToLog(`${node.title}：${selectedText}${c.targets?.length ? '（' + c.targets.map(k => subjectNames[k]).join('、') + '）' : ''}`, 'story');
@@ -810,25 +854,57 @@ function endWeek() {
     saveGame();
     continueWeekEnd();
 };
+function weekendHomeworkPlan(action, state = gameState) {
+    const missing = Object.keys(subjectNames).filter(k => !state.homework[k]);
+    const complete = action === 'complete-one' ? missing.slice().sort((a,b) => state.subjects[a] - state.subjects[b]).slice(0,2) :
+        ['complete-all', 'complete-and-repay'].includes(action) ? missing : [];
+    const repay = action === 'complete-and-repay' ? state.homeworkBacklog.slice(0,2) : [];
+    const uncompleted = missing.filter(k => !complete.includes(k)), fraction = uncompleted.length / 6;
+    const energy = (complete.length + repay.length) * 5;
+    const effects = [{ energy: -energy }, ...complete.map(k => ({ [k]: 0.5 }))];
+    if (complete.length) effects.push({ teacher: complete.length / 2, mathTeacher: complete.includes('math') ? 2 : 0,
+        chineseTeacher: complete.includes('chinese') ? 2 : 0, englishTeacher: complete.includes('english') ? 2 : 0, anxiety: -complete.length / 3 });
+    effects.push(...repay.map(row => ({ [row.subject]: 0.3, teacher: 1 })));
+    if (uncompleted.length) effects.push({ teacher: -5 * fraction, mathTeacher: uncompleted.includes('math') ? -3 : 0,
+        chineseTeacher: uncompleted.includes('chinese') ? -3 : 0, englishTeacher: uncompleted.includes('english') ? -3 : 0,
+        energy: 8 * fraction, stress: -3 * fraction, anxiety: 2 * fraction });
+    const before = metricSnapshot(state), projected = { ...before };
+    for (const effect of effects) {
+        if (state.finalSnapshot || (effect.money || 0) < -projected.money) continue;
+        for (const [key, amount] of Object.entries(effect)) projected[key] += amount;
+        for (const key of Object.keys(projected)) projected[key] = key === 'money' ? Math.max(0, projected[key]) : Math.max(0, Math.min(100, projected[key]));
+    }
+    const actual = Object.fromEntries(Object.keys(before).filter(key => Math.abs(projected[key] - before[key]) > 1e-9)
+        .map(key => [key, Number((projected[key] - before[key]).toFixed(2))]));
+    return { missing, complete, repay, uncompleted, fraction, energy, actual };
+}
+function homeworkOptionText(label, plan) {
+    const lacking = Math.max(0, plan.energy - gameState.energy);
+    const impact = Object.fromEntries(Object.entries(plan.actual).filter(([key]) => !Object.hasOwn(subjectNames, key)));
+    return `${label} · ${plan.energy}精力${lacking ? `（还差${Number(lacking.toFixed(2))}）` : ''}\n` +
+        `完成${plan.complete.length}科，补交${plan.repay.length}科次，新增欠交${plan.uncompleted.length}科次` +
+        (lacking ? '\n精力不足，暂不可选。' : `\n实际变化：${Object.keys(impact).length ? previewEffect(impact) : '状态已在上下限'}`);
+}
 function showWeekendHomework() {
     if (!gameState.weekEnding || gameState.homeworkSettledWeek === gameState.week) return;
     const missing = Object.keys(subjectNames).filter(k => !gameState.homework[k]);
     if (!missing.length) { settleWeekendHomework('rest'); return; }
-    const price = missing.length * 5;
-    elements.homeworkList.textContent = `${missing.map(k => subjectNames[k]).join('、')}待完成。现有精力 ${Math.floor(gameState.energy)}，欠交 ${gameState.homeworkBacklog.length} 科次。未完成部分会自动登记，留出的时间可恢复精力、减轻压力。`;
+    elements.homeworkList.textContent = `${missing.map(k => subjectNames[k]).join('、')}待完成。现有精力 ${Math.floor(gameState.energy)}，旧欠交 ${gameState.homeworkBacklog.length} 科次。下方先列本次后果；未完成部分新增欠交，关闭窗口也采用留出休息的安排。`;
     const entries = [
-        { text: `完成本周${missing.length}科 · ${price}精力`, disabled: gameState.energy < price, action: () => homework('complete-all') },
-        { text: `先做最弱${Math.min(2, missing.length)}科 · ${Math.min(2, missing.length) * 5}精力`, disabled: gameState.energy < Math.min(2, missing.length) * 5, action: () => homework('complete-one') }
+        { label: `完成本周${missing.length}科`, mode: 'complete-all' },
+        { label: `先做最弱${Math.min(2, missing.length)}科`, mode: 'complete-one' }
     ];
     const repay = Math.min(2, gameState.homeworkBacklog.length);
-    if (repay) entries.push({ text: `完成本周并补交${repay}科次 · ${price + repay * 5}精力`, disabled: gameState.energy < price + repay * 5, action: () => homework('complete-and-repay') });
-    entries.push({ text: '先留出休息时间', action: () => homework('rest') });
+    if (repay) entries.push({ label: `完成本周并补交${repay}科次`, mode: 'complete-and-repay' });
+    entries.push({ label: '先留出休息时间', mode: 'rest' });
     const choices = document.getElementById('weekend-choices');
     choices.innerHTML = '';
     for (const entry of entries) {
+        const plan = weekendHomeworkPlan(entry.mode);
         const button = document.createElement('button');
-        button.className = 'study-btn'; button.textContent = entry.text;
-        button.disabled = !!entry.disabled; button.onclick = entry.action;
+        button.className = 'study-btn'; button.textContent = homeworkOptionText(entry.label, plan);
+        button.style.whiteSpace = 'pre-line';
+        button.disabled = gameState.energy < plan.energy; button.onclick = () => homework(entry.mode);
         choices.appendChild(button);
     }
     document.getElementById('homework-modal').style.display = 'flex';
@@ -837,12 +913,9 @@ function showWeekendHomework() {
 function settleWeekendHomework(action = 'rest') {
     if (!gameState.weekEnding || gameState.phase !== 'playing' || gameState.homeworkSettledWeek === gameState.week ||
         !['complete-all', 'complete-one', 'complete-and-repay', 'rest', 'skip'].includes(action)) return false;
-    const missing = Object.keys(subjectNames).filter(k => !gameState.homework[k]);
-    const complete = action === 'complete-one' ? missing.slice().sort((a,b) => gameState.subjects[a] - gameState.subjects[b]).slice(0,2) :
-        ['complete-all', 'complete-and-repay'].includes(action) ? missing : [];
-    const repay = action === 'complete-and-repay' ? gameState.homeworkBacklog.slice(0,2) : [];
-    const energy = (complete.length + repay.length) * 5;
+    const { missing, complete, repay, energy } = weekendHomeworkPlan(action);
     if (gameState.energy < energy) { showNotification(`需要${energy}精力。`, 'neutral'); return false; }
+    const before = metricSnapshot();
     // Mark first so closing, double clicks and restoring cannot settle twice.
     gameState.homeworkSettledWeek = gameState.week;
     applyEffect({ energy: -energy });
@@ -861,9 +934,9 @@ function settleWeekendHomework(action = 'rest') {
             energy: 8 * fraction, stress: -3 * fraction, anxiety: 2 * fraction });
     }
     const record = { week: gameState.week, kind: 'homework', detail: action, subjects: complete, completed: complete,
-        missing: uncompleted, repaid: repay, weekend: true };
+        missing: uncompleted, repaid: repay, weekend: true, actualEffect: actualMetricChange(before) };
     gameState.homeworkHistory.push(record); gameState.actionHistory.push(record);
-    addToLog(`周末作业：完成${complete.length}科${repay.length ? `、补交${repay.length}科次` : ''}${uncompleted.length ? `，${uncompleted.length}科自动记为欠交；休息精力 +${(8*fraction).toFixed(1)}、压力 -${(3*fraction).toFixed(1)}，班主任熟悉 -${(5*fraction).toFixed(1)}、对应任课老师 -3、焦虑 +${(2*fraction).toFixed(1)}` : '，已全部交齐'}。`, uncompleted.length ? 'neutral' : 'good');
+    addToLog(`周末作业：完成${complete.length}科、补交${repay.length}科次、新增欠交${uncompleted.length}科次；尚欠${gameState.homeworkBacklog.length}科次。实际变化：${actualChangeText(before)}。`, uncompleted.length ? 'neutral' : 'good');
     legacy.closeModal('homework-modal');
     checkAchievements(); updateUI(); saveGame();
     continueWeekEnd();
@@ -998,7 +1071,8 @@ function updateGoalText() {
     elements.goalProgress.style.width = `${gameState.goalProgress}%`;
     elements.goalProgress.setAttribute('aria-valuenow', gameState.goalProgress);
     document.getElementById('goal-progress-status').textContent = status ?
-        claim ? '目标已达成，奖励已发放；选做挑战在截止周记录。' : `${status.requirements.filter(row => row.passed).length}/${status.requirements.length} 项满足 · 截止周前达标即可领取。` : '剩余周数可自由安排。';
+        claim ? `目标已达成；以下为第${claim.week}周领取时记录，选做挑战在截止周记录。` : `${status.requirements.filter(row => row.passed).length}/${status.requirements.length} 项满足 · 截止周前达标即可领取。` : '剩余周数可自由安排。';
+    if (claim) document.getElementById('goal-reward').textContent += ` · 第${claim.week}周领取时`;
     document.getElementById('goal-requirements').innerHTML = claim ? renderGoalRows(claim.requirements) : status ? renderGoalRows(status.requirements) : '';
     const extra = document.getElementById('goal-challenges');
     extra.style.display = status?.challenges.length ? 'block' : 'none';
@@ -1018,11 +1092,18 @@ changeWeather = function() {
     const ids = { '晴天': 'sun', '阴天': 'cloud', '雨天': 'rain', '雷雨': 'thunder', '雾霾': 'fog' };
     gameState.currentWeather = { ...gameState.currentWeather, id: ids[gameState.currentWeather.name] };
 };
+checkHolidays = function() {
+    const before = metricSnapshot();
+    legacy.checkHolidays();
+    const holiday = Object.values(holidays).find(value => value.week === gameState.week);
+    if (holiday) addToLog(`${holiday.name}（${holiday.days}天）按周内的一段安排记录，每周仍为3次行动；本次即时调适：${actualChangeText(before)}。`, 'neutral');
+};
 function checkSpecialDay() { /* The calendar is an abstract 52-week year. */ };
 function unlockAchievement(id) {
     if (!Object.hasOwn(achievements, id) || gameState.achievements.has(id)) return;
     gameState.achievements.add(id);
-    showNotification(`成就：${achievements[id].name}`, 'good');
+    const recent = id.startsWith('hidden-') ? gameState.events.filter(value => /^H/.test(value)).at(-1) : null;
+    showNotification(`成就：${achievements[id].name} · ${achievements[id].desc}${recent ? `（刚读到“${findNarrative(recent).title}”）` : ''}`, 'good');
 };
 checkAchievements = function() {
     legacy.checkAchievements();
@@ -1334,6 +1415,6 @@ initGame = function() {
         document.getElementById('welcome-modal').style.display = 'none';
     }
     updateUI();
-    if (restored) pumpNarrative();
+    if (restored) { showNotification(`已继续第${gameState.week}周存档，原进度已保留。`, 'neutral'); pumpNarrative(); }
 };
 window.onload = initGame;
