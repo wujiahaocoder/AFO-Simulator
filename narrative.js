@@ -6,7 +6,7 @@ const narrativeData = window.AFONarrative;
 const subjectNames = { chinese: '语文', math: '数学', english: '英语', physics: '物理', chemistry: '化学', biology: '生物' };
 const relationshipNames = { teacher: '班主任', mathTeacher: '数学老师', chineseTeacher: '语文老师', englishTeacher: '英语老师', classmateA: '同桌', classmateB: '旧队友', parents: '父母', crush: '林知夏' };
 const effectNames = { ...subjectNames, ...relationshipNames, energy: '精力', stress: '压力', health: '健康', mental: '心理', anxiety: '焦虑', money: '金钱' };
-const saveKey = 'afo-save-3.0.0';
+const saveKey = window.AFODebugBoot?.enabled === true ? 'afo-debug-save-3.0.0' : 'afo-save-3.0.0';
 // New fields are additive; existing 3.x saves keep the same local-storage key.
 const saveVersion = '3.1.0';
 const legacy = { initGame, updateUI, study, rest, exercise, takeExam, activity, economy, changeWeather, checkAchievements, openModal, closeModal };
