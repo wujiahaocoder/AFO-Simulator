@@ -97,7 +97,7 @@
         state.achievements = new Set();
         const week = command.week ?? command.state?.week ?? 1;
         Object.assign(state, { week, completedWeeks: week - 1, daysLeft: (53 - week) * 7,
-            season: Math.floor((week - 1) / 13), currentWeather: { ...weathers[0], id: 'sunny' } });
+            season: Math.floor((week - 1) / 13), currentWeather: { ...weathers[0], id: 'sun' } });
         merge(state, command.state || {}); validate(state);
         if (command.seed !== undefined && (!Number.isInteger(command.seed) || command.seed < 0 || command.seed > 0xffffffff)) throw new Error('seed must be uint32');
         randomState = command.seed ?? 1;
