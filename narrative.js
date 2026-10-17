@@ -529,7 +529,7 @@ function checkHiddenEvents() { /* Eligible side scenes are scheduled at the week
 function resolveChoices(node, state = gameState) {
     const all = Object.keys(subjectNames);
     const resolved = [];
-    for (const c of node.choices) {
+    for (const c of narrativeChoices(node, state)) {
         if (!c.target) { resolved.push({ ...c, targets: [] }); continue; }
         let allowed = all;
         if (c.target === 'weak' || c.target === 'strong') {
@@ -578,6 +578,9 @@ function practiceAttempts(state = gameState) {
 }
 function narrativeVariant(node, state = gameState) {
     if (!node.variants) return null;
+    if (['S33', 'S36'].includes(node.id) && laterContactDistanced(state)) return node.variants.contactDistant || null;
+    if (node.id === 'S24' && laterContactShared(state) && initialRomanceChoice(state) === 'A') return node.variants.contact || null;
+    if ((node.id === 'H08' || node.id === 'H09' && chose('H08', 'A', state)) && laterContactEligible(state)) return node.variants.contact || null;
     if (node.id === 'S30') {
         const archive = chose('H25', 'A', state) ? 'closed' : chose('H25', 'C', state) ? 'withdrawn' : chose('H25', 'B', state) ? 'moved' : chose('H24', 'A', state) ? 'scheduled' : null;
         return node.variants[archive] || null;
@@ -588,6 +591,10 @@ function narrativeVariant(node, state = gameState) {
     }
     const key = hasRomanceEvent('rejected', state) ? 'refused' : state.romance === '明确互相喜欢' && state.mutualAffirmation ? 'dating' : state.romance === '朋友' ? 'friends' : 'growing';
     return node.variants[key] || null;
+}
+function narrativeChoices(node, state = gameState) {
+    const keys = narrativeVariant(node, state)?.choiceKeys;
+    return node.choices.filter(c => !keys || keys.includes(c.key));
 }
 function narrativeChoiceText(node, c, variant = narrativeVariant(node)) {
     return variant?.choices?.[c.key]?.text || c.text;
@@ -653,6 +660,10 @@ function choiceFeedback(node, c, variant = null) {
 }
 // Select an actual authored branch from current abilities, state and recorded actions.
 // No hidden random draw or relationship score alone creates a romance choice.
+function initialRomanceChoice(state = gameState) {
+    return chose('H49', 'B', state) ? 'B' : state.relationships.crush >= 65 && state.actionHistory.filter(a =>
+        a.kind === 'social' && a.detail === 'crush' || a.kind === 'studyGroup' && a.partner === 'crush').length >= 2 ? 'A' : state.relationships.crush >= 35 ? 'B' : 'C';
+}
 function automaticMainChoice(node, state = gameState) {
     const low = state.energy < 35 || state.health < 55;
     const burden = state.anxiety >= 45 || state.stress >= 55;
@@ -685,7 +696,7 @@ function automaticMainChoice(node, state = gameState) {
         S22: recentStudy ? 'A' : burden ? 'C' : 'B',
         S23: r.classmateB < 45 ? 'C' : recentStudy ? 'A' : 'B',
         // Friendship and explicitly recorded interest persist; familiarity is never consent.
-        S24: r.crush >= 65 && state.actionHistory.filter(a => a.kind === 'social' && a.detail === 'crush' || a.kind === 'studyGroup' && a.partner === 'crush').length >= 2 ? 'A' : r.crush >= 35 ? 'B' : 'C',
+        S24: initialRomanceChoice(state),
         S25: state.subjects.english < state.subjects.chinese ? 'B' : state.subjects.chinese < 50 ? 'A' : 'C',
         S26: socialStudy && r.classmateB >= 60 ? 'B' : state.subjects.physics < 55 ? 'A' : 'C',
         S27: low ? 'A' : burden ? 'B' : 'C',
@@ -694,7 +705,7 @@ function automaticMainChoice(node, state = gameState) {
         S30: state.memoryCount > 0 || state.oldProgramAccess ? 'A' : burden ? 'C' : 'B',
         S31: state.money < 200 ? 'C' : average >= 60 ? 'A' : 'B',
         S32: Math.min(state.subjects.chinese, state.subjects.english) < 50 ? 'A' : socialStudy ? 'C' : 'B',
-        S33: hasRomanceEvent('mutual', state) || hasRomanceEvent('rejected', state) || state.romance === '慢慢了解' ? 'A' : state.romance === '朋友' ? 'B' : 'C',
+        S33: laterContactDistanced(state) || hasRomanceEvent('mutual', state) || hasRomanceEvent('rejected', state) || state.romance === '慢慢了解' ? 'A' : state.romance === '朋友' ? 'B' : 'C',
         S34: r.parents >= 60 ? 'A' : r.parents >= 40 ? 'B' : 'C',
         S35: low ? 'A' : burden ? 'C' : 'B', S36: 'B'
     }[node.id];
@@ -743,7 +754,8 @@ function showNarrative(node) {
         commitNarrativeChoice(node, c, true);
         return;
     }
-    const entries = node.choices.map(c => ({
+    const choices = narrativeChoices(node);
+    const entries = choices.map(c => ({
         text: `${narrativeChoiceText(node, c)}\n${previewEffect(c.effect)}${c.target ? c.target === 'lastStudy' ? `；本周最近一次主动学习科目 +${c.targetGain}` : `；另选科目，总能力 +${c.targetGain ?? 1.2}` : ''}`,
         action: () => {
             if (c.target) {
@@ -761,7 +773,7 @@ function showNarrative(node) {
     }
     // Disable costs before clicking as well as validating them again at settlement.
     Array.from(elements.storyChoices.children).forEach((button, i) => {
-        const c = node.choices[i];
+        const c = choices[i];
         if (c && (c.effect.money || 0) < -gameState.money) { button.disabled = true; button.textContent += '（余额不足）'; }
     });
 }
@@ -809,7 +821,7 @@ function commitNarrativeChoice(node, c, automatic = false) {
     if (node.kind === 'side') record.feedback = feedbackText;
     const finishShortEvent = node.kind === 'random' && !feedbackText.trim();
     gameState.narrativeFeedback = finishShortEvent ? null : { title: node.title,
-        text: automatic ? `${sceneText}\n\n${mainResponseSentence(node, c, variant)}\n\n${feedbackText}` : feedbackText,
+        text: automatic ? variant?.responseIncluded ? sceneText : `${sceneText}\n\n${mainResponseSentence(node, c, variant)}\n\n${feedbackText}` : feedbackText,
         postChoice: node.id === 'S36' ? c.key : null };
     if (finishShortEvent) closeModal('story-modal');
     addToLog(`${node.title}：${selectedText}${c.targets?.length ? '（' + c.targets.map(k => subjectNames[k]).join('、') + '）' : ''}`, 'story');
@@ -1126,7 +1138,31 @@ function sceneChoice(id, state = gameState) {
 }
 function chose(id, key, state = gameState) { return sceneChoice(id, state) === key; }
 function sceneRequirementsMet(node, state = gameState) {
-    return (node.requires || []).every(r => state.events.includes(r.id) && (!r.keys.length || r.keys.includes(sceneChoice(r.id, state))));
+    return (!node.contactRoute || laterContactEligible(state) && chose('H08', 'A', state) && chose('H09', 'A', state)) &&
+        (node.requires || []).every(r => state.events.includes(r.id) && (!r.keys.length || r.keys.includes(sceneChoice(r.id, state))));
+}
+// This route is evidence of conversations, independent of familiarity and exam results.
+function contactSceneRecorded(id, state) {
+    const node = findNarrative(id), record = state.storyChoices[id] || state.sceneChoices?.[id];
+    return state.events.includes(id) && node?.choices.some(c => c.key === record?.key) &&
+        Number.isInteger(record.week) && record.week >= node.week && (node.kind !== 'side' || record.week <= node.until);
+}
+function laterContactShared(state = gameState) {
+    return ['S05', 'S16', 'S17', 'H47', 'H48', 'H49', 'H07'].every(id => contactSceneRecorded(id, state)) &&
+        chose('S05', 'B', state) &&
+        (chose('H47', 'A', state) || chose('H48', 'A', state)) && chose('H49', 'A', state) &&
+        ['A', 'B'].includes(sceneChoice('S16', state)) && ['A', 'B'].includes(sceneChoice('S17', state));
+}
+function laterContactEligible(state = gameState) {
+    return laterContactShared(state) && contactSceneRecorded('S24', state) && chose('S24', 'A', state) && state.romance === '慢慢了解' &&
+        !['mutual', 'rejected', 'ended'].some(type => hasRomanceEvent(type, state)) &&
+        !chose('H08', 'C', state) && !chose('H09', 'C', state);
+}
+function laterContactDistanced(state = gameState) {
+    return laterContactShared(state) && contactSceneRecorded('S24', state) && chose('S24', 'A', state) &&
+        ['H08', 'H09'].every(id => contactSceneRecorded(id, state) && chose(id, 'A', state)) &&
+        ['H50', 'H51'].every(id => contactSceneRecorded(id, state)) &&
+        !['mutual', 'rejected', 'ended'].some(type => hasRomanceEvent(type, state));
 }
 function peerInteractionCount(state = gameState) {
     const scenes = ['S05', 'S16', 'S17', 'H05', 'H07', 'H08', 'H09'].filter(id =>
@@ -1135,12 +1171,19 @@ function peerInteractionCount(state = gameState) {
 }
 function hasRomanceEvent(type, state = gameState) { return state.romanceHistory?.some(e => e.type === type) || false; }
 function recordRomanceOutcome(node, c) {
-    if (!['S24', 'H08', 'S33'].includes(node.id)) return;
+    if (!['S24', 'H08', 'H09', 'H51', 'S33'].includes(node.id)) return;
     const record = type => {
         if (!gameState.romanceHistory.some(e => e.scene === node.id && e.type === type))
             gameState.romanceHistory.push({ scene: node.id, type, week: gameState.week });
     };
     if (node.id === 'S24') gameState.romance = { A: '慢慢了解', B: '朋友', C: '暂不命名' }[c.key];
+    if (node.id === 'H51' && laterContactDistanced()) gameState.romance = '减少联系';
+    if (['H08', 'H09'].includes(node.id) && laterContactShared() && chose('S24', 'A') &&
+        !['mutual', 'rejected', 'ended'].some(type => hasRomanceEvent(type))) {
+        if (c.key === 'C') gameState.romance = '朋友';
+        gameState.mutualAffirmation = false;
+        return;
+    }
     if (node.id === 'H08') {
         if (c.key === 'A' && chose('S24', 'A')) {
             if (chose('H07', 'A')) { record('rejected'); gameState.romance = '告白被拒绝'; }
@@ -1148,7 +1191,8 @@ function recordRomanceOutcome(node, c) {
         } else if (c.key === 'C') gameState.romance = '朋友';
     }
     if (node.id === 'S33') {
-        if (hasRomanceEvent('rejected')) gameState.romance = c.key === 'B' ? '被拒后朋友' : '告白被拒绝';
+        if (laterContactDistanced()) gameState.romance = '减少联系';
+        else if (hasRomanceEvent('rejected')) gameState.romance = c.key === 'B' ? '被拒后朋友' : '告白被拒绝';
         else if (hasRomanceEvent('mutual') && chose('H09', 'A')) { record('ended'); gameState.romance = '已结束'; }
         else if (c.key === 'A') {
             if (chose('H07', 'A') && chose('H08', 'A')) { record('rejected'); gameState.romance = '告白被拒绝'; }
@@ -1213,7 +1257,8 @@ function lineResults(state = gameState) {
         body: c('H26', 'A') && persistentDifficulty(state, true),
         mind: c('H26', 'A') && persistentDifficulty(state),
         crushReject: hasRomanceEvent('rejected', state),
-        crushBreakup: hasRomanceEvent('ended', state)
+        crushBreakup: hasRomanceEvent('ended', state),
+        crushDistance: laterContactDistanced(state)
     };
 }
 function chooseEpilogues(state = gameState) {
@@ -1226,7 +1271,7 @@ function chooseEpilogues(state = gameState) {
     }
     const lines = lineResults(state);
     if (lines.body || lines.mind) health = lines.body ? 'BODY_BE' : 'MIND_BE';
-    const peer = lines.crushBreakup ? 'PEER_END' : lines.crushReject ? state.romance === '被拒后朋友' ? 'PEER_REJECT_FRIEND' : 'PEER_REJECT' :
+    const peer = lines.crushDistance ? 'PEER_DISTANT' : lines.crushBreakup ? 'PEER_END' : lines.crushReject ? state.romance === '被拒后朋友' ? 'PEER_REJECT_FRIEND' : 'PEER_REJECT' :
         state.romance === '朋友' ? 'PEER01' : state.romance === '慢慢了解' ? 'PEER02' : state.romance === '明确互相喜欢' && state.mutualAffirmation ? 'PEER03' : 'PEER04';
     const selected = [lines.family ? 'FAMILY_BE' : 'F' + index('S34'), lines.desk ? 'DESK_BE' : 'DESK' + index('S28'),
         lines.team ? 'TEAM_BE' : 'TEAM' + index('S14'), peer, health, lines.oi ? 'OI_BE' : 'OI' + index('S30')];
